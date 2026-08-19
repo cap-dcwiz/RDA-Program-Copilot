@@ -1,0 +1,16 @@
+{
+    "full_name": "RDA Developer",
+    "email": "developer@rda.ai",
+    "app_name": "Demo",
+    "project_name": "DCWiz App {{ cookiecutter.app_name|title }}",
+    "__project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '_') }}",
+    "__project_folder": "{{ cookiecutter.__project_slug|replace('_', '-') }}",
+    "__project_config_prefix": "{{ cookiecutter.__project_slug|upper }}",
+    "__bin_name": "{{ cookiecutter.__project_slug }}",
+    "__container_name": "{{ '-'.join(cookiecutter.__project_folder.split('-')[1:]) }}",
+    "__image_name": "{{ cookiecutter.__project_folder }}",
+    "app_path": "{{ cookiecutter.__container_name.split('-')[1:]|join('-') }}",
+    "project_short_description": "{{ cookiecutter.project_name }}",
+    "need_database": "y",
+    "version": "0.1.0"
+}
