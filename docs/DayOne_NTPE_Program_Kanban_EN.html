@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DayOne NTPE · Program Kanban</title>
+<title>Delivery Copilot · Program Kanban</title>
 <style>
 :root{
   --bg:#080b16; --bg2:#0b0f1e;
@@ -56,11 +56,20 @@ svg.i{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke
 .icon-box{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
 /* ===== Header ===== */
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+.topbar{position:relative;display:flex;flex-direction:column;gap:14px;
   padding:14px 20px;background:var(--panel);border:1px solid var(--border);border-radius:16px;margin-bottom:20px;}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:.2px;}
 .brand .logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--purple2),var(--cyan));
-  display:flex;align-items:center;justify-content:center;color:#0a0e1c;font-weight:900;font-size:14px;}
+  display:flex;align-items:center;justify-content:center;color:#0a0e1c;font-weight:900;font-size:14px;flex-shrink:0;}
+.brand-text{display:flex;flex-direction:column;gap:1px;line-height:1.2;}
+.brand-title{font-weight:700;font-size:17px;letter-spacing:.2px;}
+.brand-sub{font-weight:500;font-size:11.5px;color:var(--text-dim);letter-spacing:.1px;}
+.project-select{display:flex;align-items:center;gap:8px;padding:0 14px;height:36px;border-radius:10px;
+  background:var(--panel3);border:1px solid var(--border);color:var(--text);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.project-select span.lbl{color:var(--text-dim);font-weight:500;}
+.project-select svg.i{width:13px;height:13px;color:var(--text-dim);}
+.mascot{position:absolute;top:-26px;right:18px;width:64px;height:64px;pointer-events:none;user-select:none;}
 .tabs{display:flex;gap:4px;background:var(--panel3);padding:4px;border-radius:11px;border:1px solid var(--border);}
 .tab{padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--text-dim);cursor:pointer;
   border:none;background:transparent;white-space:nowrap;transition:.15s;}
@@ -167,10 +176,10 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .legend-item{display:flex;align-items:center;gap:5px;}
 
 /* ===== Blocker Impact Map ===== */
-.bim-grid{display:grid;grid-template-columns:1fr 1fr 1fr 0.85fr;gap:16px;align-items:start;}
+.bim-grid{display:grid;grid-template-columns:1fr 1fr 1fr 0.85fr;gap:38px;align-items:start;}
 .bim-col-title{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:.3px;}
 .bim-col-title svg{width:13px;height:13px;}
-.flow-card{border:1px solid var(--border2);border-radius:12px;padding:12px 14px;background:var(--panel3);margin-bottom:26px;position:relative;}
+.flow-card{border:1px solid var(--border2);border-radius:12px;padding:12px 14px;background:var(--panel3);margin-bottom:32px;position:relative;}
 .flow-card:last-child{margin-bottom:0;}
 .flow-card .fc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .flow-card .fc-id{width:26px;height:26px;border-radius:7px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11.5px;}
@@ -200,16 +209,27 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .pillgroup{display:flex;gap:4px;background:var(--panel3);border:1px solid var(--border);padding:3px;border-radius:9px;}
 .pill{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;border:none;background:transparent;}
 .pill.active{background:var(--purple2);color:#fff;}
-.dep-grid{display:grid;grid-template-columns:1.1fr 1.1fr 1.1fr 0.8fr;gap:16px;}
+.dep-grid{display:grid;grid-template-columns:1.1fr 1.1fr 1.1fr 0.8fr;gap:38px;}
 .dep-lane-title{font-weight:800;font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
 .dep-lane-title span{color:var(--text-dimmer);font-weight:600;}
-.mini-card{border:1px solid var(--border2);border-radius:10px;background:var(--panel3);padding:10px 12px;margin-bottom:10px;font-size:12px;}
+.mini-card{border:1px solid var(--border2);border-radius:10px;background:var(--panel3);padding:10px 12px;margin-bottom:18px;font-size:12px;}
 .mini-card.done{border-color:rgba(34,197,94,.4);}
 .mini-card .mc-top{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
 .mini-card .mc-id{width:22px;height:22px;border-radius:6px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10.5px;}
 .mini-card .mc-name{font-weight:700;font-size:12.5px;}
 .mini-card .mc-meta{color:var(--text-dim);font-size:11px;margin-bottom:6px;display:flex;gap:6px;align-items:center;}
 .mini-card .mc-badges{display:flex;gap:5px;flex-wrap:wrap;}
+.flow-card.subset,.mini-card.subset{border-style:dashed;border-color:var(--red);background:rgba(239,68,68,.05);}
+.subset-tag{font-size:9.5px;font-weight:800;letter-spacing:.4px;color:var(--red);text-transform:uppercase;margin:-2px 0 7px;line-height:1.5;}
+.subset-tag b{color:var(--red);font-weight:800;}
+.subset-tag .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:2px;}
+.flow-card.blocker-src,.mini-card.blocker-src{border-color:var(--red);
+  box-shadow:0 0 0 1px rgba(239,68,68,.25),0 0 26px rgba(239,68,68,.14);
+  background:linear-gradient(180deg,rgba(239,68,68,.09),transparent 65%),var(--panel3);}
+.blocker-tag{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--red);text-transform:uppercase;margin:-2px 0 6px;display:flex;align-items:center;gap:5px;}
+.blocker-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--red);}
+.node-warn{margin-left:auto;color:var(--red);flex-shrink:0;width:15px;height:15px;}
+.fc-desc,.mc-desc{font-size:11.5px;color:var(--text-dim);line-height:1.5;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);}
 .mini-card.ms{border-color:var(--purple);background:var(--purple-bg);}
 .node-shape{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim);}
 
@@ -366,22 +386,47 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 
   <!-- ===== HEADER ===== -->
   <div class="topbar">
-    <div class="brand">
-      <div class="logo">D</div>
-      DayOne NTPE
+    <svg class="mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="mascotGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#6d5ef8"/>
+      </linearGradient></defs>
+      <circle cx="30" cy="24" r="9" fill="url(#mascotGrad)" opacity=".9"/>
+      <circle cx="70" cy="20" r="7" fill="url(#mascotGrad)" opacity=".9"/>
+      <rect x="24" y="30" width="52" height="44" rx="16" fill="url(#mascotGrad)"/>
+      <rect x="34" y="42" width="32" height="20" rx="6" fill="#0a0e1c"/>
+      <text x="50" y="57" font-size="12" font-weight="700" fill="#7dd3fc" text-anchor="middle" font-family="monospace">&gt;_</text>
+      <rect x="14" y="46" width="8" height="16" rx="4" fill="url(#mascotGrad)"/>
+      <rect x="78" y="46" width="8" height="16" rx="4" fill="url(#mascotGrad)"/>
+      <rect x="38" y="76" width="10" height="14" rx="4" fill="url(#mascotGrad)"/>
+      <rect x="52" y="76" width="10" height="14" rx="4" fill="url(#mascotGrad)"/>
+    </svg>
+    <div class="topbar-row">
+      <div class="brand">
+        <div class="logo">D</div>
+        <div class="brand-text">
+          <div class="brand-title">Delivery Copilot</div>
+          <div class="brand-sub">Make RDA delivery scalable.</div>
+        </div>
+      </div>
+      <div class="top-right">
+        <span class="icon-btn" title="Refresh"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
+        <span class="updated">Maintained by Selena · Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-21 09:15</b></span>
+        <span class="filter-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</span>
+        <span class="icon-btn"><svg class="i" viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+      </div>
     </div>
-    <div class="tabs">
-      <button class="tab active" data-page="overview">Overview</button>
-      <button class="tab" data-page="blocker">Blocker Impact Map</button>
-      <button class="tab" data-page="dependency">Dependency View</button>
-      <button class="tab" data-page="roadmap">Roadmap View</button>
-      <button class="tab" data-page="meetings">Meetings<span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
-    </div>
-    <div class="top-right">
-      <span class="icon-btn" title="Refresh"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
-      <span class="updated">Maintained by Selena · Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-19 14:30</b></span>
-      <span class="filter-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</span>
-      <span class="icon-btn"><svg class="i" viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+    <div class="topbar-row" style="justify-content:flex-start;gap:14px;">
+      <div class="project-select" title="Switch project">
+        <span class="lbl">Project:</span> DayOne NTPE
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-page="overview">Overview</button>
+        <button class="tab" data-page="blocker">Blocker Impact Map</button>
+        <button class="tab" data-page="dependency">Dependency View</button>
+        <button class="tab" data-page="roadmap">Roadmap View</button>
+        <button class="tab" data-page="meetings">Meetings<span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
+      </div>
     </div>
   </div>
 
@@ -457,12 +502,10 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div class="node-card ms"><span class="nid">◆</span>MS2 Digital Twin Calibrated</div>
           </div>
           <div class="chain-row">
-            <div class="node-card"><span class="nid">02</span>Data Point / API Integration</div>
-            <span class="node-arrow">→</span>
-            <div class="node-card"><span class="nid">05</span>Single Data Hall Pilot</div>
+            <div class="node-card"><span class="nid">03</span>Historical BMS Data</div>
+            <span class="node-arrow dashed">┄→</span>
+            <div class="node-card"><span class="nid">05</span>Single Data Hall Pilot <span style="color:var(--text-dimmer);font-weight:500;">(pilot subset)</span></div>
             <span class="badge red">Blocked</span>
-          </div>
-          <div class="chain-row" style="padding-left:180px">
             <span class="badge red">Overdue</span>
           </div>
         </div>
@@ -565,15 +608,19 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       <div class="bim-grid" style="position:relative;z-index:2;">
         <div>
           <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Current Blocker Sources / Upstream Blockers <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-          <div class="flow-card" data-node="03">
+          <div class="flow-card blocker-src" data-node="03">
+            <div class="blocker-tag"><span class="dot"></span>Primary Blocker</div>
             <div class="fc-top"><span class="fc-id">03</span><span class="fc-name">Historical BMS Data</span></div>
             <div class="fc-meta">👤 Hong Qing / Justin &nbsp;·&nbsp; 📅 Due: 2026-08-21</div>
             <div class="fc-badges"><span class="badge orange">At Risk</span></div>
+            <div class="fc-desc">Upstream data not available. This is the root blocker for the downstream chain.</div>
           </div>
-          <div class="flow-card" data-node="02">
-            <div class="fc-top"><span class="fc-id">02</span><span class="fc-name">Data Point / API Integration</span></div>
-            <div class="fc-meta">👤 Anurag / Istofa &nbsp;·&nbsp; 📅 Due: 2026-08-21</div>
-            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
+          <div class="flow-card subset" data-node="05">
+            <div class="subset-tag"><span class="dot"></span>PILOT SUBSET&nbsp;&nbsp;<span style="text-transform:none;font-weight:600;">Part of Historical BMS Data</span></div>
+            <div class="fc-top"><span class="fc-id">05</span><span class="fc-name">Single Data Hall Pilot</span></div>
+            <div class="fc-meta">👤 Mingchen / Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-20</div>
+            <div class="fc-badges"><span class="badge red">Blocked</span><span class="badge red">Overdue</span></div>
+            <div class="fc-desc">Pilot scope depends on Historical BMS Data availability.</div>
           </div>
         </div>
 
@@ -583,11 +630,19 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div class="fc-top"><span class="fc-id">04</span><span class="fc-name">Digital Twin Framework</span></div>
             <div class="fc-meta">👤 Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-21</div>
             <div class="fc-badges"><span class="badge red">Blocked</span></div>
+            <div class="fc-desc">Requires Historical BMS Data to build and validate framework components.</div>
           </div>
-          <div class="flow-card" data-node="05">
-            <div class="fc-top"><span class="fc-id">05</span><span class="fc-name">Single Data Hall Pilot</span></div>
-            <div class="fc-meta">👤 Mingchen / Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-20</div>
-            <div class="fc-badges"><span class="badge red">Blocked</span><span class="badge red">Overdue</span></div>
+          <div class="flow-card" data-node="31">
+            <div class="fc-top"><span class="fc-id">31</span><span class="fc-name">Baseline Energy Model</span></div>
+            <div class="fc-meta">👤 Mingchen &nbsp;·&nbsp; 📅 Due: 2026-09-30</div>
+            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
+            <div class="fc-desc">Model calibration depends on Digital Twin Framework outputs.</div>
+          </div>
+          <div class="flow-card" data-node="32">
+            <div class="fc-top"><span class="fc-id">32</span><span class="fc-name">InfluxDB Continuous Ingestion</span></div>
+            <div class="fc-meta">👤 Valdy &nbsp;·&nbsp; 📅 Due: 2026-09-05</div>
+            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
+            <div class="fc-desc">Waiting on stable data and framework readiness.</div>
           </div>
         </div>
 
@@ -597,11 +652,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div class="fc-top"><span class="fc-id">◆</span><span class="fc-name">MS2 Digital Twin Calibrated</span></div>
             <div class="fc-meta">👤 Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-28</div>
             <div class="fc-badges"><span class="badge orange">At Risk</span></div>
-          </div>
-          <div class="flow-card" style="border-style:dashed;" data-node="31">
-            <div class="fc-top"><span class="fc-id">31</span><span class="fc-name">Baseline Energy Model</span></div>
-            <div class="fc-meta">👤 Mingchen &nbsp;·&nbsp; 📅 Due: 2026-09-30</div>
-            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
+            <div class="fc-desc">Cannot be achieved until upstream tasks are unblocked.</div>
           </div>
         </div>
 
@@ -610,14 +661,16 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <h4>Legend</h4>
             <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dim)" stroke-width="2"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12"/></svg><div><b>Hard Dependency (must complete)</b><br><span style="color:var(--text-dimmer);font-size:11px">Hard Dependency</span></div></div>
             <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12" stroke-dasharray="0"/></svg><div><b>Soft Dependency (reference only)</b><br><span style="color:var(--text-dimmer);font-size:11px">Soft Dependency</span></div></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dimmer)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><div><b>Subset / Part Of</b><br><span style="color:var(--text-dimmer);font-size:11px">Pilot/scope carved out of an upstream item</span></div></div>
             <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b>Blocking</b><span>Upstream incomplete, causing delay</span></div></div>
             <div class="lg-status"><span class="dot" style="color:var(--orange)"></span><div><b>Pending</b><span>Upstream in progress or not yet due</span></div></div>
             <div class="lg-status"><span class="dot" style="color:var(--green)"></span><div><b>Satisfied</b><span>Upstream complete, no dependency risk</span></div></div>
             <div class="lg-status"><span class="dot" style="color:var(--gray)"></span><div><b>N/A</b><span>No dependency relationship</span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b>Primary Blocker</b><span>Highlighted card — root cause of the current chain</span></div></div>
           </div>
           <div class="reco-card">
             <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-            <div><h4>Recommendation</h4><p>Prioritize unblocking 03 and 02 — this recovers 04 / 05 and lowers MS2 risk.</p></div>
+            <div><h4>Recommendation</h4><p>Prioritize unblocking 03 — its pilot subset 05 and downstream tasks 04 / 31 / 32 all recover once historical data delivery is complete, lowering MS2 risk.</p></div>
           </div>
         </div>
       </div>
@@ -675,14 +728,14 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       <div class="dep-grid" style="position:relative;z-index:2;">
         <div>
           <div class="dep-lane-title">1&nbsp; Upstream Inputs</div>
+          <div class="mini-card blocker-src" data-node="03"><div class="mc-top"><span class="mc-id">03</span><span class="mc-name">Historical BMS Data</span></div><div class="mc-meta">👤 Hong Qing / Justin &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange">At Risk</span></div><div class="mc-desc"><b style="color:var(--red)">BLOCKER</b><br>Upstream source blocking downstream work</div></div>
           <div class="mini-card" data-node="02"><div class="mc-top"><span class="mc-id">02</span><span class="mc-name">Data Point / API Integration</span></div><div class="mc-meta">👤 Anurag / Istofa &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="03"><div class="mc-top"><span class="mc-id">03</span><span class="mc-name">Historical BMS Data</span></div><div class="mc-meta">👤 Hong Qing / Justin &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
           <div class="mini-card" data-node="01"><div class="mc-top"><span class="mc-id">01</span><span class="mc-name">Technical Alignment Session</span></div><div class="mc-meta">👤 RDA + DayOne On-site Team &nbsp; 📅 08/14</div><div class="mc-badges"><span class="badge violet">Unconfirmed</span></div></div>
         </div>
         <div>
           <div class="dep-lane-title">2&nbsp; Current Work</div>
           <div class="mini-card" data-node="04"><div class="mc-top"><span class="mc-id">04</span><span class="mc-name">Digital Twin Framework</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge red">Blocked</span></div></div>
-          <div class="mini-card" data-node="05"><div class="mc-top"><span class="mc-id">05</span><span class="mc-name">Single Data Hall Pilot</span></div><div class="mc-meta">👤 Mingchen / Valdy &nbsp; 📅 08/20</div><div class="mc-badges"><span class="badge red">Blocked</span><span class="badge red">Overdue</span></div></div>
+          <div class="mini-card subset" data-node="05"><div class="subset-tag">PILOT SUBSET<br><span style="font-weight:600;text-transform:none;">Part of Historical BMS Data</span></div><div class="mc-top"><span class="mc-id">05</span><span class="mc-name">Single Data Hall Pilot</span></div><div class="mc-meta">👤 Mingchen / Valdy &nbsp; 📅 08/20</div><div class="mc-badges"><span class="badge red">Blocked</span><span class="badge red">Overdue</span></div></div>
           <div class="mini-card" data-node="06"><div class="mc-top"><span class="mc-id">06</span><span class="mc-name">Model Calibration Prep</span></div><div class="mc-meta">👤 RDA Modelling Team &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
           <div class="mini-card" data-node="08"><div class="mc-top"><span class="mc-id">08</span><span class="mc-name">Chiller Plant Modelling (E+)</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
           <div class="mini-card" data-node="09"><div class="mc-top"><span class="mc-id">09</span><span class="mc-name">DCWiz Demo Preparation</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/26</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
@@ -703,6 +756,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div style="font-size:11px;color:var(--text-dimmer);margin-bottom:6px;font-weight:700;">Dependency Type</div>
             <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dim)" stroke-width="2"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12"/></svg><span style="font-size:11.5px">Hard Dependency</span></div>
             <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><span style="font-size:11.5px">Soft Dependency</span></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dimmer)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><span style="font-size:11.5px">Subset / Part Of</span></div>
             <div style="font-size:11px;color:var(--text-dimmer);margin:10px 0 6px;font-weight:700;">Status</div>
             <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b>Blocking</b><span>Currently blocking or severely delayed</span></div></div>
             <div class="lg-status"><span class="dot" style="color:var(--orange)"></span><div><b>Pending</b><span>At risk or awaiting action</span></div></div>
@@ -711,6 +765,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div style="font-size:11px;color:var(--text-dimmer);margin:10px 0 6px;font-weight:700;">Node Types</div>
             <div class="node-shape">▭ Task / Input</div>
             <div class="node-shape" style="margin-top:6px">◆ Milestone</div>
+            <div class="node-shape" style="margin-top:6px;color:var(--red)">⬡ Current Blocker (propagates delay)</div>
             <div class="node-shape" style="margin-top:6px">👤 Owner</div>
             <div class="node-shape" style="margin-top:6px">📅 Target Date</div>
           </div>
@@ -986,7 +1041,7 @@ const TASKS = [
  {id:'15',name:'DCWiz Telemetry & What-if Validation',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
 ];
 const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28'};
-const TODAY = new Date('2026-08-19');
+const TODAY = new Date('2026-08-21');
 
 const STATUS_META = {
   done:{label:'Done',color:'green'}, inprogress:{label:'In Progress',color:'orange'},
@@ -1025,12 +1080,28 @@ function isOverdue(t){
 // the currently available data"), and the pptx shows 04 already framework-complete
 // with pre-calibration in progress independent of 02. 01→06 promoted soft→hard: pptx
 // explicitly states Model Calibration Prep is "to start after the technical session."
+// 'subset' edges are a structural "part of" relationship, not a temporal dependency:
+// 05 (Single Data Hall Pilot) is literally a scoped-down slice of 03's work (the pilot
+// validates on one Data Hall using the historical data 03 is delivering), so it mirrors
+// 03's blocked/overdue state directly rather than being a separate downstream consumer.
 const EDGES = [
-  {from:'02',to:'04',type:'soft'}, {from:'02',to:'05',type:'soft'},
-  {from:'03',to:'04',type:'hard'}, {from:'03',to:'05',type:'hard'},
+  {from:'02',to:'04',type:'soft'},
+  {from:'03',to:'04',type:'hard'}, {from:'03',to:'05',type:'subset'},
+  // 05->06 is drawn as a solid "hand-off" arrow (05 feeds into calibration prep once
+  // available), but kept 'soft' for status purposes: 06 genuinely hasn't started yet,
+  // so it shouldn't be forced into a derived "Blocked" state just because 05 is overdue.
+  {from:'05',to:'06',type:'soft',solid:true},
   {from:'01',to:'06',type:'hard'}, {from:'01',to:'08',type:'soft'},
-  {from:'04',to:'07',type:'hard'}, {from:'04',to:'MS2',type:'hard'},
-  {from:'05',to:'31',type:'soft'}, {from:'05',to:'32',type:'hard'}, {from:'05',to:'MS2',type:'hard'},
+  {from:'04',to:'07',type:'hard'}, {from:'04',to:'31',type:'hard'},
+  // 32 is fed directly by 03 (not via 04): 03 is the raw-overdue root, so this is what
+  // actually drives 32 into a genuine "Blocked" state; 31 only derives from 04 (which
+  // is itself merely delayed, not raw-blocked), so 31 correctly stays "In Progress".
+  // Hidden from the Dependency View's own drawing (it would have to cut across the
+  // whole "Current Work" column to get there) but still counted for status + shown as
+  // part of the root-cause fan in the Blocker Impact Map.
+  {from:'03',to:'32',type:'hard',hideInDepView:true},
+  {from:'07',to:'MS2',type:'hard'},
+  {from:'31',to:'MS2',type:'hard'}, {from:'32',to:'MS2',type:'hard'},
   {from:'06',to:'10',type:'soft'}, {from:'08',to:'10',type:'soft'},
 ];
 
@@ -1042,10 +1113,10 @@ function deriveDependencyHealth(id){
   incoming.forEach(e=>{
     const src = TASKS_BY_ID[e.from];
     if(!src){ allDone=false; return; }
-    // Only HARD dependencies can truly block a downstream task; a blocked/overdue
-    // upstream SOFT (reference-only) dependency should surface as "pending" risk,
-    // not force the downstream task itself into a "blocking" state.
-    if(e.type==='hard'){
+    // Only HARD (and structural SUBSET) dependencies can truly block a downstream task;
+    // a blocked/overdue upstream SOFT (reference-only) dependency should surface as
+    // "pending" risk, not force the downstream task itself into a "blocking" state.
+    if(e.type==='hard' || e.type==='subset'){
       if(src.status==='blocked' || isOverdue(src)){ hasBlocking=true; allDone=false; }
       else if(src.status!=='done'){ hasPending=true; allDone=false; }
     } else {
@@ -1078,6 +1149,17 @@ function isEffectivelyBlocked(id){
   if(t && t.status==='blocked') return true;
   return deriveDependencyHealth(id)==='blocking';
 }
+// A "blocker source" is a node that is itself blocked/overdue AND has at least one
+// outgoing edge — i.e. it's actively propagating delay downstream, not just a dead-end
+// leaf that happens to be blocked. 03, 04 and 05 all propagate further (05 -> 06) and
+// are flagged; a node with no outgoing edge at all would not be.
+function isBlockerSource(id){
+  const t = TASKS_BY_ID[id];
+  if(!t) return false;
+  const isBad = t.status==='blocked' || isOverdue(t) || isEffectivelyBlocked(id);
+  if(!isBad) return false;
+  return EDGES.some(e=>e.from===id);
+}
 // Single-badge slot (Overview snapshot / Roadmap Graph) — one badge per node.
 function slotBadge(id){
   if(id==='MS2') return nodeBadges('MS2');
@@ -1091,7 +1173,7 @@ function slotBadge(id){
 // Multi-badge slot (Blocker Impact Map / Dependency View cards) — can stack e.g. Blocked + Overdue.
 function nodeBadges(id){
   if(id==='MS2'){
-    const atRisk = EDGES.some(e=>e.to==='MS2' && (()=>{ const s=TASKS_BY_ID[e.from]; return s && (s.status==='blocked'||isOverdue(s)); })());
+    const atRisk = EDGES.some(e=>e.to==='MS2' && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from])));
     return atRisk ? '<span class="badge red">Blocking</span><span class="badge orange">At Risk</span>' : '<span class="badge green">On Track</span>';
   }
   const t = TASKS_BY_ID[id];
@@ -1115,6 +1197,22 @@ function applyLiveBadges(){
   document.querySelectorAll('.mini-card[data-node] .mc-badges').forEach(el=>{
     const host = el.closest('[data-node]'); if(host) el.innerHTML = nodeBadges(host.dataset.node);
   });
+  applyBlockerWarnings();
+}
+// Dependency View only: flag nodes that actively propagate blocking downstream with a
+// small warning glyph in the card header (see isBlockerSource — a blocked/overdue node
+// with at least one outgoing edge, vs. a blocked dead-end leaf like the 05 pilot subset).
+const WARN_SVG = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+function applyBlockerWarnings(){
+  document.querySelectorAll('#depGridWrap .mini-card[data-node]').forEach(el=>{
+    const id = el.dataset.node;
+    const top = el.querySelector('.mc-top');
+    if(!top || id==='MS2') return;
+    let slot = top.querySelector('.node-warn');
+    if(isBlockerSource(id)){
+      if(!slot){ slot = document.createElement('span'); slot.className='node-warn'; slot.innerHTML = WARN_SVG; top.appendChild(slot); }
+    } else if(slot){ slot.remove(); }
+  });
 }
 
 // KPI aggregates — all computed fresh from TASKS/EDGES, never hand-set.
@@ -1129,7 +1227,7 @@ function computeKPIs(){
     return diff>=0 && diff<=3;
   });
   const blockerSourceIds = new Set(TASKS.filter(t=>(t.status==='blocked'||isOverdue(t)) && EDGES.some(e=>e.from===t.id)).map(t=>t.id));
-  const msImpacted = EDGES.some(e=>e.to==='MS2' && (()=>{ const s=TASKS_BY_ID[e.from]; return s && (s.status==='blocked'||isOverdue(s)); })()) ? 1 : 0;
+  const msImpacted = EDGES.some(e=>e.to==='MS2' && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]))) ? 1 : 0;
   const monthTasks = TASKS.filter(t=>t.month===2);
   const monthDone = monthTasks.filter(t=>t.status==='done');
   const monthProg = monthTasks.filter(t=>t.status==='inprogress');
@@ -1137,6 +1235,7 @@ function computeKPIs(){
     blocked: blockedTasks.length, atrisk: atRisk.length, overdue: overdue.length, duesoon: dueSoon.length,
     blockersources: blockerSourceIds.size, msimpacted: msImpacted,
     harddeps: EDGES.filter(e=>e.type==='hard').length, softdeps: EDGES.filter(e=>e.type==='soft').length,
+    subsetdeps: EDGES.filter(e=>e.type==='subset').length,
     depblockers: blockerSourceIds.size, depmsimpacted: msImpacted,
     monthtasks: monthTasks.length, monthdone: monthDone.length,
     'monthdone-sub': `Completion Rate ${monthTasks.length?(monthDone.length/monthTasks.length*100).toFixed(1):'0.0'}%`,
@@ -1161,7 +1260,25 @@ function goPage(id){
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
 
-/* ===================== DEPENDENCY CONNECTORS (shared engine) ===================== */
+/* ===================== DEPENDENCY CONNECTORS (shared engine) =====================
+   Nodes that share a source with 2+ outgoing edges (e.g. 03 -> {04,05}, or
+   04 -> {07,31,32}) are drawn as a single shared "trunk": one short stub leaves
+   the source, then the path branches off toward each target — instead of N
+   independent diagonal lines that cut across unrelated cards in between. A lone
+   edge (only one outgoing edge from its source) keeps the simple smooth S-curve.
+*/
+function fanPath(x1,y1,x2,y2,trunkX){
+  if(Math.abs(y2-y1) < 3) return `M ${x1} ${y1} L ${x2} ${y2}`;
+  const r = Math.min(9, Math.abs(trunkX-x1)||9, Math.abs(x2-trunkX)||9, Math.abs(y2-y1)/2);
+  const vSign = y2>y1?1:-1;
+  return `M ${x1} ${y1} L ${trunkX-r} ${y1} Q ${trunkX} ${y1} ${trunkX} ${y1+vSign*r} `+
+         `L ${trunkX} ${y2-vSign*r} Q ${trunkX} ${y2} ${trunkX+r} ${y2} L ${x2} ${y2}`;
+}
+function vhPath(x1,y1,x2,y2){
+  const r = Math.min(8, Math.abs(y2-y1)/2||8, Math.abs(x2-x1)/2||8);
+  const vSign = y2>y1?1:-1, hSign = x2>x1?1:-1;
+  return `M ${x1} ${y1} L ${x1} ${y2-vSign*r} Q ${x1} ${y2} ${x1+hSign*r} ${y2} L ${x2} ${y2}`;
+}
 function drawConnectorsInto(wrapId, svgId, filterFn){
   const wrap = document.getElementById(wrapId);
   const svg = document.getElementById(svgId);
@@ -1169,28 +1286,124 @@ function drawConnectorsInto(wrapId, svgId, filterFn){
   const wrapRect = wrap.getBoundingClientRect();
   svg.setAttribute('width', wrapRect.width);
   svg.setAttribute('height', wrapRect.height);
+  const edges = EDGES.filter(filterFn || (()=>true)).filter(e=>
+    wrap.querySelector(`[data-node="${e.from}"]`) && wrap.querySelector(`[data-node="${e.to}"]`));
+  const bySource = {};
+  edges.forEach(e=>{ (bySource[e.from]=bySource[e.from]||[]).push(e); });
+  // trunkX per source: the midpoint of the actual gutter between the source's right
+  // edge and the nearest target's left edge — a fixed pixel offset would overshoot a
+  // narrow gutter and cut straight through the next column's cards.
+  const trunkXBySource = {};
+  Object.keys(bySource).forEach(src=>{
+    if(bySource[src].length<2) return;
+    const fromEl = wrap.querySelector(`[data-node="${src}"]`);
+    const fr = fromEl.getBoundingClientRect();
+    const x1 = fr.right - wrapRect.left;
+    let minTargetLeft = Infinity;
+    bySource[src].forEach(e=>{
+      const toEl = wrap.querySelector(`[data-node="${e.to}"]`);
+      if(toEl) minTargetLeft = Math.min(minTargetLeft, toEl.getBoundingClientRect().left - wrapRect.left);
+    });
+    trunkXBySource[src] = minTargetLeft===Infinity ? x1+16 : x1 + (minTargetLeft-x1)*0.5;
+  });
   let out = '';
-  EDGES.filter(filterFn || (()=>true)).forEach(edge=>{
+  edges.forEach(edge=>{
     const fromEl = wrap.querySelector(`[data-node="${edge.from}"]`);
     const toEl = wrap.querySelector(`[data-node="${edge.to}"]`);
-    if(!fromEl || !toEl) return;
     const fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
-    const x1 = fr.right - wrapRect.left, y1 = fr.top + fr.height/2 - wrapRect.top;
-    const x2raw = tr.left - wrapRect.left, y2 = tr.top + tr.height/2 - wrapRect.top;
-    const x2 = x2raw - 8;
+    // Most edges run left-to-right across columns (anchor right edge -> left edge).
+    // But a same-column edge (e.g. two cards stacked in one lane, like 05 -> 06) has
+    // no horizontal gap at all — anchoring on right/left edges there would draw a line
+    // from the source's right side all the way back to the target's left side, looping
+    // backwards through whatever sits between them. Detect that case (horizontal
+    // ranges overlap, i.e. neither card is actually beside the other) and anchor on
+    // the vertical edges (bottom -> top) instead.
+    const sameColumn = fr.left < tr.right && tr.left < fr.right;
+    let x1,y1,x2,y2;
+    if(sameColumn){
+      x1 = fr.left + fr.width/2 - wrapRect.left; y1 = fr.bottom - wrapRect.top;
+      x2 = tr.left + tr.width/2 - wrapRect.left; y2 = (tr.top - wrapRect.top) - 6;
+    } else {
+      x1 = fr.right - wrapRect.left; y1 = fr.top + fr.height/2 - wrapRect.top;
+      x2 = (tr.left - wrapRect.left) - 8; y2 = tr.top + tr.height/2 - wrapRect.top;
+    }
     const color = deriveEdgeColor(edge.from);
-    const dash = edge.type==='soft' ? 'stroke-dasharray="5 4"' : '';
-    const mx = (x1+x2)/2;
-    const d = `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    const dash = (edge.type==='subset' || (edge.type==='soft' && !edge.solid)) ? 'stroke-dasharray="5 4"' : '';
+    const group = bySource[edge.from];
+    let d, trunkX;
+    if(sameColumn){
+      const my=(y1+y2)/2;
+      d = `M ${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
+    } else if(group.length>1){
+      trunkX = trunkXBySource[edge.from];
+      d = fanPath(x1,y1,x2,y2,trunkX);
+    } else {
+      const mx=(x1+x2)/2;
+      d = `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    }
     out += `<path d="${d}" stroke="${color}" stroke-width="1.75" fill="none" ${dash} opacity="0.85"/>`;
-    out += `<polygon points="${x2},${y2-4} ${x2+8},${y2} ${x2},${y2+4}" fill="${color}" opacity="0.9"/>`;
+    out += sameColumn
+      ? `<polygon points="${x2-4},${y2} ${x2},${y2+8} ${x2+4},${y2}" fill="${color}" opacity="0.9"/>`
+      : `<polygon points="${x2},${y2-4} ${x2+8},${y2} ${x2},${y2+4}" fill="${color}" opacity="0.9"/>`;
+    if(edge.label){
+      const lx = trunkX!==undefined ? (trunkX + x2)/2 : (x1+x2)/2;
+      const ly = y2 - 13;
+      const w = edge.label.length*5.4+12;
+      out += `<rect x="${lx-w/2}" y="${ly-9}" width="${w}" height="16" rx="4" fill="#0d1220" stroke="${color}" stroke-width="1" opacity="0.95"/>`;
+      out += `<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${color}">${edge.label}</text>`;
+    }
   });
   svg.innerHTML = out;
 }
-function drawBimConnectors(){ drawConnectorsInto('bimGridWrap','bimSvg'); }
+function drawBimConnectors(){
+  const wrap = document.getElementById('bimGridWrap');
+  const svg = document.getElementById('bimSvg');
+  if(!wrap || !svg) return;
+  const wrapRect = wrap.getBoundingClientRect();
+  svg.setAttribute('width', wrapRect.width);
+  svg.setAttribute('height', wrapRect.height);
+  const rectOf = id=>{
+    const el = wrap.querySelector(`[data-node="${id}"]`);
+    if(!el) return null;
+    const r = el.getBoundingClientRect();
+    return { left:r.left-wrapRect.left, right:r.right-wrapRect.left, top:r.top-wrapRect.top, bottom:r.bottom-wrapRect.top, cy:r.top+r.height/2-wrapRect.top };
+  };
+  const n03=rectOf('03'), n05=rectOf('05'), n04=rectOf('04'), n31=rectOf('31'), n32=rectOf('32'), nMS2=rectOf('MS2');
+  const c03 = deriveEdgeColor('03');
+  let out = '';
+  const dot = (x,y,color)=>`<circle cx="${x}" cy="${y}" r="8" fill="${color}" opacity="0.18"/><circle cx="${x}" cy="${y}" r="5" fill="${color}" opacity="0.95"/>`;
+  const arrowTip = (x2,y2,color)=>`<polygon points="${x2},${y2-4} ${x2+8},${y2} ${x2},${y2+4}" fill="${color}" opacity="0.9"/>`;
+  // 03 -> {04,31,32}: shared fan-out trunk with a junction dot (the "root cause reaches everything" fan)
+  if(n03 && n04 && n31 && n32){
+    const x1=n03.right, y1=n03.cy, trunkX=x1+(n04.left-x1)*0.5;
+    [[n04.left-8,n04.cy],[n31.left-8,n31.cy],[n32.left-8,n32.cy]].forEach(([x2,y2])=>{
+      out += `<path d="${fanPath(x1,y1,x2,y2,trunkX)}" stroke="${c03}" stroke-width="2" fill="none" opacity="0.9"/>`;
+      out += arrowTip(x2,y2,c03);
+    });
+    out += dot(trunkX,y1,c03);
+  }
+  // 03 -> 05: subset (dashed), drops straight down from 03's bottom edge, independent of the fan-out trunk
+  if(n03 && n05){
+    const x1 = n03.left+30, y1 = n03.bottom, x2 = n05.left-8, y2 = n05.cy;
+    out += `<path d="${vhPath(x1,y1,x2,y2)}" stroke="${c03}" stroke-width="1.75" fill="none" stroke-dasharray="5 4" opacity="0.85"/>`;
+    out += arrowTip(x2,y2,c03);
+  }
+  // {04,31,32} -> MS2: shared fan-in trunk with a junction dot just before the milestone
+  if(n04 && n31 && n32 && nMS2){
+    const x2 = nMS2.left-8, y2 = nMS2.cy, trunkX = x2-(x2-n04.right)*0.5;
+    [[n04.right,n04.cy,deriveEdgeColor('04')],[n31.right,n31.cy,deriveEdgeColor('31')],[n32.right,n32.cy,deriveEdgeColor('32')]].forEach(([x1,y1,color])=>{
+      out += `<path d="${fanPath(x1,y1,x2,y2,trunkX)}" stroke="${color}" stroke-width="2" fill="none" opacity="0.9"/>`;
+    });
+    out += dot(trunkX,y2,deriveEdgeColor('04'));
+    out += arrowTip(x2,y2,deriveEdgeColor('04'));
+  }
+  svg.innerHTML = out;
+}
 function drawDepConnectors(){
   const activeFilter = document.querySelector('.pill[data-depfilter].active')?.dataset.depfilter || 'all';
   drawConnectorsInto('depGridWrap','depSvg', edge=>{
+    if(edge.hideInDepView) return false;
+    if(edge.type==='soft' && !edge.solid) return false; // soft/reference-only deps are counted in the stats but not drawn
     if(activeFilter==='hard' && edge.type!=='hard') return false;
     if(activeFilter==='blocking'){
       const t = TASKS_BY_ID[edge.from];
@@ -1428,6 +1641,7 @@ function renderActionsTables(){
    Nothing here writes to TASKS directly — every field change flows through
    approveProposal() so raw project data only ever changes via human approval. */
 const MEETINGS = [
+  {id:'m3', title:'DayOne Weekly Meeting', date:'2026-08-21', summary:'One-Data-Hall historical extraction, TH sensor mapping, and the historical-data insight run are all confirmed done on schedule; Data Point/API alignment continues with its target pushed to 08/28; the Single Data Hall Pilot now moves into validation using the delivered data; cold-aisle thermal analysis shows a healthy SLA margin plus a CRAH setpoint-tuning opportunity to investigate.'},
   {id:'m2', title:'DayOne Weekly Meeting', date:'2026-08-14', summary:'Digital Twin calibration takes priority over AI control; historical data can be provided in batches; BMS/PMS API and control points still to be aligned'},
   {id:'m1', title:'Digital Twin Sharing Session', date:'2026-08-12', summary:'Cooling topology, BMS data sharing, and the calibration path: Recommendation → Human Monitoring → Auto-Control'},
 ];
@@ -1465,6 +1679,38 @@ const PROPOSALS = [
   {id:'p10', meetingId:'m2', entityType:'action', entityId:'31', newValue:{title:'Align on the Energy Baseline / Benchmark methodology', owner:'Mingchen / Valdy', status:'To Align', due:'08/28', priority:'low'}, confidence:'confirmed',
    evidence:'Align on the Energy Baseline / Benchmark methodology — Mingchen / Valdy — 🟡 To Align — Target: 28 Aug 2026',
    reason:'A concrete Next Actions item, related to Baseline Energy Model.', status:'pending'},
+
+  // --- DayOne Weekly Meeting, 21 Aug 2026 (m3) — extracted from the weekly progress email ---
+  {id:'p11', meetingId:'m3', entityType:'task', entityId:'03', field:'progress', oldValue:50, newValue:70, confidence:'confirmed',
+   evidence:'Weekly Progress — "Historical BMS Data – One Data Hall": Done (Expected Completion 2026/08/21, Justin); "TH Sensor Location": Done; "Insight of Historical Data": Done (RDA ran the model and concluded the insight of the historical data).',
+   reason:'All three prep items behind the first Data Hall\'s historical dataset are now confirmed done — a real jump from the prior 50%.', status:'pending'},
+  {id:'p12', meetingId:'m3', entityType:'task', entityId:'03', field:'due', oldValue:'08/21', newValue:'08/28', confidence:'confirmed',
+   evidence:'Next Week — "Historical BMS Data": Continue historical data extraction and confirm availability of the first usable batch — Expected Completion 2026/08/28, Justin.',
+   reason:'The 08/21 milestone (first Data Hall) was met on time; the team has now set the next target for the remaining extraction.', status:'pending'},
+  {id:'p13', meetingId:'m3', entityType:'task', entityId:'03', field:'ge', oldValue:'2026-08-21', newValue:'2026-08-28', confidence:'confirmed',
+   evidence:'Same Next Week row as above — new target date 2026/08/28.',
+   reason:'Keeps the Roadmap Gantt bar in sync with the updated target date.', status:'pending'},
+  {id:'p14', meetingId:'m3', entityType:'task', entityId:'03', field:'targetOriginal', oldValue:'2026-08-14', newValue:'2026-08-28', confidence:'confirmed',
+   evidence:'The original 08/14 target was already missed once; the 08/21 milestone that replaced it was met on schedule, and the email sets a fresh 08/28 target for what remains.',
+   reason:'Carrying the stale 08/14 date forward would keep flagging this task Overdue even though the interim milestone was delivered on time — resolves the Overdue badge against the new, confirmed date.', status:'pending'},
+  {id:'p15', meetingId:'m3', entityType:'task', entityId:'03', field:'next', oldValue:'Continue providing remaining historical data (Justin, target 21 Aug)', newValue:'Continue full-site historical data extraction and confirm the next usable batch (Justin, target 28 Aug) — one Data Hall dataset already delivered', confidence:'confirmed',
+   evidence:'Next Week — "Historical BMS Data": Continue historical data extraction and confirm availability of the first usable batch — Justin — Expected Completion 2026/08/28.',
+   reason:'Keeps the task description in sync with the newly confirmed target and what has already been delivered.', status:'pending'},
+  {id:'p16', meetingId:'m3', entityType:'task', entityId:'02', field:'due', oldValue:'08/21', newValue:'08/28', confidence:'confirmed',
+   evidence:'Weekly Progress — "Data Point / API": In Progress, Expected Completion TBC, Istofa. Next Week — same item, Expected Completion 2026/08/28, Istofa.',
+   reason:'The team has now committed to a concrete 08/28 date after the completion date was previously unconfirmed (TBC).', status:'pending'},
+  {id:'p17', meetingId:'m3', entityType:'task', entityId:'02', field:'next', oldValue:'Complete remaining API endpoint integration', newValue:'Istofa Rifqy to follow up with the PMS/BMS contractor to expose the required API data points for live RDA connectivity (target 08/28)', confidence:'confirmed',
+   evidence:'Next Steps: "@Istofa Rifqy will follow up on the Data Point API." / "Follow up with the PMS/BMS contractor to expose the required API data points for future live data connectivity to RDA."',
+   reason:'Names the explicit owner and next step directly from the meeting email.', status:'pending'},
+  {id:'p18', meetingId:'m3', entityType:'task', entityId:'05', field:'due', oldValue:'08/20', newValue:'08/28', confidence:'confirmed',
+   evidence:'Next Week — "Single Data Hall Pilot": Select one Data Hall as the first validation scope and verify data and simulation logic before scaling to the full site — Expected Completion 2026/08/28, RDA.',
+   reason:'The pilot can now proceed since its input (the first Data Hall historical dataset) is confirmed delivered; the team has set 08/28 as the validation target.', status:'pending'},
+  {id:'p19', meetingId:'m3', entityType:'task', entityId:'05', field:'targetOriginal', oldValue:'2026-08-17', newValue:'2026-08-28', confidence:'confirmed',
+   evidence:'Next Steps: "By using the historical data, RDA will verify and simulate the logic for one data hall as a pilot." Next Week row target: 2026/08/28.',
+   reason:'Resolves the Overdue flag now that a new, confirmed target has been set and the blocking historical-data dependency has been delivered.', status:'pending'},
+  {id:'p20', meetingId:'m3', entityType:'action', entityId:'06', newValue:{title:'Assess how safely CRAH setpoints can be adjusted per cold-aisle row (Aisle 5 runs cooler; middle rows peak hottest)', owner:'RDA', status:'To Assess', due:'TBC', priority:'medium'}, confidence:'confirmed',
+   evidence:'"Different cold aisle rows respond differently to CRAH supply-air changes. Further analysis will assess how safely CRAH setpoints can be adjusted." Cold aisle max recorded 22.4°C, a 1.6°C margin against the 24°C SLA ceiling; Cold Aisle 5 runs consistently cooler — an optimization opportunity.',
+   reason:'A concrete follow-up analysis raised in the meeting email, closest to the calibration/optimization work already tracked under Model Calibration Prep.', status:'pending'},
 ];
 
 const CHANGELOG = [
@@ -1472,7 +1718,7 @@ const CHANGELOG = [
   {date:'2026-08-12', text:'Confirmed rollout path: <b>Recommendation → Human Monitoring / Validation → Auto-Control</b> (source: Digital Twin Sharing Session).'},
 ];
 
-function fieldLabel(f){ return {progress:'Progress',next:'Next Step',status:'Status',due:'Target Date',health:'Health',calibrationTarget:'Calibration Accuracy Acceptance Threshold'}[f] || f; }
+function fieldLabel(f){ return {progress:'Progress',next:'Next Step',status:'Status',due:'Target Date',health:'Health',calibrationTarget:'Calibration Accuracy Acceptance Threshold',targetOriginal:'Original Target Date',ge:'Gantt End Date'}[f] || f; }
 function formatFieldVal(field, v){
   if(v===null || v===undefined) return '<span style="color:var(--text-dimmer)">Pending confirmation</span>';
   if(field==='progress') return v+'%';
@@ -1626,7 +1872,7 @@ function render(){
 render();
 
 /* set updated timestamp to now (Singapore) */
-document.getElementById('updatedTime').textContent = '2026-08-19 14:30';
+document.getElementById('updatedTime').textContent = '2026-08-21 09:15';
 </script>
 </body>
 </html>
