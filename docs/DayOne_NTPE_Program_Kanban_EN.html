@@ -24,7 +24,7 @@
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
-body{min-height:100vh;position:relative;}
+body{min-height:100vh;position:relative;padding-left:64px;}
 body::before{
   content:"";position:fixed;inset:0;z-index:-1;background:
   radial-gradient(ellipse 1000px 620px at 8% -10%, rgba(124,108,246,.55), transparent 62%),
@@ -82,6 +82,25 @@ svg.i{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke
 .icon-btn:hover{color:var(--text);border-color:var(--border2);}
 .filter-btn{display:flex;align-items:center;gap:6px;padding:0 14px;height:34px;border-radius:9px;background:var(--panel3);
   border:1px solid var(--border);color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;}
+.updated-block{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:var(--text-dim);}
+.updated-block .live{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--text);}
+.updated-block .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg);}
+
+/* ===== Left icon rail (global nav) ===== */
+.icon-rail{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;padding:16px 0 14px;gap:5px;z-index:80;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.icon-rail .rail-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple2),var(--cyan));
+  display:flex;align-items:center;justify-content:center;color:#0a0e1c;font-weight:900;font-size:15px;margin-bottom:16px;flex-shrink:0;}
+.rail-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text-dimmer);
+  cursor:pointer;position:relative;flex-shrink:0;transition:.15s;}
+.rail-icon:hover{background:var(--panel3);color:var(--text-dim);}
+.rail-icon.active{background:var(--purple-bg);color:var(--purple);}
+.rail-icon svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.rail-icon .rail-dot{position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid var(--panel);}
+.rail-spacer{flex:1;}
+.rail-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));
+  display:flex;align-items:center;justify-content:center;color:#04262c;font-weight:800;font-size:11px;margin-top:4px;flex-shrink:0;cursor:pointer;}
 
 /* ===== Page ===== */
 .page{display:none;}
@@ -103,6 +122,49 @@ svg.i{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke
 .stat-sub{font-size:11.5px;color:var(--text-dimmer);}
 .stat-sub.up{color:var(--orange);}
 .stat-sub.down{color:var(--cyan);}
+.stat-spark{width:100%;height:26px;display:block;opacity:.85;}
+
+/* ===== AI brief banner ===== */
+.ai-tag{display:inline-flex;align-items:center;font-size:9.5px;font-weight:800;letter-spacing:.3px;color:var(--purple);
+  background:var(--purple-bg);border-radius:5px;padding:1px 6px;margin-left:7px;vertical-align:middle;}
+
+/* ===== Overview: Blocker Impact Snapshot (condensed 3-col flow) ===== */
+.row3{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:16px;margin-bottom:18px;align-items:start;}
+.bim-snap-grid{display:flex;align-items:stretch;gap:0;}
+.bim-snap-col{flex:1;min-width:0;display:flex;flex-direction:column;}
+.bim-snap-arrow-col{width:26px;display:flex;align-items:center;justify-content:center;color:var(--text-dimmer);flex-shrink:0;padding-top:54px;}
+.bim-snap-col .flow-card{margin-bottom:12px;}
+.bim-snap-col .flow-card:last-child{margin-bottom:0;}
+
+/* ===== Overview: Roadmap Snapshot restyled as a status timeline ===== */
+.snap-tag{display:inline-flex;align-items:center;font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;
+  border-radius:5px;padding:2px 6px;margin-left:8px;}
+.snap-col:nth-child(1) .snap-tag{background:var(--green-bg);color:var(--green);}
+.snap-col:nth-child(2) .snap-tag{background:var(--purple-bg);color:var(--purple);}
+.snap-col:nth-child(3) .snap-tag{background:var(--gray-bg);color:var(--text-dim);}
+.snap-item{position:relative;padding-left:18px;}
+.snap-item::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;
+  border:2px solid var(--panel3);box-shadow:0 0 0 1px var(--border2);z-index:1;}
+.snap-item:not(:last-of-type)::after{content:'';position:absolute;left:4px;top:calc(50% + 7px);bottom:-7px;width:1px;background:var(--border2);}
+.snap-col:nth-child(1) .snap-item::before{background:var(--green);}
+.snap-col:nth-child(2) .snap-item::before{background:var(--blue);}
+.snap-col:nth-child(3) .snap-item::before{background:var(--gray);}
+
+/* ===== Overview: Luna Queue / Internal Delivery mini panels ===== */
+.mini-queue-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:12.5px;}
+.mini-queue-row:last-of-type{border-bottom:none;}
+.mini-queue-row .mq-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mini-queue-row .mq-icon svg{width:13px;height:13px;}
+.mini-queue-row .mq-count{font-weight:800;font-size:14px;width:16px;text-align:right;flex-shrink:0;}
+.mini-queue-row .mq-label{flex:1;color:var(--text-dim);}
+.mq-recent-label{font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-dimmer);font-weight:700;margin:12px 0 8px;}
+.mq-recent-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;padding:8px 10px;
+  background:var(--panel3);border-radius:8px;border:1px solid var(--border2);}
+.mq-recent-row b{font-weight:700;color:var(--text);}
+.deliv-row{margin-bottom:14px;}
+.deliv-row:last-of-type{margin-bottom:0;}
+.deliv-row .deliv-top{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+.deliv-row .deliv-top b{color:var(--text);font-weight:700;}
 
 /* ===== Panels ===== */
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
@@ -119,7 +181,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke
 .banner-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px;}
 .banner-text{font-size:13.5px;color:#cfd4ea;line-height:1.6;}
 
-.row2{display:grid;grid-template-columns:1.05fr 1.4fr;gap:16px;margin-bottom:18px;}
+.row2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:18px;align-items:start;}
 
 /* badges */
 .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;}
@@ -243,9 +305,11 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .month-card.current{border-color:var(--purple);box-shadow:0 0 0 1px var(--purple) inset,0 8px 24px rgba(109,94,248,.15);}
 .month-card.done{border-color:rgba(34,197,94,.35);}
 .month-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.month-head .mh-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
-.month-head .mh-txt b{display:block;font-size:13px;}
+.month-head .mh-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.month-head .mh-txt b{display:block;font-size:12.5px;line-height:1.35;}
 .month-head .mh-txt span{font-size:10.5px;color:var(--text-dimmer);}
+.card-badges{display:flex;gap:5px;flex-wrap:wrap;margin:0 0 10px;}
+.card-badges .badge{padding:2px 8px;font-size:10px;}
 .month-connector{width:26px;display:flex;align-items:center;justify-content:center;color:var(--text-dimmer);flex-shrink:0;}
 .mtask{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 0;font-size:12px;border-bottom:1px dashed var(--border);}
 .mtask:last-of-type{border-bottom:none;}
@@ -269,8 +333,10 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .month5to9{margin-top:6px;}
 .mini-month-row{display:flex;gap:0;}
 .mini-month{flex:1;border:1px solid var(--border);border-radius:10px;padding:11px 12px;background:var(--panel3);font-size:11.5px;min-width:0;}
-.mini-month b{display:block;font-size:12px;margin-bottom:8px;}
-.mini-month span.sub{display:block;color:var(--text-dimmer);font-size:10px;margin-top:-6px;margin-bottom:8px;}
+.mini-month b{display:block;font-size:12px;margin-bottom:2px;}
+.mini-month span.sub{display:block;color:var(--text-dimmer);font-size:10px;margin-bottom:8px;}
+.mini-month .mini-badges{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 8px;}
+.mini-month .mini-badges .badge{padding:2px 7px;font-size:9.5px;}
 .mini-month ul{margin:0;padding-left:16px;color:var(--text-dim);display:flex;flex-direction:column;gap:5px;}
 .mini-connector{width:20px;display:flex;align-items:center;justify-content:center;color:var(--text-dimmer);flex-shrink:0;}
 
@@ -302,11 +368,15 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   border-bottom:1px solid var(--border);height:36px;}
 .gantt-left .gr .gid{color:var(--text-dimmer);font-weight:800;}
 .gantt-left .gr .gname{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gantt-left .gr.gr-phase{display:flex;align-items:center;height:28px;padding:0 12px;background:var(--panel2);
+  font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-dim);}
+.gantt-left .gr.gr-empty{display:flex;align-items:center;height:36px;padding:0 12px;color:var(--text-dimmer);font-style:italic;font-size:11.5px;}
 .gantt-right{flex:1;overflow-x:auto;position:relative;}
 .gantt-months{display:flex;border-bottom:1px solid var(--border);background:var(--panel2);}
 .gantt-months .gm{flex:1;min-width:78px;text-align:center;padding:8px 0;font-size:11px;font-weight:700;color:var(--text-dim);border-right:1px dashed var(--border);}
 .gantt-rows{position:relative;}
 .gantt-row-bg{display:flex;height:36px;border-bottom:1px solid var(--border);}
+.gantt-row-bg.phase-bg{background:var(--panel2);}
 .gantt-row-bg .gc{flex:1;min-width:78px;border-right:1px dashed var(--border);}
 .gantt-bar{position:absolute;height:20px;border-radius:6px;top:8px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;
   color:#0b0f1e;white-space:nowrap;overflow:visible;}
@@ -330,6 +400,18 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .import-form input,.import-form textarea{background:var(--panel3);border:1px solid var(--border);border-radius:8px;color:var(--text);
   padding:8px 10px;font-size:12.5px;font-family:inherit;resize:vertical;}
 .import-form textarea{min-height:110px;}
+.attach-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.attach-btn{display:inline-flex;align-items:center;gap:6px;width:auto;}
+.attach-status{font-size:11px;color:var(--text-dimmer);}
+.attach-previews{display:flex;flex-wrap:wrap;gap:8px;}
+.attach-chip{display:flex;align-items:center;gap:6px;background:var(--panel3);border:1px solid var(--border2);border-radius:8px;
+  padding:4px 9px 4px 4px;font-size:11px;color:var(--text-dim);}
+.attach-chip img{width:26px;height:26px;object-fit:cover;border-radius:5px;}
+.attach-chip .file-ico{width:26px;height:26px;border-radius:5px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.attach-chip .remove{cursor:pointer;color:var(--text-dimmer);font-weight:800;margin-left:2px;}
+.attach-chip .remove:hover{color:var(--red);}
+.meet-attach-row{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.meet-attach-row img{width:24px;height:24px;object-fit:cover;border-radius:5px;border:1px solid var(--border2);cursor:zoom-in;}
 .btn-primary{background:linear-gradient(135deg,var(--purple2),#5a4bef);color:#fff;border:none;border-radius:8px;padding:9px 14px;
   font-size:12.5px;font-weight:700;cursor:pointer;}
 .btn-ghost{background:var(--panel3);border:1px solid var(--border2);color:var(--text-dim);border-radius:8px;padding:8px 13px;
@@ -375,6 +457,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 @media (max-width:1400px){
   .stats{grid-template-columns:repeat(3,1fr);}
   .row2{grid-template-columns:1fr;}
+  .row3{grid-template-columns:1fr;}
   .bim-grid{grid-template-columns:1fr 1fr;}
   .dep-grid{grid-template-columns:1fr 1fr;}
   .rm-body{grid-template-columns:1fr;}
@@ -382,6 +465,19 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 </style>
 </head>
 <body>
+<!-- ===== LEFT ICON RAIL (global nav) ===== -->
+<div class="icon-rail">
+  <div class="rail-logo">D</div>
+  <div class="rail-icon active" data-page="overview" title="Overview" onclick="goPage('overview')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+  <div class="rail-icon" data-page="blocker" title="Blocker Impact Map" onclick="goPage('blocker')"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5L15.5 10.5M8.5 16.5L15.5 13.5"/></svg></div>
+  <div class="rail-icon" data-page="dependency" title="Dependency View" onclick="goPage('dependency')"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+  <div class="rail-icon" data-page="roadmap" title="Roadmap View" onclick="goPage('roadmap')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+  <div class="rail-icon" data-page="meetings" title="Meetings" onclick="goPage('meetings')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+  <div class="rail-icon" data-page="luna" title="Luna Queue" onclick="goPage('luna')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="rail-dot" id="railLunaDot"></span></div>
+  <div class="rail-spacer"></div>
+  <div class="rail-icon" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  <div class="rail-avatar" title="Selena">SV</div>
+</div>
 <div class="app">
 
   <!-- ===== HEADER ===== -->
@@ -409,8 +505,11 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         </div>
       </div>
       <div class="top-right">
+        <div class="updated-block">
+          <span class="live"><span class="live-dot"></span>Maintained by Selena</span>
+          <span>Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-21 09:15</b></span>
+        </div>
         <span class="icon-btn" title="Refresh"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
-        <span class="updated">Maintained by Selena · Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-21 09:15</b></span>
         <span class="filter-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</span>
         <span class="icon-btn"><svg class="i" viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
       </div>
@@ -426,6 +525,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         <button class="tab" data-page="dependency">Dependency View</button>
         <button class="tab" data-page="roadmap">Roadmap View</button>
         <button class="tab" data-page="meetings">Meetings<span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
+        <button class="tab" data-page="luna">Luna Queue<span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
       </div>
     </div>
   </div>
@@ -445,38 +545,43 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
           <div class="stat-label">Blocked</div>
         </div>
+        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,20 14,22 28,14 42,18 56,9 70,15 84,6 100,11" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="blocked">2</div>
-        <div class="stat-sub" data-kpi="blocked-sub">Flat vs. last week</div>
+        <div class="stat-sub" data-kpi="blocked-sub">Tasks blocked</div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <div class="stat-label">At Risk</div>
         </div>
+        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,18 14,12 28,16 42,8 56,13 70,7 84,12 100,5" fill="none" stroke="var(--orange)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="atrisk">8</div>
-        <div class="stat-sub up" data-kpi="atrisk-sub">+1 vs. last week</div>
+        <div class="stat-sub up" data-kpi="atrisk-sub">Tasks at risk</div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
           <div class="stat-label">Overdue</div>
         </div>
+        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,10 14,16 28,12 42,20 56,15 70,22 84,18 100,24" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="overdue">1</div>
-        <div class="stat-sub" data-kpi="overdue-sub">Flat vs. last week</div>
+        <div class="stat-sub" data-kpi="overdue-sub">Tasks overdue</div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="stat-label">Due in 7 Days</div>
         </div>
+        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,8 14,14 28,10 42,17 56,13 70,19 84,15 100,20" fill="none" stroke="var(--blue)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="duesoon">2</div>
-        <div class="stat-sub down" data-kpi="duesoon-sub">-1 vs. last week</div>
+        <div class="stat-sub down" data-kpi="duesoon-sub">Tasks due soon</div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="stat-label">Current Phase</div>
         </div>
+        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><circle cx="50" cy="15" r="11" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-dasharray="52 69"/></svg>
         <div class="stat-value small">Month 2</div>
         <div class="stat-sub">Aug 2026 · Digital Twin Construction</div>
       </div>
@@ -484,29 +589,62 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 
     <div class="banner">
       <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-      <div>
-        <div class="banner-title">Priority Summary</div>
-        <div class="banner-text">Calibration for the first data center (Month 2) has started. Current focus is on consolidating historical data and coordinating with BMS/PMS vendors to keep Digital Twin calibration on track.</div>
+      <div style="flex:1;">
+        <div class="banner-title">Selena Program Brief<span class="ai-tag">AI</span></div>
+        <div class="banner-text">Historical BMS Data remains the primary blocker and is affecting Digital Twin work and MS2 calibration. Calibration for the first data center (Month 2) has started; current focus is consolidating historical data and coordinating with BMS/PMS vendors to keep Digital Twin calibration on track.</div>
       </div>
+      <a class="panel-link" style="margin:2px 0 0;flex-shrink:0;" onclick="showToast('Selena Program Brief','The full AI-generated brief is a preview feature — not wired up yet.')">View full brief <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
 
     <div class="row2">
       <div class="panel">
-        <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>Current Blocker Summary (Critical Path)</div>
-        <div class="chain-flow">
-          <div class="chain-row">
-            <div class="node-card"><span class="nid">03</span>Historical BMS Data</div>
-            <span class="node-arrow">→</span>
-            <div class="node-card"><span class="nid">04</span>Digital Twin Framework</div>
-            <span class="node-arrow dashed">┄→</span>
-            <div class="node-card ms"><span class="nid">◆</span>MS2 Digital Twin Calibrated</div>
+        <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>Blocker Impact Snapshot</div>
+        <div class="bim-snap-grid">
+          <div class="bim-snap-col">
+            <div class="bim-col-title">Current Blocker Source</div>
+            <div class="flow-card blocker-src" data-node="03">
+              <div class="blocker-tag"><span class="dot"></span>Primary Blocker</div>
+              <div class="fc-top"><div class="fc-id">03</div><div class="fc-name">Historical BMS Data</div></div>
+              <div class="fc-meta">Hong Qing / Justin &nbsp;·&nbsp; Due 21 Aug 2026</div>
+              <div class="fc-badges"></div>
+              <div class="fc-desc">Upstream data not available. This is the root blocker for the downstream chain.</div>
+            </div>
+            <div class="flow-card subset" data-node="05">
+              <div class="subset-tag"><span class="dot"></span>PILOT SUBSET&nbsp;&nbsp;<span style="text-transform:none;font-weight:600;">Part of Historical BMS Data</span></div>
+              <div class="fc-top"><div class="fc-id">05</div><div class="fc-name">Single Data Hall Pilot</div></div>
+              <div class="fc-meta">Mingchen / Valdy &nbsp;·&nbsp; Due 20 Aug 2026</div>
+              <div class="fc-badges"></div>
+              <div class="fc-desc">Pilot scope depends on Historical BMS Data availability.</div>
+            </div>
           </div>
-          <div class="chain-row">
-            <div class="node-card"><span class="nid">03</span>Historical BMS Data</div>
-            <span class="node-arrow dashed">┄→</span>
-            <div class="node-card"><span class="nid">05</span>Single Data Hall Pilot <span style="color:var(--text-dimmer);font-weight:500;">(pilot subset)</span></div>
-            <span class="badge red">Blocked</span>
-            <span class="badge red">Overdue</span>
+          <div class="bim-snap-arrow-col"><svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="bim-snap-col">
+            <div class="bim-col-title">Impacted Tasks</div>
+            <div class="flow-card" data-node="04">
+              <div class="fc-top"><div class="fc-id">04</div><div class="fc-name">Digital Twin Framework</div></div>
+              <div class="fc-meta">Valdy &nbsp;·&nbsp; Due 21 Aug 2026</div>
+              <div class="fc-badges"></div>
+            </div>
+            <div class="flow-card" data-node="31">
+              <div class="fc-top"><div class="fc-id">31</div><div class="fc-name">Baseline Energy Model</div></div>
+              <div class="fc-meta">Mingchen &nbsp;·&nbsp; Due 30 Sep 2026</div>
+              <div class="fc-badges"></div>
+            </div>
+            <div class="flow-card" data-node="32">
+              <div class="fc-top"><div class="fc-id">32</div><div class="fc-name">InfluxDB Continuous Ingestion</div></div>
+              <div class="fc-meta">Valdy &nbsp;·&nbsp; Due 05 Sep 2026</div>
+              <div class="fc-badges"></div>
+            </div>
+          </div>
+          <div class="bim-snap-arrow-col"><svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="bim-snap-col">
+            <div class="bim-col-title">Milestone / Downstream Impact</div>
+            <div class="flow-card ms" data-node="MS2">
+              <div class="fc-top"><div class="fc-id">◆</div><div class="fc-name">MS2 Digital Twin Calibrated</div></div>
+              <div class="fc-meta">Valdy &nbsp;·&nbsp; Due 28 Aug 2026</div>
+              <div class="fc-badges"></div>
+              <div class="fc-desc">Cannot be achieved until upstream tasks are unblocked.</div>
+            </div>
           </div>
         </div>
         <a class="panel-link" onclick="goPage('blocker')">View full Blocker Impact Map <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
@@ -515,58 +653,86 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       <div class="panel">
         <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>Actions to Follow Up (Top 5)</div>
         <table>
-          <thead><tr><th>Action Item</th><th>Owner</th><th>Target Date</th><th>Priority</th><th>Status</th></tr></thead>
+          <thead><tr><th style="width:22px;">#</th><th>Action</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead>
           <tbody id="top5ActionsBody"></tbody>
         </table>
         <a class="panel-link" onclick="goPage('roadmap')">View all actions <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </div>
 
-    <div class="panel">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div class="panel-title" style="margin:0"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>Roadmap Snapshot (Milestone Overview)</div>
-        <a class="panel-link" style="margin:0" onclick="goPage('roadmap')">Go to full Roadmap View <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    <div class="row3">
+      <div class="panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="panel-title" style="margin:0"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>Roadmap Snapshot (Milestone Overview)</div>
+          <a class="panel-link" style="margin:0" onclick="goPage('roadmap')">Go to full Roadmap View <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        </div>
+        <div class="snap-grid">
+          <div class="snap-col">
+            <div class="snap-head">Month 1<span class="snap-tag">Completed</span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">00</span>VPN / VM Access</span><span class="badge-slot" data-node="00"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">01</span>Technical Alignment Session</span><span class="badge-slot" data-node="01"></span></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label">Completion 50%</div></div>
+          </div>
+          <div class="snap-col current">
+            <div class="snap-head">Month 2<span class="snap-tag">Current</span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">02</span>Data Point / API Integration</span><span class="badge-slot" data-node="02"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">03</span>Historical BMS Data</span><span class="badge-slot" data-node="03"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">04</span>Digital Twin Framework</span><span class="badge-slot" data-node="04"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">05</span>Single Data Hall Pilot</span><span class="badge-slot" data-node="05"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">06</span>Model Calibration Prep</span><span class="badge-slot" data-node="06"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">07</span>Leakage Detection Definition</span><span class="badge-slot" data-node="07"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">31</span>Baseline Energy Model</span><span class="badge-slot" data-node="31"></span></div>
+            <div class="snap-item ms"><span class="lbl">◆ 08/28 MS2 Digital Twin Calibrated</span></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--blue)"></div></div><div class="progress-label">Completion 49%</div></div>
+          </div>
+          <div class="snap-col">
+            <div class="snap-head">Month 3<span class="snap-tag">Upcoming</span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">10</span>AI Optimization Training</span><span class="badge-slot" data-node="10"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">11</span>Simulation Savings Validation</span><span class="badge-slot" data-node="11"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">12</span>Safety Guardrail Definition</span><span class="badge-slot" data-node="12"></span></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label">Completion 0%</div></div>
+          </div>
+        </div>
       </div>
-      <div class="snap-grid">
-        <div class="snap-col">
-          <div class="snap-head"><span class="dotcol" style="background:var(--orange)"></span>Month 1 <span style="font-weight:500;color:var(--text-dimmer)">Jul 2026</span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">00</span>VPN / VM Access</span><span class="badge-slot" data-node="00"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">01</span>Technical Alignment Session</span><span class="badge-slot" data-node="01"></span></div>
-          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label">Completion 50%</div></div>
+
+      <div class="panel">
+        <div class="panel-title"><div class="icon-box" style="background:var(--violet-bg);color:var(--violet)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Luna Queue<span class="ai-tag">Preview</span></div>
+        <div class="mini-queue-row">
+          <span class="mq-icon" style="background:var(--blue-bg);color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          <span class="mq-count">3</span><span class="mq-label">Pending Review</span>
         </div>
-        <div class="snap-col current">
-          <div class="snap-head"><span class="dotcol" style="background:var(--purple)"></span>Month 2 <span style="font-weight:500;color:var(--text-dimmer)">Aug 2026 (current)</span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">02</span>Data Point / API Integration</span><span class="badge-slot" data-node="02"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">03</span>Historical BMS Data</span><span class="badge-slot" data-node="03"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">04</span>Digital Twin Framework</span><span class="badge-slot" data-node="04"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">05</span>Single Data Hall Pilot</span><span class="badge-slot" data-node="05"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">06</span>Model Calibration Prep</span><span class="badge-slot" data-node="06"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">07</span>Leakage Detection Definition</span><span class="badge-slot" data-node="07"></span></div>
-          <div class="snap-item ms"><span class="lbl">◆ 08/28 MS2 Digital Twin Calibrated</span></div>
-          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--blue)"></div></div><div class="progress-label">Completion 49%</div></div>
+        <div class="mini-queue-row">
+          <span class="mq-icon" style="background:var(--orange-bg);color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+          <span class="mq-count">2</span><span class="mq-label">Waiting for Response</span>
         </div>
-        <div class="snap-col">
-          <div class="snap-head"><span class="dotcol" style="background:var(--gray)"></span>Month 3 <span style="font-weight:500;color:var(--text-dimmer)">Sep 2026</span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">10</span>AI Optimization Training</span><span class="badge-slot" data-node="10"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">11</span>Simulation Savings Validation</span><span class="badge-slot" data-node="11"></span></div>
-          <div class="snap-item"><span class="lbl"><span class="nid">12</span>Safety Guardrail Definition</span><span class="badge-slot" data-node="12"></span></div>
-          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label">Completion 0%</div></div>
+        <div class="mini-queue-row">
+          <span class="mq-icon" style="background:var(--red-bg);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+          <span class="mq-count">1</span><span class="mq-label">Escalation Suggested</span>
         </div>
+        <div class="mq-recent-label">Recent</div>
+        <div class="mq-recent-row"><span><b>DT-024</b> · Historical BMS Data</span><span class="badge red">Overdue</span></div>
+        <a class="panel-link" onclick="goPage('luna')">Open Luna Queue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
-      <div class="legend-row">
-        <div class="legend-group"><b>Status:</b>
-          <span class="legend-item"><span class="dot" style="color:var(--green)"></span>Completed</span>
-          <span class="legend-item"><span class="dot" style="color:var(--orange)"></span>In Progress</span>
-          <span class="legend-item"><span class="dot" style="color:var(--blue)"></span>Planned</span>
-          <span class="legend-item"><span class="dot" style="color:var(--red)"></span>Overdue</span>
-          <span class="legend-item"><span class="dot" style="color:var(--gray)"></span>Not Started</span>
-          <span class="legend-item"><span class="dot" style="color:var(--violet)"></span>Unconfirmed</span>
+
+      <div class="panel">
+        <div class="panel-title"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>Internal Delivery<span class="ai-tag">Preview</span></div>
+        <div class="deliv-row">
+          <div class="deliv-top"><span>API Service</span><b>72%</b></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--blue)"></div></div>
         </div>
-        <div class="legend-group"><b>Priority:</b>
-          <span class="legend-item" style="color:var(--orange)">▲ High</span>
-          <span class="legend-item" style="color:var(--blue)">▲ Medium</span>
-          <span class="legend-item" style="color:var(--gray)">▲ Low</span>
+        <div class="deliv-row">
+          <div class="deliv-top"><span>Model & Simulation</span><b>61%</b></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:61%;background:var(--orange)"></div></div>
         </div>
+        <div class="deliv-row">
+          <div class="deliv-top"><span>Platform & Deployment</span><b>83%</b></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:83%;background:var(--green)"></div></div>
+        </div>
+        <div class="deliv-row">
+          <div class="deliv-top"><span>AI Optimization Engine</span><b>10%</b></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:10%;background:var(--red)"></div></div>
+        </div>
+        <a class="panel-link" onclick="showToast('Internal Delivery','Full internal-progress drill-down is a preview feature — not wired up yet.')">View internal progress <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </div>
   </div>
@@ -853,14 +1019,16 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         <div>
           <div class="month-flow">
             <div class="month-card">
-              <div class="month-head"><span class="mh-icon" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 1</b><span>Jul 2026</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 1 · Project Kick-Off</b><span>Jul 2026</span></div></div>
+              <div class="card-badges"><span class="badge green">VPN ON</span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">00</span>VPN / VM Access</span><span class="badge-slot" data-node="00"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">01</span>Technical Alignment Session</span><span class="badge-slot" data-node="01"></span></div>
               <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label">Completion 50%</div></div>
             </div>
             <div class="month-connector">→</div>
             <div class="month-card current">
-              <div class="month-head"><span class="mh-icon" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 2</b><span>Aug 2026 (current)</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 2 · Digital Twin Construction</b><span>Aug 2026 (current)</span></div></div>
+              <div class="card-badges"><span class="badge blue">BMS read</span><span class="badge green">VPN ON</span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">02</span>Data Point / API Integration</span><span class="badge-slot" data-node="02"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">03</span>Historical BMS Data</span><span class="badge-slot" data-node="03"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">04</span>Digital Twin Framework</span><span class="badge-slot" data-node="04"></span></div>
@@ -873,7 +1041,8 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             </div>
             <div class="month-connector">→</div>
             <div class="month-card">
-              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 3</b><span>Sep 2026</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 3 · AI Optimization Training</b><span>Sep 2026</span></div></div>
+              <div class="card-badges"><span class="badge blue">BMS read</span><span class="badge green">VPN ON</span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">10</span>AI Optimization Training</span><span class="badge-slot" data-node="10"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">11</span>Simulation Savings Validation</span><span class="badge-slot" data-node="11"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">12</span>Safety Guardrail Definition</span><span class="badge-slot" data-node="12"></span></div>
@@ -881,7 +1050,8 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             </div>
             <div class="month-connector">→</div>
             <div class="month-card">
-              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 4</b><span>Oct 2026</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 4 · Optimization Deployment (Human-in-Loop)</b><span>Oct 2026</span></div></div>
+              <div class="card-badges"><span class="badge blue">BMS read</span><span class="badge green">VPN ON</span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">13</span>DCVerse/DCWiz Integration</span><span class="badge-slot" data-node="13"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">14</span>Human-in-the-Loop Rollout</span><span class="badge-slot" data-node="14"></span></div>
               <div class="mtask"><span class="mt-lbl"><span class="nid">15</span>DCWiz Telemetry & What-if Validation</span><span class="badge-slot" data-node="15"></span></div>
@@ -892,15 +1062,15 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="panel month5to9">
             <div class="panel-title" style="margin-bottom:14px;"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>Month 5–9 Roadmap Overview</div>
             <div class="mini-month-row">
-              <div class="mini-month"><b>Month 5</b><span class="sub">Nov 2026</span><ul><li>16 Data governance & quality improvement</li><li>17 Model iteration & optimization</li><li>18 Energy baseline established</li></ul></div>
+              <div class="mini-month"><b>Month 5 · Optimization Validation & Auto-Control Build</b><span class="sub">Nov 2026</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge violet">VPN ON → OFF</span></div><ul><li>Optimization validation & fine-tuning</li><li>Auto-control engine building</li><li>Control accuracy evaluation</li><li>Operator feedback incorporated</li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 6</b><span class="sub">Dec 2026</span><ul><li>19 Policy simulation validated at scale</li><li>20 Reporting & visualization improvements</li><li>21 Alerting & anomaly detection refined</li></ul></div>
+              <div class="mini-month"><b>Month 6 · Stable Energy Savings</b><span class="sub">Dec 2026</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Sustained energy savings demonstrated</li><li>Auto-control model shadowing started</li><li>System ready for operational trials</li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 7</b><span class="sub">Jan 2027</span><ul><li>22 Full-site deployment & integration testing</li><li>23 O&M process & documentation handover</li><li>24 Project acceptance preparation</li></ul></div>
+              <div class="mini-month"><b>Month 7 · Controlled Auto-Control Trials</b><span class="sub">Jan 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Controlled auto-control activation</li><li>Safety guardrails verified</li><li>No SLA violations</li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 8</b><span class="sub">Feb 2027</span><ul><li>25 Performance optimization & stability improvements</li><li>26 Security hardening & audit</li><li>27 Training & knowledge transfer</li></ul></div>
+              <div class="mini-month"><b>Month 8 · Optimization Refinement</b><span class="sub">Feb 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Optimization policy refined</li><li>Additional energy savings realized</li><li>Operator training conducted</li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 9</b><span class="sub">Mar 2027</span><ul><li>28 Continuous optimization & version iteration</li><li>29 Operations support & SLA assurance</li><li>30 Project closeout & retrospective</li></ul></div>
+              <div class="mini-month"><b>Month 9 · Final Validation & Project Completion</b><span class="sub">Mar 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Energy savings verified</li><li>Operational handover completed</li><li>Replication roadmap prepared</li></ul></div>
             </div>
             <div class="legend-row" style="margin-top:18px;">
               <span class="legend-item"><span class="dot" style="color:var(--green)"></span>Completed</span>
@@ -929,7 +1099,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
               </div>
               <select class="select-box" id="phaseFilter">
                 <option value="all">All Phases</option>
-                <option value="1">Month 1</option><option value="2">Month 2</option><option value="3">Month 3</option><option value="4">Month 4</option>
+                <option value="1">Month 1</option><option value="2">Month 2</option><option value="3">Month 3</option><option value="4">Month 4</option><option value="5">Month 5</option><option value="6">Month 6</option><option value="7">Month 7</option><option value="8">Month 8</option><option value="9">Month 9</option>
               </select>
               <div class="status-pills" id="statusPills">
                 <button class="pill active" data-status="all">All Statuses</button>
@@ -940,7 +1110,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
               </div>
               <select class="select-box" id="monthFilter">
                 <option value="all">All Months</option>
-                <option value="1">Jul 2026</option><option value="2">Aug 2026</option><option value="3">Sep 2026</option><option value="4">Oct 2026</option>
+                <option value="1">Jul 2026</option><option value="2">Aug 2026</option><option value="3">Sep 2026</option><option value="4">Oct 2026</option><option value="5">Nov 2026</option><option value="6">Dec 2026</option><option value="7">Jan 2027</option><option value="8">Feb 2027</option><option value="9">Mar 2027</option>
               </select>
               <button class="export-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
             </div>
@@ -986,9 +1156,15 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <input type="text" id="impTitle" placeholder="Meeting title, e.g. DayOne Weekly Meeting">
             <input type="text" id="impDate" placeholder="Date YYYY-MM-DD">
             <textarea id="impText" placeholder="Paste the raw meeting minutes / transcript…"></textarea>
+            <div class="attach-row">
+              <label class="btn-ghost attach-btn" for="impFile">📎 Attach file (image / .pdf / .docx / .md / .txt)</label>
+              <input type="file" id="impFile" accept=".md,.txt,.pdf,.docx,image/png,image/jpeg,image/jpg" style="display:none;" onchange="handleAttachmentUpload(this)">
+              <span class="attach-status" id="attachStatus"></span>
+            </div>
+            <div class="attach-previews" id="attachPreviews"></div>
             <button class="btn-primary" onclick="importMeeting()">Save Meeting Record</button>
             <div style="font-size:11px;color:var(--text-dimmer);line-height:1.6;">
-              Note: this step only saves the raw text. The actual "AI change detection" is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one.
+              Note: this step only saves the raw text (plus any attached files' extracted text, or images for visual reference). The actual "AI change detection" is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one.
             </div>
           </div>
         </div>
@@ -1014,15 +1190,113 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- LUNA QUEUE (preview — placeholder content, no live data yet) -->
+  <!-- ============================================================ -->
+  <div class="page" id="page-luna">
+    <div class="page-head">
+      <h1>Luna Queue</h1>
+      <p>A queue of items Luna (the AI assistant) has flagged for human review, response, or escalation</p>
+    </div>
+
+    <div class="banner" style="margin-bottom:18px;">
+      <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div>
+        <div class="banner-title">Preview</div>
+        <div class="banner-text">This page is a preview of an upcoming feature — the counts and rows below are placeholder content, not live data. Once wired up, Luna Queue will surface anything the AI assistant thinks needs a human decision: ambiguous Change Proposals, stalled owners, and items worth escalating.</div>
+      </div>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stat-card">
+        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-label">Pending Review</div></div>
+        <div class="stat-value">3</div>
+        <div class="stat-sub">Change Proposals awaiting your Approve / Reject</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label">Waiting for Response</div></div>
+        <div class="stat-value">2</div>
+        <div class="stat-sub">Owners pinged, no reply yet</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label">Escalation Suggested</div></div>
+        <div class="stat-value">1</div>
+        <div class="stat-sub">Luna thinks this needs a manager's attention</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Queue</div>
+      <table>
+        <thead><tr><th>ID</th><th>Item</th><th>Reason</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>DT-024</td><td>03 Historical BMS Data</td><td>Root blocker, overdue against original target</td><td><span class="badge red">Overdue</span></td></tr>
+          <tr><td>DT-025</td><td>02 Data Point / API Integration</td><td>Completion date was TBC for 2 weeks</td><td><span class="badge orange">Waiting for Response</span></td></tr>
+          <tr><td>DT-026</td><td>08 Chiller Plant Modelling (E+)</td><td>Geometry flagged as incorrect, no update since 08/19</td><td><span class="badge orange">Waiting for Response</span></td></tr>
+          <tr><td>DT-027</td><td>p14 · 03 Original Target Date change</td><td>Confidence: confirmed, still pending review</td><td><span class="badge violet">Pending Review</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <div id="toast"><div class="toast-title" id="toastTitle">Program updated</div><div class="toast-body" id="toastBody"></div></div>
 
+<!-- Optional client-side file readers for the Meetings "Attach file" control (PDF / DOCX text
+     extraction). Loaded from cdnjs; if the browser has no network access to reach it, the
+     library stays undefined and handleAttachmentUpload() below falls back to a clear message
+     instead of failing silently — text/markdown and image attachments still work either way. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
+if(typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
+}
 /* ===================== DATA ===================== */
+// Canonical 9-month master roadmap — mirrors the "Time-line and core system support"
+// reference slide exactly (titles, badges, checklist items). Every TASKS[] row rolls up
+// under one of these via its `month` field; List / Gantt / Graph subviews of the
+// Roadmap View all read titles from here so phase names can never drift out of sync
+// between views. Months 1-4 also carry real, granular TASKS[] entries; Months 5-9 have
+// no granular backlog yet, so their `items` (below) are the slide's own checklist bullets.
+const PHASES = [
+  {month:1, title:'Project Kick-Off', dateLabel:'Jul 2026',
+   badges:[{label:'VPN ON',color:'green'}],
+   items:['Data connectivity established','Cooling system topology mapped','Control policy & tenant SLA alignment']},
+  {month:2, title:'Digital Twin Construction', dateLabel:'Aug 2026',
+   badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
+   items:['Digital twin calibrated to real system','Energy baseline model created','Simulation environment ready']},
+  {month:3, title:'AI Optimization Training', dateLabel:'Sep 2026',
+   badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
+   items:['AI optimization policy trained','Energy savings validated in simulation','Safety guardrails established']},
+  {month:4, title:'Optimization Deployment (Human-in-Loop)', dateLabel:'Oct 2026',
+   badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
+   items:['Optimization recommendations live','Operators follow AI suggestions','First real energy reduction observed']},
+  {month:5, title:'Optimization Validation & Auto-Control Build', dateLabel:'Nov 2026',
+   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN ON → OFF',color:'violet'}],
+   items:['Optimization validation & fine-tuning','Auto-control engine building','Control accuracy evaluation','Operator feedback incorporated']},
+  {month:6, title:'Stable Energy Savings', dateLabel:'Dec 2026',
+   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
+   items:['Sustained energy savings demonstrated','Auto-control model shadowing started','System ready for operational trials']},
+  {month:7, title:'Controlled Auto-Control Trials', dateLabel:'Jan 2027',
+   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
+   items:['Controlled auto-control activation','Safety guardrails verified','No SLA violations']},
+  {month:8, title:'Optimization Refinement', dateLabel:'Feb 2027',
+   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
+   items:['Optimization policy refined','Additional energy savings realized','Operator training conducted']},
+  {month:9, title:'Final Validation & Project Completion', dateLabel:'Mar 2027',
+   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
+   items:['Energy savings verified','Operational handover completed','Replication roadmap prepared']},
+];
+const PHASES_BY_MONTH = {}; PHASES.forEach(p=>{ PHASES_BY_MONTH[p.month]=p; });
+function phaseTitle(month){ const p=PHASES_BY_MONTH[month]; return p ? p.title : `Month ${month}`; }
+function phaseLabel(month){ const p=PHASES_BY_MONTH[month]; return p ? `Month ${p.month} · ${p.dateLabel} · ${p.title}` : `Month ${month}`; }
+function miniBadge(b){ return `<span class="badge ${b.color}" style="padding:2px 7px;font-size:9.5px;">${b.label}</span>`; }
+
 const TASKS = [
- {id:'00',name:'VPN / VM Access',en:'Access & connectivity setup',month:1,monthLabel:'Month 1 · Jul 2026 · Foundation & Kickoff',owner:'Istofa',status:'done',health:'good',progress:100,next:'—',due:'07/18',ms:'—',gs:'2026-07-15',ge:'2026-07-18'},
- {id:'01',name:'Technical Alignment Session',en:'Cooling topology & data-point confirmation',month:1,monthLabel:'Month 1 · Jul 2026 · Foundation & Kickoff',owner:'RDA + DayOne On-site Team',status:'unconfirmed',health:'none',progress:0,next:'Confirm whether the 08/14 alignment session has been completed',due:'08/14',ms:'—',gs:'2026-08-12',ge:'2026-08-14'},
+ {id:'00',name:'VPN / VM Access',en:'Access & connectivity setup',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'Istofa',status:'done',health:'good',progress:100,next:'—',due:'07/18',ms:'—',gs:'2026-07-15',ge:'2026-07-18'},
+ {id:'01',name:'Technical Alignment Session',en:'Cooling topology & data-point confirmation',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'RDA + DayOne On-site Team',status:'unconfirmed',health:'none',progress:0,next:'Confirm whether the 08/14 alignment session has been completed',due:'08/14',ms:'—',gs:'2026-08-12',ge:'2026-08-14'},
  {id:'02',name:'Data Point / API Integration',en:'Real-time BMS point exposure',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Anurag / Istofa',status:'inprogress',health:'fine',progress:65,next:'Complete remaining API endpoint integration',due:'08/21',ms:'MS2',gs:'2026-08-12',ge:'2026-09-05'},
  {id:'03',name:'Historical BMS Data',en:'6-month historical extraction',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Hong Qing / Justin',status:'inprogress',health:'risk',progress:50,next:'Continue providing remaining historical data (Justin, target 21 Aug)',due:'08/21',ms:'MS2',gs:'2026-07-31',ge:'2026-08-21',targetOriginal:'2026-08-14'},
  {id:'04',name:'Digital Twin Framework',en:'Data Hall, Chiller & Cooling Tower loops',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:70,next:'Complete remaining module integration; calibration depends on historical data',due:'08/21',ms:'MS2',gs:'2026-08-26',ge:'2026-09-15'},
@@ -1040,7 +1314,7 @@ const TASKS = [
  {id:'14',name:'Human-in-the-Loop Rollout',en:'Operators follow AI suggestions',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Phased rollout and monitoring',due:'10/15',ms:'—',gs:'2026-10-15',ge:'2026-11-01'},
  {id:'15',name:'DCWiz Telemetry & What-if Validation',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
 ];
-const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28'};
+const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28',month:2};
 const TODAY = new Date('2026-08-21');
 
 const STATUS_META = {
@@ -1252,8 +1526,11 @@ function applyKPIs(){
 function goPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.rail-icon[data-page]').forEach(r=>r.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelector(`.tab[data-page="${id}"]`).classList.add('active');
+  const rail = document.querySelector(`.rail-icon[data-page="${id}"]`);
+  if(rail) rail.classList.add('active');
   if(id==='dependency') requestAnimationFrame(()=>requestAnimationFrame(drawDepConnectors));
   if(id==='blocker') requestAnimationFrame(()=>requestAnimationFrame(drawBimConnectors));
   if(id==='meetings') renderMeetingsPage();
@@ -1481,7 +1758,7 @@ function renderList(){
   const body = document.getElementById('listBody');
   body.innerHTML='';
   let lastMonth=null;
-  const monthMeta = {1:'✓ Month 1 · Jul 2026 · Foundation & Kickoff',2:'Month 2 · Aug 2026 · Digital Twin Construction',3:'Month 3 · Sep 2026 · AI Optimization Training',4:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)'};
+  const monthMeta = {}; PHASES.forEach(p=>{ monthMeta[p.month] = phaseLabel(p.month); });
   rows.sort((a,b)=>a.month-b.month || a.id.localeCompare(b.id));
   rows.forEach(t=>{
     if(t.month!==lastMonth){
@@ -1532,40 +1809,69 @@ function buildGantt(){
 
   MONTHS.forEach(m=>{ monthsEl.innerHTML += `<div class="gm">${m}</div>`; });
 
-  const allRows = [...TASKS, {id:'MS2', name:MILESTONE.name, en:MILESTONE.en, owner:MILESTONE.owner, status:'milestone'}];
+  // Build one flat row list, grouped under each master roadmap phase (PHASES) so every
+  // task visibly rolls up under its Month-X master task — matching the List and Graph
+  // subviews. Phases with no granular backlog yet (Month 5-9) still get a header row
+  // (plus an "empty" placeholder row) so the full 9-month roadmap reads end-to-end.
+  const rows = [];
+  PHASES.forEach(ph=>{
+    rows.push({kind:'phase', ph});
+    const monthTasks = TASKS.filter(t=>t.month===ph.month);
+    monthTasks.forEach(t=> rows.push({kind:'task', t}));
+    if(MILESTONE.month===ph.month) rows.push({kind:'milestone'});
+    if(monthTasks.length===0 && MILESTONE.month!==ph.month) rows.push({kind:'empty', ph});
+  });
 
-  allRows.forEach(t=>{
-    const isMs = t.status==='milestone';
-    leftRows.innerHTML += `<div class="gr"><span class="gid">${isMs?'◆':t.id}</span><span class="gname">${t.name}</span><span>${isMs?'':badgeSmall(t.status)}</span></div>`;
-    let bgHtml = '';
-    MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
-    rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
+  const TASK_H = 36, PHASE_H = 28;
+  let y = 0;
+  rows.forEach(r=>{
+    const h = r.kind==='phase' ? PHASE_H : TASK_H;
+    r.top = y; r.h = h;
+    if(r.kind==='phase'){
+      leftRows.innerHTML += `<div class="gr gr-phase"><span>Month ${r.ph.month} · ${r.ph.title}</span></div>`;
+      rowsEl.innerHTML += `<div class="gantt-row-bg phase-bg" style="height:${h}px"></div>`;
+    } else if(r.kind==='empty'){
+      leftRows.innerHTML += `<div class="gr gr-empty"><span>No tasks scheduled yet</span></div>`;
+      let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
+      rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
+    } else if(r.kind==='milestone'){
+      leftRows.innerHTML += `<div class="gr"><span class="gid">◆</span><span class="gname">${MILESTONE.name}</span><span></span></div>`;
+      let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
+      rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
+    } else {
+      const t=r.t;
+      leftRows.innerHTML += `<div class="gr"><span class="gid">${t.id}</span><span class="gname">${t.name}</span><span>${badgeSmall(t.status)}</span></div>`;
+      let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
+      rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
+    }
+    y += h;
   });
 
   // position bars absolutely
   rowsEl.style.position='relative';
-  const rowH = 36;
-  allRows.forEach((t,i)=>{
-    if(t.status==='milestone'){
+  rows.forEach(r=>{
+    if(r.kind==='phase' || r.kind==='empty') return;
+    if(r.kind==='milestone'){
       const left = pct(dayOffset(MILESTONE.date));
       const el = document.createElement('div');
-      el.style.position='absolute'; el.style.left = `calc(${left}% - 6px)`; el.style.top = (i*rowH+8)+'px';
+      el.style.position='absolute'; el.style.left = `calc(${left}% - 6px)`; el.style.top = (r.top+8)+'px';
       el.innerHTML = `<span class="msdiamond" style="width:16px;height:16px;background:var(--purple)"></span>`;
       rowsEl.appendChild(el);
       const tag=document.createElement('div');
-      tag.style.position='absolute'; tag.style.left=`calc(${left}% + 14px)`; tag.style.top=(i*rowH+10)+'px';
+      tag.style.position='absolute'; tag.style.left=`calc(${left}% + 14px)`; tag.style.top=(r.top+10)+'px';
       tag.style.fontSize='10px'; tag.style.fontWeight='800'; tag.style.color='var(--purple)';
       tag.textContent = MILESTONE.due;
       rowsEl.appendChild(tag);
       return;
     }
+    const t=r.t;
     const left = pct(dayOffset(t.gs));
     const rawWidth = pct(dayOffset(t.ge)-dayOffset(t.gs));
     const width = Math.max(rawWidth,1.2);
     const colorMap = {done:'var(--green)',inprogress:'var(--orange)',blocked:'var(--red)',overdue:'var(--red)',notstarted:'var(--gray)'};
     const bar = document.createElement('div');
     bar.className='gantt-bar';
-    bar.style.left = left+'%'; bar.style.width = width+'%'; bar.style.top = (i*rowH+8)+'px';
+    bar.style.left = left+'%'; bar.style.width = width+'%'; bar.style.top = (r.top+8)+'px';
     bar.style.background = colorMap[t.status]||'var(--gray)';
     bar.style.zIndex = 6;
     if(t.status==='notstarted'){ bar.style.background='var(--panel2)'; bar.style.color='var(--text-dim)'; bar.style.border='1px solid var(--border2)';}
@@ -1573,7 +1879,7 @@ function buildGantt(){
     if(width < 7){
       bar.textContent = '';
       const ext = document.createElement('div');
-      ext.style.position='absolute'; ext.style.left = `calc(${left}% + ${width}% + 6px)`; ext.style.top = (i*rowH+8)+'px';
+      ext.style.position='absolute'; ext.style.left = `calc(${left}% + ${width}% + 6px)`; ext.style.top = (r.top+8)+'px';
       ext.style.fontSize='10px'; ext.style.fontWeight='700'; ext.style.color='var(--text-dim)'; ext.style.whiteSpace='nowrap';
       ext.style.height='20px'; ext.style.display='flex'; ext.style.alignItems='center'; ext.style.zIndex=6;
       ext.textContent = label;
@@ -1584,10 +1890,10 @@ function buildGantt(){
     rowsEl.appendChild(bar);
   });
 
-  rowsEl.style.height = (allRows.length*rowH)+'px';
+  rowsEl.style.height = y+'px';
 
   // today line
-  const todayOffset = pct(dayOffset('2026-08-19'));
+  const todayOffset = pct(dayOffset(TODAY));
   const line = document.createElement('div');
   line.className='today-line'; line.style.left = todayOffset+'%';
   line.innerHTML = `<div class="today-tag">Today</div>`;
@@ -1621,7 +1927,7 @@ function renderActionsTables(){
   const sorted = [...ACTIONS].sort((a,b)=>(pr[a.priority]??1)-(pr[b.priority]??1));
   const top5Body = document.getElementById('top5ActionsBody');
   if(top5Body){
-    top5Body.innerHTML = sorted.slice(0,5).map(a=>`<tr><td>${a.title}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${priorityBadge(a.priority)}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
+    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${a.title}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
   }
   const recoveryBody = document.getElementById('recoveryActionsBody');
   if(recoveryBody){
@@ -1777,15 +2083,103 @@ function toggleImportForm(){
   const f = document.getElementById('importForm');
   f.style.display = (f.style.display==='none' || !f.style.display) ? 'block' : 'none';
 }
+
+/* ---- Attach file (image / .pdf / .docx / .md / .txt) into the Import Meeting form ----
+   Text-bearing files (.md/.txt/.pdf/.docx) get their extracted text appended straight into
+   the raw-minutes textarea, since that's what the human hands to Claude for change-proposal
+   extraction. Images can't be auto-transcribed client-side, so they're kept as a visual
+   attachment on the meeting record instead, with a reminder note added to the textarea. */
+let pendingAttachments = []; // {name, kind:'text'|'image', dataUrl?}
+
+function handleAttachmentUpload(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const name = file.name;
+  const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  const statusEl = document.getElementById('attachStatus');
+  statusEl.textContent = `Reading ${name}…`;
+
+  const appendText = (extractedText, label) => {
+    const ta = document.getElementById('impText');
+    const block = `\n\n[Attached ${label}: ${name}]\n${extractedText}`;
+    ta.value = ta.value ? ta.value + block : block.trim();
+    statusEl.textContent = `Added text from ${name} to the box above.`;
+    pendingAttachments.push({name, kind:'text'});
+    renderAttachPreviews();
+  };
+
+  if(ext==='md' || ext==='txt'){
+    const reader = new FileReader();
+    reader.onload = e => appendText(e.target.result, 'file');
+    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.readAsText(file);
+  } else if(ext==='pdf'){
+    if(typeof pdfjsLib==='undefined'){ statusEl.textContent = `PDF reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.`; return; }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try{
+        const pdf = await pdfjsLib.getDocument({data:e.target.result}).promise;
+        let out = '';
+        for(let i=1;i<=pdf.numPages;i++){
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          out += content.items.map(it=>it.str).join(' ') + '\n\n';
+        }
+        appendText(out.trim() || '(No extractable text found — this PDF may be scanned/image-only.)', 'PDF');
+      }catch(err){ statusEl.textContent = `Could not parse ${name}: ${err.message}`; }
+    };
+    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.readAsArrayBuffer(file);
+  } else if(ext==='docx'){
+    if(typeof mammoth==='undefined'){ statusEl.textContent = `DOCX reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.`; return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      mammoth.extractRawText({arrayBuffer:e.target.result})
+        .then(result => appendText(result.value.trim() || '(No text found in this document.)', 'Word document'))
+        .catch(err => { statusEl.textContent = `Could not parse ${name}: ${err.message}`; });
+    };
+    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.readAsArrayBuffer(file);
+  } else if(['png','jpg','jpeg'].includes(ext)){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      pendingAttachments.push({name, kind:'image', dataUrl:e.target.result});
+      const ta = document.getElementById('impText');
+      const note = `\n\n[Attached image: ${name} — see the thumbnail below; images aren't auto-transcribed, so paste/describe any relevant text here.]`;
+      ta.value = ta.value + note;
+      statusEl.textContent = `Attached ${name} as an image (view it under the box, not auto-transcribed).`;
+      renderAttachPreviews();
+    };
+    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.readAsDataURL(file);
+  } else {
+    statusEl.textContent = `Unsupported file type: .${ext||'?'}. Try an image, .pdf, .docx, .md, or .txt.`;
+  }
+  input.value = ''; // allow re-selecting the same file later
+}
+
+function renderAttachPreviews(){
+  const el = document.getElementById('attachPreviews');
+  if(!el) return;
+  el.innerHTML = pendingAttachments.map((a,i)=>{
+    const thumb = a.kind==='image' ? `<img src="${a.dataUrl}">` : `<span class="file-ico">📄</span>`;
+    return `<div class="attach-chip">${thumb}<span>${a.name}</span><span class="remove" onclick="removeAttachment(${i})">✕</span></div>`;
+  }).join('');
+}
+function removeAttachment(i){ pendingAttachments.splice(i,1); renderAttachPreviews(); }
+
 function importMeeting(){
   const title = document.getElementById('impTitle').value.trim();
   const date = document.getElementById('impDate').value.trim();
   const text = document.getElementById('impText').value.trim();
   if(!title || !date){ showToast('Missing information', 'Please fill in the meeting title and date'); return; }
   const id = 'm'+(MEETINGS.length+1);
-  MEETINGS.unshift({id, title, date, summary: text ? (text.slice(0,60)+(text.length>60?'…':'')) : '(Awaiting Claude to parse Change Proposals)'});
+  const imageAttachments = pendingAttachments.filter(a=>a.kind==='image');
+  MEETINGS.unshift({id, title, date, summary: text ? (text.slice(0,60)+(text.length>60?'…':'')) : '(Awaiting Claude to parse Change Proposals)', attachments: imageAttachments});
   currentMeetingId = id;
   document.getElementById('impTitle').value=''; document.getElementById('impDate').value=''; document.getElementById('impText').value='';
+  pendingAttachments = []; renderAttachPreviews();
+  document.getElementById('attachStatus').textContent = '';
   document.getElementById('importForm').style.display='none';
   renderMeetingsPage();
   showToast('Meeting record saved', 'Paste the raw minutes to Claude — Claude will generate pending-review updates here in Change Proposal format');
@@ -1795,7 +2189,12 @@ function selectMeeting(id){ currentMeetingId = id; renderMeetingsPage(); }
 function renderMeetList(){
   const el = document.getElementById('meetList');
   if(!el) return;
-  el.innerHTML = MEETINGS.map(m=>`<div class="meet-item ${m.id===currentMeetingId?'active':''}" onclick="selectMeeting('${m.id}')"><b>${m.title}</b><span>${m.date} · ${m.summary}</span></div>`).join('');
+  el.innerHTML = MEETINGS.map(m=>{
+    const attachRow = (m.attachments && m.attachments.length)
+      ? `<div class="meet-attach-row">${m.attachments.map(a=>`<img src="${a.dataUrl}" title="${a.name}" onclick="event.stopPropagation();window.open('${a.dataUrl}','_blank')">`).join('')}</div>`
+      : '';
+    return `<div class="meet-item ${m.id===currentMeetingId?'active':''}" onclick="selectMeeting('${m.id}')"><b>${m.title}</b><span>${m.date} · ${m.summary}</span>${attachRow}</div>`;
+  }).join('');
 }
 function renderProposalList(){
   const label = document.getElementById('propMeetingLabel');
