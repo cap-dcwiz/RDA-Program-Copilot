@@ -501,31 +501,34 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         <div class="logo">D</div>
         <div class="brand-text">
           <div class="brand-title">Delivery Copilot</div>
-          <div class="brand-sub">Make RDA delivery scalable.</div>
+          <div class="brand-sub"><span data-i18n-en="Make RDA delivery scalable." data-i18n-zh="让 RDA 交付更具可扩展性。">Make RDA delivery scalable.</span></div>
         </div>
       </div>
       <div class="top-right">
         <div class="updated-block">
-          <span class="live"><span class="live-dot"></span>Maintained by Selena</span>
+          <span class="live"><span class="live-dot"></span><span data-i18n-en="Maintained by Selena" data-i18n-zh="由 Selena 维护">Maintained by Selena</span></span>
           <span>Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-21 09:15</b></span>
         </div>
         <span class="icon-btn" title="Refresh"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
-        <span class="filter-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</span>
+        <span class="filter-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span data-i18n-en="Filter" data-i18n-zh="筛选">Filter</span></span>
+        <div id="langToggle" class="lang-toggle" style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:11.5px;font-weight:700;cursor:pointer;user-select:none;">
+          <span data-lang-opt="en" style="padding:5px 9px;">EN</span><span data-lang-opt="zh" style="padding:5px 9px;">中文</span>
+        </div>
         <span class="icon-btn"><svg class="i" viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
       </div>
     </div>
     <div class="topbar-row" style="justify-content:flex-start;gap:14px;">
       <div class="project-select" title="Switch project">
-        <span class="lbl">Project:</span> DayOne NTPE
+        <span class="lbl"><span data-i18n-en="Project:" data-i18n-zh="项目:">Project:</span></span> DayOne NTPE
         <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="tabs">
-        <button class="tab active" data-page="overview">Overview</button>
-        <button class="tab" data-page="blocker">Blocker Impact Map</button>
-        <button class="tab" data-page="dependency">Dependency View</button>
-        <button class="tab" data-page="roadmap">Roadmap View</button>
-        <button class="tab" data-page="meetings">Meetings<span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
-        <button class="tab" data-page="luna">Luna Queue<span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
+        <button class="tab active" data-page="overview"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
+        <button class="tab" data-page="blocker"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
+        <button class="tab" data-page="dependency"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
+        <button class="tab" data-page="roadmap"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
+        <button class="tab" data-page="meetings"><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span><span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
+        <button class="tab" data-page="luna"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
       </div>
     </div>
   </div>
@@ -535,54 +538,54 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <div class="page active" id="page-overview">
     <div class="page-head">
-      <h1>Program Overview</h1>
-      <p>Program management console · health, blocker impact, and key actions at a glance</p>
+      <h1><span data-i18n-en="Program Overview" data-i18n-zh="项目总览">Program Overview</span></h1>
+      <p><span data-i18n-en="Program management console · health, blocker impact, and key actions at a glance" data-i18n-zh="项目管理控制台 · 一览健康度、阻塞影响与关键行动项">Program management console · health, blocker impact, and key actions at a glance</span></p>
     </div>
 
     <div class="stats">
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-          <div class="stat-label">Blocked</div>
+          <div class="stat-label"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></div>
         </div>
         <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,20 14,22 28,14 42,18 56,9 70,15 84,6 100,11" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="blocked">2</div>
-        <div class="stat-sub" data-kpi="blocked-sub">Tasks blocked</div>
+        <div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Tasks blocked" data-i18n-zh="阻塞任务数">Tasks blocked</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-          <div class="stat-label">At Risk</div>
+          <div class="stat-label"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></div>
         </div>
         <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,18 14,12 28,16 42,8 56,13 70,7 84,12 100,5" fill="none" stroke="var(--orange)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="atrisk">8</div>
-        <div class="stat-sub up" data-kpi="atrisk-sub">Tasks at risk</div>
+        <div class="stat-sub up" data-kpi="atrisk-sub"><span data-i18n-en="Tasks at risk" data-i18n-zh="有风险任务数">Tasks at risk</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-          <div class="stat-label">Overdue</div>
+          <div class="stat-label"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></div>
         </div>
         <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,10 14,16 28,12 42,20 56,15 70,22 84,18 100,24" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="overdue">1</div>
-        <div class="stat-sub" data-kpi="overdue-sub">Tasks overdue</div>
+        <div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Tasks overdue" data-i18n-zh="逾期任务数">Tasks overdue</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <div class="stat-label">Due in 7 Days</div>
+          <div class="stat-label"><span data-i18n-en="Due in 7 Days" data-i18n-zh="7天内到期">Due in 7 Days</span></div>
         </div>
         <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,8 14,14 28,10 42,17 56,13 70,19 84,15 100,20" fill="none" stroke="var(--blue)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="duesoon">2</div>
-        <div class="stat-sub down" data-kpi="duesoon-sub">Tasks due soon</div>
+        <div class="stat-sub down" data-kpi="duesoon-sub"><span data-i18n-en="Tasks due soon" data-i18n-zh="即将到期任务数">Tasks due soon</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top">
           <div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <div class="stat-label">Current Phase</div>
+          <div class="stat-label"><span data-i18n-en="Current Phase" data-i18n-zh="当前阶段">Current Phase</span></div>
         </div>
         <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><circle cx="50" cy="15" r="11" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-dasharray="52 69"/></svg>
-        <div class="stat-value small">Month 2</div>
+        <div class="stat-value small"><span data-i18n-en="Month 2" data-i18n-zh="第 2 月">Month 2</span></div>
         <div class="stat-sub">Aug 2026 · Digital Twin Construction</div>
       </div>
     </div>
@@ -590,149 +593,149 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
     <div class="banner">
       <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
       <div style="flex:1;">
-        <div class="banner-title">Selena Program Brief<span class="ai-tag">AI</span></div>
-        <div class="banner-text">Historical BMS Data remains the primary blocker and is affecting Digital Twin work and MS2 calibration. Calibration for the first data center (Month 2) has started; current focus is consolidating historical data and coordinating with BMS/PMS vendors to keep Digital Twin calibration on track.</div>
+        <div class="banner-title"><span data-i18n-en="Selena Program Brief" data-i18n-zh="Selena 项目简报">Selena Program Brief</span><span class="ai-tag">AI</span></div>
+        <div class="banner-text"><span data-i18n-en="Historical BMS Data remains the primary blocker and is affecting Digital Twin work and MS2 calibration. Calibration for the first data center (Month 2) has started; current focus is consolidating historical data and coordinating with BMS/PMS vendors to keep Digital Twin calibration on track." data-i18n-zh="历史 BMS 数据仍是主要阻塞项,正影响数字孪生工作和 MS2 标定。首个数据中心(第2月)的标定已经开始;当前重点是整合历史数据,并与 BMS/PMS 供应商协调,确保数字孪生标定按计划推进。">Historical BMS Data remains the primary blocker and is affecting Digital Twin work and MS2 calibration. Calibration for the first data center (Month 2) has started; current focus is consolidating historical data and coordinating with BMS/PMS vendors to keep Digital Twin calibration on track.</span></div>
       </div>
-      <a class="panel-link" style="margin:2px 0 0;flex-shrink:0;" onclick="showToast('Selena Program Brief','The full AI-generated brief is a preview feature — not wired up yet.')">View full brief <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      <a class="panel-link" style="margin:2px 0 0;flex-shrink:0;" onclick="showToast('Selena Program Brief','The full AI-generated brief is a preview feature — not wired up yet.')"><span data-i18n-en="View full brief" data-i18n-zh="查看完整简报">View full brief</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
 
     <div class="row2">
       <div class="panel">
-        <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>Blocker Impact Snapshot</div>
+        <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><span data-i18n-en="Blocker Impact Snapshot" data-i18n-zh="阻塞影响速览">Blocker Impact Snapshot</span></div>
         <div class="bim-snap-grid">
           <div class="bim-snap-col">
-            <div class="bim-col-title">Current Blocker Source</div>
+            <div class="bim-col-title"><span data-i18n-en="Current Blocker Source" data-i18n-zh="当前阻塞源">Current Blocker Source</span></div>
             <div class="flow-card blocker-src" data-node="03">
-              <div class="blocker-tag"><span class="dot"></span>Primary Blocker</div>
-              <div class="fc-top"><div class="fc-id">03</div><div class="fc-name">Historical BMS Data</div></div>
+              <div class="blocker-tag"><span class="dot"></span><span data-i18n-en="Primary Blocker" data-i18n-zh="主要阻塞项">Primary Blocker</span></div>
+              <div class="fc-top"><div class="fc-id">03</div><div class="fc-name"><span data-i18n-en="Historical BMS Data" data-i18n-zh="历史 BMS 数据">Historical BMS Data</span></div></div>
               <div class="fc-meta">Hong Qing / Justin &nbsp;·&nbsp; Due 21 Aug 2026</div>
               <div class="fc-badges"></div>
-              <div class="fc-desc">Upstream data not available. This is the root blocker for the downstream chain.</div>
+              <div class="fc-desc"><span data-i18n-en="Upstream data not available. This is the root blocker for the downstream chain." data-i18n-zh="上游数据尚未就绪,是下游链条的根本阻塞项。">Upstream data not available. This is the root blocker for the downstream chain.</span></div>
             </div>
             <div class="flow-card subset" data-node="05">
-              <div class="subset-tag"><span class="dot"></span>PILOT SUBSET&nbsp;&nbsp;<span style="text-transform:none;font-weight:600;">Part of Historical BMS Data</span></div>
-              <div class="fc-top"><div class="fc-id">05</div><div class="fc-name">Single Data Hall Pilot</div></div>
+              <div class="subset-tag"><span class="dot"></span><span data-i18n-en="PILOT SUBSET" data-i18n-zh="试点子集">PILOT SUBSET</span>&nbsp;&nbsp;<span style="text-transform:none;font-weight:600;"><span data-i18n-en="Part of Historical BMS Data" data-i18n-zh="属于历史 BMS 数据">Part of Historical BMS Data</span></span></div>
+              <div class="fc-top"><div class="fc-id">05</div><div class="fc-name"><span data-i18n-en="Single Data Hall Pilot" data-i18n-zh="单机房试点">Single Data Hall Pilot</span></div></div>
               <div class="fc-meta">Mingchen / Valdy &nbsp;·&nbsp; Due 20 Aug 2026</div>
               <div class="fc-badges"></div>
-              <div class="fc-desc">Pilot scope depends on Historical BMS Data availability.</div>
+              <div class="fc-desc"><span data-i18n-en="Pilot scope depends on Historical BMS Data availability." data-i18n-zh="试点范围取决于历史 BMS 数据是否就绪。">Pilot scope depends on Historical BMS Data availability.</span></div>
             </div>
           </div>
           <div class="bim-snap-arrow-col"><svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
           <div class="bim-snap-col">
-            <div class="bim-col-title">Impacted Tasks</div>
+            <div class="bim-col-title"><span data-i18n-en="Impacted Tasks" data-i18n-zh="受影响任务">Impacted Tasks</span></div>
             <div class="flow-card" data-node="04">
-              <div class="fc-top"><div class="fc-id">04</div><div class="fc-name">Digital Twin Framework</div></div>
+              <div class="fc-top"><div class="fc-id">04</div><div class="fc-name"><span data-i18n-en="Digital Twin Framework" data-i18n-zh="数字孪生框架">Digital Twin Framework</span></div></div>
               <div class="fc-meta">Valdy &nbsp;·&nbsp; Due 21 Aug 2026</div>
               <div class="fc-badges"></div>
             </div>
             <div class="flow-card" data-node="31">
-              <div class="fc-top"><div class="fc-id">31</div><div class="fc-name">Baseline Energy Model</div></div>
+              <div class="fc-top"><div class="fc-id">31</div><div class="fc-name"><span data-i18n-en="Baseline Energy Model" data-i18n-zh="能耗基线模型">Baseline Energy Model</span></div></div>
               <div class="fc-meta">Mingchen &nbsp;·&nbsp; Due 30 Sep 2026</div>
               <div class="fc-badges"></div>
             </div>
             <div class="flow-card" data-node="32">
-              <div class="fc-top"><div class="fc-id">32</div><div class="fc-name">InfluxDB Continuous Ingestion</div></div>
+              <div class="fc-top"><div class="fc-id">32</div><div class="fc-name"><span data-i18n-en="InfluxDB Continuous Ingestion" data-i18n-zh="InfluxDB 持续接入">InfluxDB Continuous Ingestion</span></div></div>
               <div class="fc-meta">Valdy &nbsp;·&nbsp; Due 05 Sep 2026</div>
               <div class="fc-badges"></div>
             </div>
           </div>
           <div class="bim-snap-arrow-col"><svg viewBox="0 0 24 24" style="width:18px;height:18px" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
           <div class="bim-snap-col">
-            <div class="bim-col-title">Milestone / Downstream Impact</div>
+            <div class="bim-col-title"><span data-i18n-en="Milestone / Downstream Impact" data-i18n-zh="里程碑／下游影响">Milestone / Downstream Impact</span></div>
             <div class="flow-card ms" data-node="MS2">
-              <div class="fc-top"><div class="fc-id">◆</div><div class="fc-name">MS2 Digital Twin Calibrated</div></div>
+              <div class="fc-top"><div class="fc-id">◆</div><div class="fc-name"><span data-i18n-en="MS2 Digital Twin Calibrated" data-i18n-zh="MS2 数字孪生标定完成">MS2 Digital Twin Calibrated</span></div></div>
               <div class="fc-meta">Valdy &nbsp;·&nbsp; Due 28 Aug 2026</div>
               <div class="fc-badges"></div>
-              <div class="fc-desc">Cannot be achieved until upstream tasks are unblocked.</div>
+              <div class="fc-desc"><span data-i18n-en="Cannot be achieved until upstream tasks are unblocked." data-i18n-zh="需上游任务解除阻塞后才能达成。">Cannot be achieved until upstream tasks are unblocked.</span></div>
             </div>
           </div>
         </div>
-        <a class="panel-link" onclick="goPage('blocker')">View full Blocker Impact Map <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="panel-link" onclick="goPage('blocker')"><span data-i18n-en="View full Blocker Impact Map" data-i18n-zh="查看完整阻塞影响图">View full Blocker Impact Map</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
 
       <div class="panel">
-        <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>Actions to Follow Up (Top 5)</div>
+        <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><span data-i18n-en="Actions to Follow Up (Top 5)" data-i18n-zh="待跟进行动项(前5)">Actions to Follow Up (Top 5)</span></div>
         <table>
-          <thead><tr><th style="width:22px;">#</th><th>Action</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead>
+          <thead><tr><th style="width:22px;">#</th><th><span data-i18n-en="Action" data-i18n-zh="行动项">Action</span></th><th><span data-i18n-en="Owner" data-i18n-zh="负责人">Owner</span></th><th><span data-i18n-en="Due" data-i18n-zh="截止日期">Due</span></th><th><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></th></tr></thead>
           <tbody id="top5ActionsBody"></tbody>
         </table>
-        <a class="panel-link" onclick="goPage('roadmap')">View all actions <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="panel-link" onclick="goPage('roadmap')"><span data-i18n-en="View all actions" data-i18n-zh="查看全部行动项">View all actions</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </div>
 
     <div class="row3">
       <div class="panel">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="panel-title" style="margin:0"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>Roadmap Snapshot (Milestone Overview)</div>
-          <a class="panel-link" style="margin:0" onclick="goPage('roadmap')">Go to full Roadmap View <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          <div class="panel-title" style="margin:0"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span data-i18n-en="Roadmap Snapshot (Milestone Overview)" data-i18n-zh="路线图速览(里程碑总览)">Roadmap Snapshot (Milestone Overview)</span></div>
+          <a class="panel-link" style="margin:0" onclick="goPage('roadmap')"><span data-i18n-en="Go to full Roadmap View" data-i18n-zh="前往完整路线图">Go to full Roadmap View</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
         <div class="snap-grid">
           <div class="snap-col">
-            <div class="snap-head">Month 1<span class="snap-tag">Completed</span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">00</span>VPN / VM Access</span><span class="badge-slot" data-node="00"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">01</span>Technical Alignment Session</span><span class="badge-slot" data-node="01"></span></div>
-            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label">Completion 50%</div></div>
+            <div class="snap-head"><span data-i18n-en="Month 1" data-i18n-zh="第 1 月">Month 1</span><span class="snap-tag"><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">00</span><span data-i18n-en="VPN / VM Access" data-i18n-zh="VPN／虚拟机接入">VPN / VM Access</span></span><span class="badge-slot" data-node="00"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">01</span><span data-i18n-en="Technical Alignment Session" data-i18n-zh="技术对齐会议">Technical Alignment Session</span></span><span class="badge-slot" data-node="01"></span></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label"><span data-i18n-en="Completion 50%" data-i18n-zh="完成度 50%">Completion 50%</span></div></div>
           </div>
           <div class="snap-col current">
-            <div class="snap-head">Month 2<span class="snap-tag">Current</span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">02</span>Data Point / API Integration</span><span class="badge-slot" data-node="02"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">03</span>Historical BMS Data</span><span class="badge-slot" data-node="03"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">04</span>Digital Twin Framework</span><span class="badge-slot" data-node="04"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">05</span>Single Data Hall Pilot</span><span class="badge-slot" data-node="05"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">06</span>Model Calibration Prep</span><span class="badge-slot" data-node="06"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">07</span>Leakage Detection Definition</span><span class="badge-slot" data-node="07"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">31</span>Baseline Energy Model</span><span class="badge-slot" data-node="31"></span></div>
-            <div class="snap-item ms"><span class="lbl">◆ 08/28 MS2 Digital Twin Calibrated</span></div>
-            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--blue)"></div></div><div class="progress-label">Completion 49%</div></div>
+            <div class="snap-head"><span data-i18n-en="Month 2" data-i18n-zh="第 2 月">Month 2</span><span class="snap-tag"><span data-i18n-en="Current" data-i18n-zh="当前">Current</span></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">02</span><span data-i18n-en="Data Point / API Integration" data-i18n-zh="数据点／API 集成">Data Point / API Integration</span></span><span class="badge-slot" data-node="02"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">03</span><span data-i18n-en="Historical BMS Data" data-i18n-zh="历史 BMS 数据">Historical BMS Data</span></span><span class="badge-slot" data-node="03"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">04</span><span data-i18n-en="Digital Twin Framework" data-i18n-zh="数字孪生框架">Digital Twin Framework</span></span><span class="badge-slot" data-node="04"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">05</span><span data-i18n-en="Single Data Hall Pilot" data-i18n-zh="单机房试点">Single Data Hall Pilot</span></span><span class="badge-slot" data-node="05"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">06</span><span data-i18n-en="Model Calibration Prep" data-i18n-zh="模型标定准备">Model Calibration Prep</span></span><span class="badge-slot" data-node="06"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">07</span><span data-i18n-en="Leakage Detection Definition" data-i18n-zh="泄漏检测定义">Leakage Detection Definition</span></span><span class="badge-slot" data-node="07"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">31</span><span data-i18n-en="Baseline Energy Model" data-i18n-zh="能耗基线模型">Baseline Energy Model</span></span><span class="badge-slot" data-node="31"></span></div>
+            <div class="snap-item ms"><span class="lbl"><span data-i18n-en="◆ 08/28 MS2 Digital Twin Calibrated" data-i18n-zh="◆ 08/28 MS2 数字孪生标定完成">◆ 08/28 MS2 Digital Twin Calibrated</span></span></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--blue)"></div></div><div class="progress-label"><span data-i18n-en="Completion 49%" data-i18n-zh="完成度 49%">Completion 49%</span></div></div>
           </div>
           <div class="snap-col">
-            <div class="snap-head">Month 3<span class="snap-tag">Upcoming</span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">10</span>AI Optimization Training</span><span class="badge-slot" data-node="10"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">11</span>Simulation Savings Validation</span><span class="badge-slot" data-node="11"></span></div>
-            <div class="snap-item"><span class="lbl"><span class="nid">12</span>Safety Guardrail Definition</span><span class="badge-slot" data-node="12"></span></div>
-            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label">Completion 0%</div></div>
+            <div class="snap-head"><span data-i18n-en="Month 3" data-i18n-zh="第 3 月">Month 3</span><span class="snap-tag"><span data-i18n-en="Upcoming" data-i18n-zh="即将开始">Upcoming</span></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">10</span><span data-i18n-en="AI Optimization Training" data-i18n-zh="AI 优化训练">AI Optimization Training</span></span><span class="badge-slot" data-node="10"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">11</span><span data-i18n-en="Simulation Savings Validation" data-i18n-zh="仿真节能验证">Simulation Savings Validation</span></span><span class="badge-slot" data-node="11"></span></div>
+            <div class="snap-item"><span class="lbl"><span class="nid">12</span><span data-i18n-en="Safety Guardrail Definition" data-i18n-zh="安全护栏定义">Safety Guardrail Definition</span></span><span class="badge-slot" data-node="12"></span></div>
+            <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label"><span data-i18n-en="Completion 0%" data-i18n-zh="完成度 0%">Completion 0%</span></div></div>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <div class="panel-title"><div class="icon-box" style="background:var(--violet-bg);color:var(--violet)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Luna Queue<span class="ai-tag">Preview</span></div>
+        <div class="panel-title"><div class="icon-box" style="background:var(--violet-bg);color:var(--violet)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span class="ai-tag"><span data-i18n-en="Preview" data-i18n-zh="预览">Preview</span></span></div>
         <div class="mini-queue-row">
           <span class="mq-icon" style="background:var(--blue-bg);color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-          <span class="mq-count">3</span><span class="mq-label">Pending Review</span>
+          <span class="mq-count">3</span><span class="mq-label"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></span>
         </div>
         <div class="mini-queue-row">
           <span class="mq-icon" style="background:var(--orange-bg);color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-          <span class="mq-count">2</span><span class="mq-label">Waiting for Response</span>
+          <span class="mq-count">2</span><span class="mq-label"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span>
         </div>
         <div class="mini-queue-row">
           <span class="mq-icon" style="background:var(--red-bg);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-          <span class="mq-count">1</span><span class="mq-label">Escalation Suggested</span>
+          <span class="mq-count">1</span><span class="mq-label"><span data-i18n-en="Escalation Suggested" data-i18n-zh="建议升级">Escalation Suggested</span></span>
         </div>
-        <div class="mq-recent-label">Recent</div>
-        <div class="mq-recent-row"><span><b>DT-024</b> · Historical BMS Data</span><span class="badge red">Overdue</span></div>
-        <a class="panel-link" onclick="goPage('luna')">Open Luna Queue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <div class="mq-recent-label"><span data-i18n-en="Recent" data-i18n-zh="最近">Recent</span></div>
+        <div class="mq-recent-row"><span><b>DT-024</b> · Historical BMS Data</span><span class="badge red"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span></div>
+        <a class="panel-link" onclick="goPage('luna')"><span data-i18n-en="Open Luna Queue" data-i18n-zh="打开 Luna 队列">Open Luna Queue</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
 
       <div class="panel">
-        <div class="panel-title"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>Internal Delivery<span class="ai-tag">Preview</span></div>
+        <div class="panel-title"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><span data-i18n-en="Internal Delivery" data-i18n-zh="内部交付进度">Internal Delivery</span><span class="ai-tag"><span data-i18n-en="Preview" data-i18n-zh="预览">Preview</span></span></div>
         <div class="deliv-row">
-          <div class="deliv-top"><span>API Service</span><b>72%</b></div>
+          <div class="deliv-top"><span><span data-i18n-en="API Service" data-i18n-zh="API 服务">API Service</span></span><b>72%</b></div>
           <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--blue)"></div></div>
         </div>
         <div class="deliv-row">
-          <div class="deliv-top"><span>Model & Simulation</span><b>61%</b></div>
+          <div class="deliv-top"><span><span data-i18n-en="Model & Simulation" data-i18n-zh="模型与仿真">Model & Simulation</span></span><b>61%</b></div>
           <div class="progress-bar"><div class="progress-fill" style="width:61%;background:var(--orange)"></div></div>
         </div>
         <div class="deliv-row">
-          <div class="deliv-top"><span>Platform & Deployment</span><b>83%</b></div>
+          <div class="deliv-top"><span><span data-i18n-en="Platform & Deployment" data-i18n-zh="平台与部署">Platform & Deployment</span></span><b>83%</b></div>
           <div class="progress-bar"><div class="progress-fill" style="width:83%;background:var(--green)"></div></div>
         </div>
         <div class="deliv-row">
-          <div class="deliv-top"><span>AI Optimization Engine</span><b>10%</b></div>
+          <div class="deliv-top"><span><span data-i18n-en="AI Optimization Engine" data-i18n-zh="AI 优化引擎">AI Optimization Engine</span></span><b>10%</b></div>
           <div class="progress-bar"><div class="progress-fill" style="width:10%;background:var(--red)"></div></div>
         </div>
-        <a class="panel-link" onclick="showToast('Internal Delivery','Full internal-progress drill-down is a preview feature — not wired up yet.')">View internal progress <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="panel-link" onclick="showToast('Internal Delivery','Full internal-progress drill-down is a preview feature — not wired up yet.')"><span data-i18n-en="View internal progress" data-i18n-zh="查看内部进度">View internal progress</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </div>
   </div>
@@ -742,29 +745,29 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <div class="page" id="page-blocker">
     <div class="page-head">
-      <h1>Blocker Impact Map</h1>
-      <p>Focused on the current real blocker chain — who is blocking whom, and which tasks and milestones are impacted</p>
+      <h1><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></h1>
+      <p><span data-i18n-en="Focused on the current real blocker chain — who is blocking whom, and which tasks and milestones are impacted" data-i18n-zh="聚焦当前真实的阻塞链条 — 谁在阻塞谁,哪些任务和里程碑受到影响">Focused on the current real blocker chain — who is blocking whom, and which tasks and milestones are impacted</span></p>
     </div>
     <div class="stats">
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label">Blocked</div></div>
-        <div class="stat-value" data-kpi="blocked">2</div><div class="stat-sub" data-kpi="blocked-sub">Flat vs. last week</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></div></div>
+        <div class="stat-value" data-kpi="blocked">2</div><div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-label">At Risk</div></div>
-        <div class="stat-value" data-kpi="atrisk">8</div><div class="stat-sub up" data-kpi="atrisk-sub">+1 vs. last week</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-label"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></div></div>
+        <div class="stat-value" data-kpi="atrisk">8</div><div class="stat-sub up" data-kpi="atrisk-sub"><span data-i18n-en="+1 vs. last week" data-i18n-zh="较上周 +1">+1 vs. last week</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label">Overdue</div></div>
-        <div class="stat-value" data-kpi="overdue">1</div><div class="stat-sub" data-kpi="overdue-sub">Flat vs. last week</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></div></div>
+        <div class="stat-value" data-kpi="overdue">1</div><div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="stat-label">Current Blocker Sources</div></div>
-        <div class="stat-value" data-kpi="blockersources">2</div><div class="stat-sub">Flat vs. last week</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="stat-label"><span data-i18n-en="Current Blocker Sources" data-i18n-zh="当前阻塞源数量">Current Blocker Sources</span></div></div>
+        <div class="stat-value" data-kpi="blockersources">2</div><div class="stat-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="stat-label">Milestones Impacted</div></div>
-        <div class="stat-value" data-kpi="msimpacted">1</div><div class="stat-sub">Flat vs. last week</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="stat-label"><span data-i18n-en="Milestones Impacted" data-i18n-zh="受影响里程碑数">Milestones Impacted</span></div></div>
+        <div class="stat-value" data-kpi="msimpacted">1</div><div class="stat-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
       </div>
     </div>
 
@@ -773,70 +776,70 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       <svg id="bimSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1;"></svg>
       <div class="bim-grid" style="position:relative;z-index:2;">
         <div>
-          <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Current Blocker Sources / Upstream Blockers <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+          <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span data-i18n-en="Current Blocker Sources / Upstream Blockers" data-i18n-zh="当前阻塞源／上游阻塞项">Current Blocker Sources / Upstream Blockers</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
           <div class="flow-card blocker-src" data-node="03">
-            <div class="blocker-tag"><span class="dot"></span>Primary Blocker</div>
-            <div class="fc-top"><span class="fc-id">03</span><span class="fc-name">Historical BMS Data</span></div>
+            <div class="blocker-tag"><span class="dot"></span><span data-i18n-en="Primary Blocker" data-i18n-zh="主要阻塞项">Primary Blocker</span></div>
+            <div class="fc-top"><span class="fc-id">03</span><span class="fc-name"><span data-i18n-en="Historical BMS Data" data-i18n-zh="历史 BMS 数据">Historical BMS Data</span></span></div>
             <div class="fc-meta">👤 Hong Qing / Justin &nbsp;·&nbsp; 📅 Due: 2026-08-21</div>
-            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
-            <div class="fc-desc">Upstream data not available. This is the root blocker for the downstream chain.</div>
+            <div class="fc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div>
+            <div class="fc-desc"><span data-i18n-en="Upstream data not available. This is the root blocker for the downstream chain." data-i18n-zh="上游数据尚未就绪,是下游链条的根本阻塞项。">Upstream data not available. This is the root blocker for the downstream chain.</span></div>
           </div>
           <div class="flow-card subset" data-node="05">
-            <div class="subset-tag"><span class="dot"></span>PILOT SUBSET&nbsp;&nbsp;<span style="text-transform:none;font-weight:600;">Part of Historical BMS Data</span></div>
-            <div class="fc-top"><span class="fc-id">05</span><span class="fc-name">Single Data Hall Pilot</span></div>
+            <div class="subset-tag"><span class="dot"></span><span data-i18n-en="PILOT SUBSET" data-i18n-zh="试点子集">PILOT SUBSET</span>&nbsp;&nbsp;<span style="text-transform:none;font-weight:600;"><span data-i18n-en="Part of Historical BMS Data" data-i18n-zh="属于历史 BMS 数据">Part of Historical BMS Data</span></span></div>
+            <div class="fc-top"><span class="fc-id">05</span><span class="fc-name"><span data-i18n-en="Single Data Hall Pilot" data-i18n-zh="单机房试点">Single Data Hall Pilot</span></span></div>
             <div class="fc-meta">👤 Mingchen / Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-20</div>
-            <div class="fc-badges"><span class="badge red">Blocked</span><span class="badge red">Overdue</span></div>
-            <div class="fc-desc">Pilot scope depends on Historical BMS Data availability.</div>
+            <div class="fc-badges"><span class="badge red"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></span><span class="badge red"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span></div>
+            <div class="fc-desc"><span data-i18n-en="Pilot scope depends on Historical BMS Data availability." data-i18n-zh="试点范围取决于历史 BMS 数据是否就绪。">Pilot scope depends on Historical BMS Data availability.</span></div>
           </div>
         </div>
 
         <div>
-          <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Impacted Tasks <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+          <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span data-i18n-en="Impacted Tasks" data-i18n-zh="受影响任务">Impacted Tasks</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
           <div class="flow-card" data-node="04">
-            <div class="fc-top"><span class="fc-id">04</span><span class="fc-name">Digital Twin Framework</span></div>
+            <div class="fc-top"><span class="fc-id">04</span><span class="fc-name"><span data-i18n-en="Digital Twin Framework" data-i18n-zh="数字孪生框架">Digital Twin Framework</span></span></div>
             <div class="fc-meta">👤 Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-21</div>
-            <div class="fc-badges"><span class="badge red">Blocked</span></div>
-            <div class="fc-desc">Requires Historical BMS Data to build and validate framework components.</div>
+            <div class="fc-badges"><span class="badge red"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></span></div>
+            <div class="fc-desc"><span data-i18n-en="Requires Historical BMS Data to build and validate framework components." data-i18n-zh="需要历史 BMS 数据来构建和验证框架组件。">Requires Historical BMS Data to build and validate framework components.</span></div>
           </div>
           <div class="flow-card" data-node="31">
-            <div class="fc-top"><span class="fc-id">31</span><span class="fc-name">Baseline Energy Model</span></div>
+            <div class="fc-top"><span class="fc-id">31</span><span class="fc-name"><span data-i18n-en="Baseline Energy Model" data-i18n-zh="能耗基线模型">Baseline Energy Model</span></span></div>
             <div class="fc-meta">👤 Mingchen &nbsp;·&nbsp; 📅 Due: 2026-09-30</div>
-            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
-            <div class="fc-desc">Model calibration depends on Digital Twin Framework outputs.</div>
+            <div class="fc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div>
+            <div class="fc-desc"><span data-i18n-en="Model calibration depends on Digital Twin Framework outputs." data-i18n-zh="模型标定依赖数字孪生框架的输出。">Model calibration depends on Digital Twin Framework outputs.</span></div>
           </div>
           <div class="flow-card" data-node="32">
-            <div class="fc-top"><span class="fc-id">32</span><span class="fc-name">InfluxDB Continuous Ingestion</span></div>
+            <div class="fc-top"><span class="fc-id">32</span><span class="fc-name"><span data-i18n-en="InfluxDB Continuous Ingestion" data-i18n-zh="InfluxDB 持续接入">InfluxDB Continuous Ingestion</span></span></div>
             <div class="fc-meta">👤 Valdy &nbsp;·&nbsp; 📅 Due: 2026-09-05</div>
-            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
-            <div class="fc-desc">Waiting on stable data and framework readiness.</div>
+            <div class="fc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div>
+            <div class="fc-desc"><span data-i18n-en="Waiting on stable data and framework readiness." data-i18n-zh="等待数据稳定和框架就绪。">Waiting on stable data and framework readiness.</span></div>
           </div>
         </div>
 
         <div>
-          <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg>Milestones / Downstream Impact <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+          <div class="bim-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg><span data-i18n-en="Milestones / Downstream Impact" data-i18n-zh="里程碑／下游影响">Milestones / Downstream Impact</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
           <div class="flow-card ms" data-node="MS2">
-            <div class="fc-top"><span class="fc-id">◆</span><span class="fc-name">MS2 Digital Twin Calibrated</span></div>
+            <div class="fc-top"><span class="fc-id">◆</span><span class="fc-name"><span data-i18n-en="MS2 Digital Twin Calibrated" data-i18n-zh="MS2 数字孪生标定完成">MS2 Digital Twin Calibrated</span></span></div>
             <div class="fc-meta">👤 Valdy &nbsp;·&nbsp; 📅 Due: 2026-08-28</div>
-            <div class="fc-badges"><span class="badge orange">At Risk</span></div>
-            <div class="fc-desc">Cannot be achieved until upstream tasks are unblocked.</div>
+            <div class="fc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div>
+            <div class="fc-desc"><span data-i18n-en="Cannot be achieved until upstream tasks are unblocked." data-i18n-zh="需上游任务解除阻塞后才能达成。">Cannot be achieved until upstream tasks are unblocked.</span></div>
           </div>
         </div>
 
         <div>
           <div class="legend-card">
-            <h4>Legend</h4>
-            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dim)" stroke-width="2"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12"/></svg><div><b>Hard Dependency (must complete)</b><br><span style="color:var(--text-dimmer);font-size:11px">Hard Dependency</span></div></div>
-            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12" stroke-dasharray="0"/></svg><div><b>Soft Dependency (reference only)</b><br><span style="color:var(--text-dimmer);font-size:11px">Soft Dependency</span></div></div>
-            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dimmer)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><div><b>Subset / Part Of</b><br><span style="color:var(--text-dimmer);font-size:11px">Pilot/scope carved out of an upstream item</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b>Blocking</b><span>Upstream incomplete, causing delay</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--orange)"></span><div><b>Pending</b><span>Upstream in progress or not yet due</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--green)"></span><div><b>Satisfied</b><span>Upstream complete, no dependency risk</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--gray)"></span><div><b>N/A</b><span>No dependency relationship</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b>Primary Blocker</b><span>Highlighted card — root cause of the current chain</span></div></div>
+            <h4><span data-i18n-en="Legend" data-i18n-zh="图例">Legend</span></h4>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dim)" stroke-width="2"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12"/></svg><div><b><span data-i18n-en="Hard Dependency (must complete)" data-i18n-zh="硬依赖(必须完成)">Hard Dependency (must complete)</span></b><br><span style="color:var(--text-dimmer);font-size:11px"><span data-i18n-en="Hard Dependency" data-i18n-zh="硬依赖">Hard Dependency</span></span></div></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12" stroke-dasharray="0"/></svg><div><b><span data-i18n-en="Soft Dependency (reference only)" data-i18n-zh="软依赖(仅供参考)">Soft Dependency (reference only)</span></b><br><span style="color:var(--text-dimmer);font-size:11px"><span data-i18n-en="Soft Dependency" data-i18n-zh="软依赖">Soft Dependency</span></span></div></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:26px;height:14px" fill="none" stroke="var(--text-dimmer)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><div><b><span data-i18n-en="Subset / Part Of" data-i18n-zh="子集／属于">Subset / Part Of</span></b><br><span style="color:var(--text-dimmer);font-size:11px"><span data-i18n-en="Pilot/scope carved out of an upstream item" data-i18n-zh="从上游项中划分出的试点/范围">Pilot/scope carved out of an upstream item</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b><span data-i18n-en="Blocking" data-i18n-zh="阻塞中">Blocking</span></b><span><span data-i18n-en="Upstream incomplete, causing delay" data-i18n-zh="上游未完成,导致延迟">Upstream incomplete, causing delay</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--orange)"></span><div><b><span data-i18n-en="Pending" data-i18n-zh="待处理">Pending</span></b><span><span data-i18n-en="Upstream in progress or not yet due" data-i18n-zh="上游进行中或尚未到期">Upstream in progress or not yet due</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--green)"></span><div><b><span data-i18n-en="Satisfied" data-i18n-zh="已满足">Satisfied</span></b><span><span data-i18n-en="Upstream complete, no dependency risk" data-i18n-zh="上游已完成,无依赖风险">Upstream complete, no dependency risk</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--gray)"></span><div><b><span data-i18n-en="N/A" data-i18n-zh="不适用">N/A</span></b><span><span data-i18n-en="No dependency relationship" data-i18n-zh="无依赖关系">No dependency relationship</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b><span data-i18n-en="Primary Blocker" data-i18n-zh="主要阻塞项">Primary Blocker</span></b><span><span data-i18n-en="Highlighted card — root cause of the current chain" data-i18n-zh="高亮卡片 — 当前链条的根本原因">Highlighted card — root cause of the current chain</span></span></div></div>
           </div>
           <div class="reco-card">
             <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-            <div><h4>Recommendation</h4><p>Prioritize unblocking 03 — its pilot subset 05 and downstream tasks 04 / 31 / 32 all recover once historical data delivery is complete, lowering MS2 risk.</p></div>
+            <div><h4><span data-i18n-en="Recommendation" data-i18n-zh="建议">Recommendation</span></h4><p><span data-i18n-en="Prioritize unblocking 03 — its pilot subset 05 and downstream tasks 04 / 31 / 32 all recover once historical data delivery is complete, lowering MS2 risk." data-i18n-zh="优先解除 03 的阻塞 — 一旦历史数据交付完成,其试点子集 05 及下游任务 04／31／32 都将恢复正常,从而降低 MS2 的风险。">Prioritize unblocking 03 — its pilot subset 05 and downstream tasks 04 / 31 / 32 all recover once historical data delivery is complete, lowering MS2 risk.</span></p></div>
           </div>
         </div>
       </div>
@@ -844,12 +847,12 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
     </div>
 
     <div class="panel" style="margin-top:16px;">
-      <div class="panel-title"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>Recovery Actions</div>
+      <div class="panel-title"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span data-i18n-en="Recovery Actions" data-i18n-zh="恢复行动项">Recovery Actions</span></div>
       <table>
-        <thead><tr><th>#</th><th>Action Item</th><th>Owner</th><th>Due Date</th><th>Impact Path</th><th>Status</th></tr></thead>
+        <thead><tr><th>#</th><th><span data-i18n-en="Action Item" data-i18n-zh="行动项">Action Item</span></th><th><span data-i18n-en="Owner" data-i18n-zh="负责人">Owner</span></th><th><span data-i18n-en="Due Date" data-i18n-zh="截止日期">Due Date</span></th><th><span data-i18n-en="Impact Path" data-i18n-zh="影响路径">Impact Path</span></th><th><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></th></tr></thead>
         <tbody id="recoveryActionsBody"></tbody>
       </table>
-      <a class="panel-link" onclick="goPage('roadmap')">View all recovery actions <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      <a class="panel-link" onclick="goPage('roadmap')"><span data-i18n-en="View all recovery actions" data-i18n-zh="查看全部恢复行动项">View all recovery actions</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
   </div>
 
@@ -858,33 +861,33 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <div class="page" id="page-dependency">
     <div class="page-head">
-      <h1>Dependency View</h1>
-      <p>Full dependency graph · from upstream inputs to downstream tasks and milestones</p>
+      <h1><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></h1>
+      <p><span data-i18n-en="Full dependency graph · from upstream inputs to downstream tasks and milestones" data-i18n-zh="完整依赖关系图 · 从上游输入到下游任务与里程碑">Full dependency graph · from upstream inputs to downstream tasks and milestones</span></p>
     </div>
     <div class="stats n4">
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div class="stat-label">Hard Dependencies</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div class="stat-label"><span data-i18n-en="Hard Dependencies" data-i18n-zh="硬依赖数量">Hard Dependencies</span></div></div>
         <div class="stat-value" data-kpi="harddeps">7</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div class="stat-label">Soft Dependencies</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div class="stat-label"><span data-i18n-en="Soft Dependencies" data-i18n-zh="软依赖数量">Soft Dependencies</span></div></div>
         <div class="stat-value" data-kpi="softdeps">2</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-label">Current Blockers</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-label"><span data-i18n-en="Current Blockers" data-i18n-zh="当前阻塞项数量">Current Blockers</span></div></div>
         <div class="stat-value" data-kpi="depblockers">2</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></div><div class="stat-label">Milestones Impacted</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></div><div class="stat-label"><span data-i18n-en="Milestones Impacted" data-i18n-zh="受影响里程碑数">Milestones Impacted</span></div></div>
         <div class="stat-value" data-kpi="depmsimpacted">1</div>
       </div>
     </div>
 
     <div class="dep-toolbar">
       <div class="pillgroup">
-        <button class="pill active" data-depfilter="all">All</button>
-        <button class="pill" data-depfilter="hard">Hard only</button>
-        <button class="pill" data-depfilter="blocking">Blocking only</button>
+        <button class="pill active" data-depfilter="all"><span data-i18n-en="All" data-i18n-zh="全部">All</span></button>
+        <button class="pill" data-depfilter="hard"><span data-i18n-en="Hard only" data-i18n-zh="仅硬依赖">Hard only</span></button>
+        <button class="pill" data-depfilter="blocking"><span data-i18n-en="Blocking only" data-i18n-zh="仅阻塞中">Blocking only</span></button>
       </div>
     </div>
 
@@ -893,54 +896,54 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       <svg id="depSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1;"></svg>
       <div class="dep-grid" style="position:relative;z-index:2;">
         <div>
-          <div class="dep-lane-title">1&nbsp; Upstream Inputs</div>
-          <div class="mini-card blocker-src" data-node="03"><div class="mc-top"><span class="mc-id">03</span><span class="mc-name">Historical BMS Data</span></div><div class="mc-meta">👤 Hong Qing / Justin &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange">At Risk</span></div><div class="mc-desc"><b style="color:var(--red)">BLOCKER</b><br>Upstream source blocking downstream work</div></div>
-          <div class="mini-card" data-node="02"><div class="mc-top"><span class="mc-id">02</span><span class="mc-name">Data Point / API Integration</span></div><div class="mc-meta">👤 Anurag / Istofa &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="01"><div class="mc-top"><span class="mc-id">01</span><span class="mc-name">Technical Alignment Session</span></div><div class="mc-meta">👤 RDA + DayOne On-site Team &nbsp; 📅 08/14</div><div class="mc-badges"><span class="badge violet">Unconfirmed</span></div></div>
+          <div class="dep-lane-title">1&nbsp; <span data-i18n-en="Upstream Inputs" data-i18n-zh="上游输入">Upstream Inputs</span></div>
+          <div class="mini-card blocker-src" data-node="03"><div class="mc-top"><span class="mc-id">03</span><span class="mc-name"><span data-i18n-en="Historical BMS Data" data-i18n-zh="历史 BMS 数据">Historical BMS Data</span></span></div><div class="mc-meta">👤 Hong Qing / Justin &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div><div class="mc-desc"><b style="color:var(--red)"><span data-i18n-en="BLOCKER" data-i18n-zh="阻塞项">BLOCKER</span></b><br><span data-i18n-en="Upstream source blocking downstream work" data-i18n-zh="上游来源正在阻塞下游工作">Upstream source blocking downstream work</span></div></div>
+          <div class="mini-card" data-node="02"><div class="mc-top"><span class="mc-id">02</span><span class="mc-name"><span data-i18n-en="Data Point / API Integration" data-i18n-zh="数据点／API 集成">Data Point / API Integration</span></span></div><div class="mc-meta">👤 Anurag / Istofa &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
+          <div class="mini-card" data-node="01"><div class="mc-top"><span class="mc-id">01</span><span class="mc-name"><span data-i18n-en="Technical Alignment Session" data-i18n-zh="技术对齐会议">Technical Alignment Session</span></span></div><div class="mc-meta">👤 RDA + DayOne On-site Team &nbsp; 📅 08/14</div><div class="mc-badges"><span class="badge violet">Unconfirmed</span></div></div>
         </div>
         <div>
-          <div class="dep-lane-title">2&nbsp; Current Work</div>
-          <div class="mini-card" data-node="04"><div class="mc-top"><span class="mc-id">04</span><span class="mc-name">Digital Twin Framework</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge red">Blocked</span></div></div>
-          <div class="mini-card subset" data-node="05"><div class="subset-tag">PILOT SUBSET<br><span style="font-weight:600;text-transform:none;">Part of Historical BMS Data</span></div><div class="mc-top"><span class="mc-id">05</span><span class="mc-name">Single Data Hall Pilot</span></div><div class="mc-meta">👤 Mingchen / Valdy &nbsp; 📅 08/20</div><div class="mc-badges"><span class="badge red">Blocked</span><span class="badge red">Overdue</span></div></div>
-          <div class="mini-card" data-node="06"><div class="mc-top"><span class="mc-id">06</span><span class="mc-name">Model Calibration Prep</span></div><div class="mc-meta">👤 RDA Modelling Team &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="08"><div class="mc-top"><span class="mc-id">08</span><span class="mc-name">Chiller Plant Modelling (E+)</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="09"><div class="mc-top"><span class="mc-id">09</span><span class="mc-name">DCWiz Demo Preparation</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/26</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
+          <div class="dep-lane-title">2&nbsp; <span data-i18n-en="Current Work" data-i18n-zh="当前工作">Current Work</span></div>
+          <div class="mini-card" data-node="04"><div class="mc-top"><span class="mc-id">04</span><span class="mc-name"><span data-i18n-en="Digital Twin Framework" data-i18n-zh="数字孪生框架">Digital Twin Framework</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/21</div><div class="mc-badges"><span class="badge red"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></span></div></div>
+          <div class="mini-card subset" data-node="05"><div class="subset-tag"><span data-i18n-en="PILOT SUBSET" data-i18n-zh="试点子集">PILOT SUBSET</span><br><span style="font-weight:600;text-transform:none;"><span data-i18n-en="Part of Historical BMS Data" data-i18n-zh="属于历史 BMS 数据">Part of Historical BMS Data</span></span></div><div class="mc-top"><span class="mc-id">05</span><span class="mc-name"><span data-i18n-en="Single Data Hall Pilot" data-i18n-zh="单机房试点">Single Data Hall Pilot</span></span></div><div class="mc-meta">👤 Mingchen / Valdy &nbsp; 📅 08/20</div><div class="mc-badges"><span class="badge red"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></span><span class="badge red"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span></div></div>
+          <div class="mini-card" data-node="06"><div class="mc-top"><span class="mc-id">06</span><span class="mc-name"><span data-i18n-en="Model Calibration Prep" data-i18n-zh="模型标定准备">Model Calibration Prep</span></span></div><div class="mc-meta">👤 RDA Modelling Team &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
+          <div class="mini-card" data-node="08"><div class="mc-top"><span class="mc-id">08</span><span class="mc-name"><span data-i18n-en="Chiller Plant Modelling (E+)" data-i18n-zh="冷机房建模(E+)">Chiller Plant Modelling (E+)</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
+          <div class="mini-card" data-node="09"><div class="mc-top"><span class="mc-id">09</span><span class="mc-name"><span data-i18n-en="DCWiz Demo Preparation" data-i18n-zh="DCWiz 演示准备">DCWiz Demo Preparation</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/26</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
         </div>
         <div>
-          <div class="dep-lane-title">3&nbsp; Downstream Tasks</div>
-          <div class="mini-card" data-node="07"><div class="mc-top"><span class="mc-id">07</span><span class="mc-name">Leakage Detection Definition</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="31"><div class="mc-top"><span class="mc-id">31</span><span class="mc-name">Baseline Energy Model</span></div><div class="mc-meta">👤 Mingchen &nbsp; 📅 09/30</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="32"><div class="mc-top"><span class="mc-id">32</span><span class="mc-name">InfluxDB Continuous Ingestion</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 09/05</div><div class="mc-badges"><span class="badge orange">At Risk</span></div></div>
-          <div class="mini-card" data-node="10"><div class="mc-top"><span class="mc-id">10</span><span class="mc-name">AI Optimization Training (EnergyPlus Prototype)</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 09/10</div><div class="mc-badges"><span class="badge gray">Not Started</span></div></div>
+          <div class="dep-lane-title">3&nbsp; <span data-i18n-en="Downstream Tasks" data-i18n-zh="下游任务">Downstream Tasks</span></div>
+          <div class="mini-card" data-node="07"><div class="mc-top"><span class="mc-id">07</span><span class="mc-name"><span data-i18n-en="Leakage Detection Definition" data-i18n-zh="泄漏检测定义">Leakage Detection Definition</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/25</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
+          <div class="mini-card" data-node="31"><div class="mc-top"><span class="mc-id">31</span><span class="mc-name"><span data-i18n-en="Baseline Energy Model" data-i18n-zh="能耗基线模型">Baseline Energy Model</span></span></div><div class="mc-meta">👤 Mingchen &nbsp; 📅 09/30</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
+          <div class="mini-card" data-node="32"><div class="mc-top"><span class="mc-id">32</span><span class="mc-name"><span data-i18n-en="InfluxDB Continuous Ingestion" data-i18n-zh="InfluxDB 持续接入">InfluxDB Continuous Ingestion</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 09/05</div><div class="mc-badges"><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
+          <div class="mini-card" data-node="10"><div class="mc-top"><span class="mc-id">10</span><span class="mc-name"><span data-i18n-en="AI Optimization Training (EnergyPlus Prototype)" data-i18n-zh="AI 优化训练(EnergyPlus 原型)">AI Optimization Training (EnergyPlus Prototype)</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 09/10</div><div class="mc-badges"><span class="badge gray"><span data-i18n-en="Not Started" data-i18n-zh="未开始">Not Started</span></span></div></div>
         </div>
         <div>
-          <div class="dep-lane-title">4&nbsp; Milestones / Impact</div>
-          <div class="mini-card ms" data-node="MS2"><div class="mc-top"><span class="mc-id">◆</span><span class="mc-name">MS2 Digital Twin Calibrated</span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/28</div><div class="mc-badges"><span class="badge red">Blocking</span><span class="badge orange">At Risk</span></div></div>
+          <div class="dep-lane-title">4&nbsp; <span data-i18n-en="Milestones / Impact" data-i18n-zh="里程碑／影响">Milestones / Impact</span></div>
+          <div class="mini-card ms" data-node="MS2"><div class="mc-top"><span class="mc-id">◆</span><span class="mc-name"><span data-i18n-en="MS2 Digital Twin Calibrated" data-i18n-zh="MS2 数字孪生标定完成">MS2 Digital Twin Calibrated</span></span></div><div class="mc-meta">👤 Valdy &nbsp; 📅 08/28</div><div class="mc-badges"><span class="badge red"><span data-i18n-en="Blocking" data-i18n-zh="阻塞中">Blocking</span></span><span class="badge orange"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span></div></div>
 
           <div class="legend-card" style="margin-top:16px;">
-            <h4>Legend</h4>
-            <div style="font-size:11px;color:var(--text-dimmer);margin-bottom:6px;font-weight:700;">Dependency Type</div>
-            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dim)" stroke-width="2"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12"/></svg><span style="font-size:11.5px">Hard Dependency</span></div>
-            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><span style="font-size:11.5px">Soft Dependency</span></div>
-            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dimmer)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><span style="font-size:11.5px">Subset / Part Of</span></div>
-            <div style="font-size:11px;color:var(--text-dimmer);margin:10px 0 6px;font-weight:700;">Status</div>
-            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b>Blocking</b><span>Currently blocking or severely delayed</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--orange)"></span><div><b>Pending</b><span>At risk or awaiting action</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--green)"></span><div><b>Satisfied</b><span>Complete, or condition satisfied</span></div></div>
-            <div class="lg-status"><span class="dot" style="color:var(--gray)"></span><div><b>N/A</b><span>Not yet started or not planned</span></div></div>
-            <div style="font-size:11px;color:var(--text-dimmer);margin:10px 0 6px;font-weight:700;">Node Types</div>
-            <div class="node-shape">▭ Task / Input</div>
-            <div class="node-shape" style="margin-top:6px">◆ Milestone</div>
-            <div class="node-shape" style="margin-top:6px;color:var(--red)">⬡ Current Blocker (propagates delay)</div>
-            <div class="node-shape" style="margin-top:6px">👤 Owner</div>
-            <div class="node-shape" style="margin-top:6px">📅 Target Date</div>
+            <h4><span data-i18n-en="Legend" data-i18n-zh="图例">Legend</span></h4>
+            <div style="font-size:11px;color:var(--text-dimmer);margin-bottom:6px;font-weight:700;"><span data-i18n-en="Dependency Type" data-i18n-zh="依赖类型">Dependency Type</span></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dim)" stroke-width="2"><line x1="2" y1="7" x2="20" y2="7"/><polyline points="15 2 20 7 15 12"/></svg><span style="font-size:11.5px"><span data-i18n-en="Hard Dependency" data-i18n-zh="硬依赖">Hard Dependency</span></span></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><span style="font-size:11.5px"><span data-i18n-en="Soft Dependency" data-i18n-zh="软依赖">Soft Dependency</span></span></div>
+            <div class="lg-line"><svg viewBox="0 0 24 24" style="width:22px;height:12px" fill="none" stroke="var(--text-dimmer)" stroke-width="2" stroke-dasharray="3 3"><line x1="2" y1="7" x2="20" y2="7"/></svg><span style="font-size:11.5px"><span data-i18n-en="Subset / Part Of" data-i18n-zh="子集／属于">Subset / Part Of</span></span></div>
+            <div style="font-size:11px;color:var(--text-dimmer);margin:10px 0 6px;font-weight:700;"><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></div>
+            <div class="lg-status"><span class="dot" style="color:var(--red)"></span><div><b><span data-i18n-en="Blocking" data-i18n-zh="阻塞中">Blocking</span></b><span><span data-i18n-en="Currently blocking or severely delayed" data-i18n-zh="当前正在阻塞或严重延迟">Currently blocking or severely delayed</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--orange)"></span><div><b><span data-i18n-en="Pending" data-i18n-zh="待处理">Pending</span></b><span><span data-i18n-en="At risk or awaiting action" data-i18n-zh="存在风险或等待处理">At risk or awaiting action</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--green)"></span><div><b><span data-i18n-en="Satisfied" data-i18n-zh="已满足">Satisfied</span></b><span><span data-i18n-en="Complete, or condition satisfied" data-i18n-zh="已完成,或条件已满足">Complete, or condition satisfied</span></span></div></div>
+            <div class="lg-status"><span class="dot" style="color:var(--gray)"></span><div><b><span data-i18n-en="N/A" data-i18n-zh="不适用">N/A</span></b><span><span data-i18n-en="Not yet started or not planned" data-i18n-zh="尚未开始或未计划">Not yet started or not planned</span></span></div></div>
+            <div style="font-size:11px;color:var(--text-dimmer);margin:10px 0 6px;font-weight:700;"><span data-i18n-en="Node Types" data-i18n-zh="节点类型">Node Types</span></div>
+            <div class="node-shape"><span data-i18n-en="▭ Task / Input" data-i18n-zh="▭ 任务／输入">▭ Task / Input</span></div>
+            <div class="node-shape" style="margin-top:6px"><span data-i18n-en="◆ Milestone" data-i18n-zh="◆ 里程碑">◆ Milestone</span></div>
+            <div class="node-shape" style="margin-top:6px;color:var(--red)"><span data-i18n-en="⬡ Current Blocker (propagates delay)" data-i18n-zh="⬡ 当前阻塞项(会传导延迟)">⬡ Current Blocker (propagates delay)</span></div>
+            <div class="node-shape" style="margin-top:6px"><span data-i18n-en="👤 Owner" data-i18n-zh="👤 负责人">👤 Owner</span></div>
+            <div class="node-shape" style="margin-top:6px"><span data-i18n-en="📅 Target Date" data-i18n-zh="📅 目标日期">📅 Target Date</span></div>
           </div>
         </div>
       </div>
       </div>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-dimmer);display:flex;align-items:center;gap:8px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        Tip: satisfied dependencies are hidden by default — toggle to see the full chain
+        <span data-i18n-en="Tip: satisfied dependencies are hidden by default — toggle to see the full chain" data-i18n-zh="提示:已满足的依赖默认隐藏 — 切换开关可查看完整链条">Tip: satisfied dependencies are hidden by default — toggle to see the full chain</span>
       </div>
     </div>
   </div>
@@ -951,35 +954,35 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <div class="page" id="page-roadmap">
     <div class="page-head" style="display:flex;align-items:flex-start;justify-content:space-between;">
       <div>
-        <h1>Roadmap View</h1>
-        <p>A 9-month project roadmap — view phases, tasks, status, and milestones by month</p>
+        <h1><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></h1>
+        <p><span data-i18n-en="A 9-month project roadmap — view phases, tasks, status, and milestones by month" data-i18n-zh="为期9个月的项目路线图 — 按月查看阶段、任务、状态与里程碑">A 9-month project roadmap — view phases, tasks, status, and milestones by month</span></p>
       </div>
       <div class="pillgroup" style="margin-top:2px;">
-        <button class="pill active" data-sub="rm-gantt">Gantt</button>
-        <button class="pill" data-sub="rm-graph">Graph</button>
-        <button class="pill" data-sub="rm-list">List</button>
+        <button class="pill active" data-sub="rm-gantt"><span data-i18n-en="Gantt" data-i18n-zh="甘特图">Gantt</span></button>
+        <button class="pill" data-sub="rm-graph"><span data-i18n-en="Graph" data-i18n-zh="图形">Graph</span></button>
+        <button class="pill" data-sub="rm-list"><span data-i18n-en="List" data-i18n-zh="列表">List</span></button>
       </div>
     </div>
 
     <div class="stats" id="rmStats">
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-label">Current Phase</div></div>
-        <div class="stat-value small">Month 2</div><div class="stat-sub">Aug 2026 · Digital Twin Construction</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-label"><span data-i18n-en="Current Phase" data-i18n-zh="当前阶段">Current Phase</span></div></div>
+        <div class="stat-value small"><span data-i18n-en="Month 2" data-i18n-zh="第 2 月">Month 2</span></div><div class="stat-sub">Aug 2026 · Digital Twin Construction</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="stat-label">Tasks This Month</div></div>
-        <div class="stat-value" data-kpi="monthtasks">10</div><div class="stat-sub up">+1 vs. last month</div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="stat-label"><span data-i18n-en="Tasks This Month" data-i18n-zh="本月任务数">Tasks This Month</span></div></div>
+        <div class="stat-value" data-kpi="monthtasks">10</div><div class="stat-sub up"><span data-i18n-en="+1 vs. last month" data-i18n-zh="较上月 +1">+1 vs. last month</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label">Completed</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label"><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></div></div>
         <div class="stat-value" data-kpi="monthdone">2</div><div class="stat-sub" data-kpi="monthdone-sub">Completion Rate 11.1%</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div><div class="stat-label">In Progress</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div><div class="stat-label"><span data-i18n-en="In Progress" data-i18n-zh="进行中">In Progress</span></div></div>
         <div class="stat-value" data-kpi="monthprog">9</div><div class="stat-sub" data-kpi="monthprog-sub">Share 50.0%</div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="stat-label">Next Milestone</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="stat-label"><span data-i18n-en="Next Milestone" data-i18n-zh="下一个里程碑">Next Milestone</span></div></div>
         <div class="stat-value small">08/28 MS2</div><div class="stat-sub">Digital Twin Calibrated</div>
       </div>
     </div>
@@ -991,7 +994,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         <div>
           <div class="gantt-wrap">
             <div class="gantt-left">
-              <div class="gh"><span>#</span><span>Task / Task</span><span>Status</span></div>
+              <div class="gh"><span>#</span><span><span data-i18n-en="Task / Task" data-i18n-zh="任务">Task / Task</span></span><span><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></span></div>
               <div id="ganttLeftRows"></div>
             </div>
             <div class="gantt-right" id="ganttRightWrap">
@@ -1000,14 +1003,14 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             </div>
           </div>
           <div class="gantt-legend">
-            <span class="legend-item"><span class="dot" style="color:var(--green)"></span>Completed</span>
-            <span class="legend-item"><span class="dot" style="color:var(--orange)"></span>In Progress</span>
-            <span class="legend-item"><span class="dot" style="color:var(--red)"></span>Blocked</span>
-            <span class="legend-item"><span class="dot" style="color:var(--red)"></span>Overdue</span>
-            <span class="legend-item"><span class="dot" style="color:var(--orange)"></span>At Risk</span>
-            <span class="legend-item"><span class="dot" style="color:var(--gray)"></span>Not Started</span>
-            <span class="legend-item"><span class="msdiamond"></span>&nbsp;Milestone</span>
-            <span class="legend-item">┈→ Dependency</span>
+            <span class="legend-item"><span class="dot" style="color:var(--green)"></span><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></span>
+            <span class="legend-item"><span class="dot" style="color:var(--orange)"></span><span data-i18n-en="In Progress" data-i18n-zh="进行中">In Progress</span></span>
+            <span class="legend-item"><span class="dot" style="color:var(--red)"></span><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></span>
+            <span class="legend-item"><span class="dot" style="color:var(--red)"></span><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span>
+            <span class="legend-item"><span class="dot" style="color:var(--orange)"></span><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span>
+            <span class="legend-item"><span class="dot" style="color:var(--gray)"></span><span data-i18n-en="Not Started" data-i18n-zh="未开始">Not Started</span></span>
+            <span class="legend-item"><span class="msdiamond"></span>&nbsp;<span data-i18n-en="Milestone" data-i18n-zh="里程碑">Milestone</span></span>
+            <span class="legend-item">┈→ <span data-i18n-en="Dependency" data-i18n-zh="依赖关系">Dependency</span></span>
           </div>
         </div>
         <div id="rmSidebarGantt"></div>
@@ -1019,67 +1022,67 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         <div>
           <div class="month-flow">
             <div class="month-card">
-              <div class="month-head"><span class="mh-icon" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 1 · Project Kick-Off</b><span>Jul 2026</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b><span data-i18n-en="Month 1 · Project Kick-Off" data-i18n-zh="第1月 · 项目启动">Month 1 · Project Kick-Off</span></b><span>Jul 2026</span></div></div>
               <div class="card-badges"><span class="badge green">VPN ON</span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">00</span>VPN / VM Access</span><span class="badge-slot" data-node="00"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">01</span>Technical Alignment Session</span><span class="badge-slot" data-node="01"></span></div>
-              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label">Completion 50%</div></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">00</span><span data-i18n-en="VPN / VM Access" data-i18n-zh="VPN／虚拟机接入">VPN / VM Access</span></span><span class="badge-slot" data-node="00"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">01</span><span data-i18n-en="Technical Alignment Session" data-i18n-zh="技术对齐会议">Technical Alignment Session</span></span><span class="badge-slot" data-node="01"></span></div>
+              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--orange)"></div></div><div class="progress-label"><span data-i18n-en="Completion 50%" data-i18n-zh="完成度 50%">Completion 50%</span></div></div>
             </div>
             <div class="month-connector">→</div>
             <div class="month-card current">
-              <div class="month-head"><span class="mh-icon" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 2 · Digital Twin Construction</b><span>Aug 2026 (current)</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b><span data-i18n-en="Month 2 · Digital Twin Construction" data-i18n-zh="第2月 · 数字孪生构建">Month 2 · Digital Twin Construction</span></b><span>Aug 2026 (current)</span></div></div>
               <div class="card-badges"><span class="badge blue">BMS read</span><span class="badge green">VPN ON</span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">02</span>Data Point / API Integration</span><span class="badge-slot" data-node="02"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">03</span>Historical BMS Data</span><span class="badge-slot" data-node="03"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">04</span>Digital Twin Framework</span><span class="badge-slot" data-node="04"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">05</span>Single Data Hall Pilot</span><span class="badge-slot" data-node="05"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">06</span>Model Calibration Prep</span><span class="badge-slot" data-node="06"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">07</span>Leakage Detection Definition</span><span class="badge-slot" data-node="07"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">31</span>Baseline Energy Model</span><span class="badge-slot" data-node="31"></span></div>
-              <div class="mtask ms-row"><span class="mt-lbl">◆ 08/28 MS2 Digital Twin Calibrated</span></div>
-              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--blue)"></div></div><div class="progress-label">Completion 49%</div></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">02</span><span data-i18n-en="Data Point / API Integration" data-i18n-zh="数据点／API 集成">Data Point / API Integration</span></span><span class="badge-slot" data-node="02"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">03</span><span data-i18n-en="Historical BMS Data" data-i18n-zh="历史 BMS 数据">Historical BMS Data</span></span><span class="badge-slot" data-node="03"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">04</span><span data-i18n-en="Digital Twin Framework" data-i18n-zh="数字孪生框架">Digital Twin Framework</span></span><span class="badge-slot" data-node="04"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">05</span><span data-i18n-en="Single Data Hall Pilot" data-i18n-zh="单机房试点">Single Data Hall Pilot</span></span><span class="badge-slot" data-node="05"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">06</span><span data-i18n-en="Model Calibration Prep" data-i18n-zh="模型标定准备">Model Calibration Prep</span></span><span class="badge-slot" data-node="06"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">07</span><span data-i18n-en="Leakage Detection Definition" data-i18n-zh="泄漏检测定义">Leakage Detection Definition</span></span><span class="badge-slot" data-node="07"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">31</span><span data-i18n-en="Baseline Energy Model" data-i18n-zh="能耗基线模型">Baseline Energy Model</span></span><span class="badge-slot" data-node="31"></span></div>
+              <div class="mtask ms-row"><span class="mt-lbl"><span data-i18n-en="◆ 08/28 MS2 Digital Twin Calibrated" data-i18n-zh="◆ 08/28 MS2 数字孪生标定完成">◆ 08/28 MS2 Digital Twin Calibrated</span></span></div>
+              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--blue)"></div></div><div class="progress-label"><span data-i18n-en="Completion 49%" data-i18n-zh="完成度 49%">Completion 49%</span></div></div>
             </div>
             <div class="month-connector">→</div>
             <div class="month-card">
-              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 3 · AI Optimization Training</b><span>Sep 2026</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b><span data-i18n-en="Month 3 · AI Optimization Training" data-i18n-zh="第3月 · AI 优化训练">Month 3 · AI Optimization Training</span></b><span>Sep 2026</span></div></div>
               <div class="card-badges"><span class="badge blue">BMS read</span><span class="badge green">VPN ON</span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">10</span>AI Optimization Training</span><span class="badge-slot" data-node="10"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">11</span>Simulation Savings Validation</span><span class="badge-slot" data-node="11"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">12</span>Safety Guardrail Definition</span><span class="badge-slot" data-node="12"></span></div>
-              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label">Completion 0%</div></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">10</span><span data-i18n-en="AI Optimization Training" data-i18n-zh="AI 优化训练">AI Optimization Training</span></span><span class="badge-slot" data-node="10"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">11</span><span data-i18n-en="Simulation Savings Validation" data-i18n-zh="仿真节能验证">Simulation Savings Validation</span></span><span class="badge-slot" data-node="11"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">12</span><span data-i18n-en="Safety Guardrail Definition" data-i18n-zh="安全护栏定义">Safety Guardrail Definition</span></span><span class="badge-slot" data-node="12"></span></div>
+              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label"><span data-i18n-en="Completion 0%" data-i18n-zh="完成度 0%">Completion 0%</span></div></div>
             </div>
             <div class="month-connector">→</div>
             <div class="month-card">
-              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b>Month 4 · Optimization Deployment (Human-in-Loop)</b><span>Oct 2026</span></div></div>
+              <div class="month-head"><span class="mh-icon" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="mh-txt"><b><span data-i18n-en="Month 4 · Optimization Deployment (Human-in-Loop)" data-i18n-zh="第4月 · 优化部署(人机协同)">Month 4 · Optimization Deployment (Human-in-Loop)</span></b><span>Oct 2026</span></div></div>
               <div class="card-badges"><span class="badge blue">BMS read</span><span class="badge green">VPN ON</span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">13</span>DCVerse/DCWiz Integration</span><span class="badge-slot" data-node="13"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">14</span>Human-in-the-Loop Rollout</span><span class="badge-slot" data-node="14"></span></div>
-              <div class="mtask"><span class="mt-lbl"><span class="nid">15</span>DCWiz Telemetry & What-if Validation</span><span class="badge-slot" data-node="15"></span></div>
-              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label">Completion 0%</div></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">13</span><span data-i18n-en="DCVerse/DCWiz Integration" data-i18n-zh="DCVerse/DCWiz 集成">DCVerse/DCWiz Integration</span></span><span class="badge-slot" data-node="13"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">14</span><span data-i18n-en="Human-in-the-Loop Rollout" data-i18n-zh="人机协同上线">Human-in-the-Loop Rollout</span></span><span class="badge-slot" data-node="14"></span></div>
+              <div class="mtask"><span class="mt-lbl"><span class="nid">15</span><span data-i18n-en="DCWiz Telemetry & What-if Validation" data-i18n-zh="DCWiz 遥测与假设分析验证">DCWiz Telemetry & What-if Validation</span></span><span class="badge-slot" data-node="15"></span></div>
+              <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray)"></div></div><div class="progress-label"><span data-i18n-en="Completion 0%" data-i18n-zh="完成度 0%">Completion 0%</span></div></div>
             </div>
           </div>
 
           <div class="panel month5to9">
-            <div class="panel-title" style="margin-bottom:14px;"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>Month 5–9 Roadmap Overview</div>
+            <div class="panel-title" style="margin-bottom:14px;"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div><span data-i18n-en="Month 5–9 Roadmap Overview" data-i18n-zh="第5–9月路线图总览">Month 5–9 Roadmap Overview</span></div>
             <div class="mini-month-row">
-              <div class="mini-month"><b>Month 5 · Optimization Validation & Auto-Control Build</b><span class="sub">Nov 2026</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge violet">VPN ON → OFF</span></div><ul><li>Optimization validation & fine-tuning</li><li>Auto-control engine building</li><li>Control accuracy evaluation</li><li>Operator feedback incorporated</li></ul></div>
+              <div class="mini-month"><b><span data-i18n-en="Month 5 · Optimization Validation & Auto-Control Build" data-i18n-zh="第5月 · 优化验证与自动控制搭建">Month 5 · Optimization Validation & Auto-Control Build</span></b><span class="sub">Nov 2026</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge violet">VPN ON → OFF</span></div><ul><li><span data-i18n-en="Optimization validation & fine-tuning" data-i18n-zh="优化验证与微调">Optimization validation & fine-tuning</span></li><li><span data-i18n-en="Auto-control engine building" data-i18n-zh="自动控制引擎搭建">Auto-control engine building</span></li><li><span data-i18n-en="Control accuracy evaluation" data-i18n-zh="控制精度评估">Control accuracy evaluation</span></li><li><span data-i18n-en="Operator feedback incorporated" data-i18n-zh="纳入操作员反馈">Operator feedback incorporated</span></li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 6 · Stable Energy Savings</b><span class="sub">Dec 2026</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Sustained energy savings demonstrated</li><li>Auto-control model shadowing started</li><li>System ready for operational trials</li></ul></div>
+              <div class="mini-month"><b><span data-i18n-en="Month 6 · Stable Energy Savings" data-i18n-zh="第6月 · 稳定节能">Month 6 · Stable Energy Savings</span></b><span class="sub">Dec 2026</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li><span data-i18n-en="Sustained energy savings demonstrated" data-i18n-zh="持续节能效果得到验证">Sustained energy savings demonstrated</span></li><li><span data-i18n-en="Auto-control model shadowing started" data-i18n-zh="自动控制模型影子运行启动">Auto-control model shadowing started</span></li><li><span data-i18n-en="System ready for operational trials" data-i18n-zh="系统已准备好进行试运行">System ready for operational trials</span></li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 7 · Controlled Auto-Control Trials</b><span class="sub">Jan 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Controlled auto-control activation</li><li>Safety guardrails verified</li><li>No SLA violations</li></ul></div>
+              <div class="mini-month"><b><span data-i18n-en="Month 7 · Controlled Auto-Control Trials" data-i18n-zh="第7月 · 受控自动控制试运行">Month 7 · Controlled Auto-Control Trials</span></b><span class="sub">Jan 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li><span data-i18n-en="Controlled auto-control activation" data-i18n-zh="受控自动控制启用">Controlled auto-control activation</span></li><li><span data-i18n-en="Safety guardrails verified" data-i18n-zh="安全护栏已验证">Safety guardrails verified</span></li><li><span data-i18n-en="No SLA violations" data-i18n-zh="无 SLA 违规">No SLA violations</span></li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 8 · Optimization Refinement</b><span class="sub">Feb 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Optimization policy refined</li><li>Additional energy savings realized</li><li>Operator training conducted</li></ul></div>
+              <div class="mini-month"><b><span data-i18n-en="Month 8 · Optimization Refinement" data-i18n-zh="第8月 · 优化调优">Month 8 · Optimization Refinement</span></b><span class="sub">Feb 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li><span data-i18n-en="Optimization policy refined" data-i18n-zh="优化策略已调优">Optimization policy refined</span></li><li><span data-i18n-en="Additional energy savings realized" data-i18n-zh="实现额外节能">Additional energy savings realized</span></li><li><span data-i18n-en="Operator training conducted" data-i18n-zh="已开展操作员培训">Operator training conducted</span></li></ul></div>
               <div class="mini-connector">→</div>
-              <div class="mini-month"><b>Month 9 · Final Validation & Project Completion</b><span class="sub">Mar 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li>Energy savings verified</li><li>Operational handover completed</li><li>Replication roadmap prepared</li></ul></div>
+              <div class="mini-month"><b><span data-i18n-en="Month 9 · Final Validation & Project Completion" data-i18n-zh="第9月 · 最终验证与项目收尾">Month 9 · Final Validation & Project Completion</span></b><span class="sub">Mar 2027</span><div class="mini-badges"><span class="badge blue">BMS read</span><span class="badge orange">BMS write</span><span class="badge gray">VPN OFF</span></div><ul><li><span data-i18n-en="Energy savings verified" data-i18n-zh="节能效果已验证">Energy savings verified</span></li><li><span data-i18n-en="Operational handover completed" data-i18n-zh="运维交接已完成">Operational handover completed</span></li><li><span data-i18n-en="Replication roadmap prepared" data-i18n-zh="复制推广路线图已准备">Replication roadmap prepared</span></li></ul></div>
             </div>
             <div class="legend-row" style="margin-top:18px;">
-              <span class="legend-item"><span class="dot" style="color:var(--green)"></span>Completed</span>
-              <span class="legend-item"><span class="dot" style="color:var(--orange)"></span>In Progress</span>
-              <span class="legend-item"><span class="dot" style="color:var(--red)"></span>Blocked</span>
-              <span class="legend-item"><span class="dot" style="color:var(--red)"></span>Overdue</span>
-              <span class="legend-item"><span class="dot" style="color:var(--orange)"></span>At Risk</span>
-              <span class="legend-item"><span class="dot" style="color:var(--gray)"></span>Not Started</span>
-              <span class="legend-item"><span class="msdiamond"></span>&nbsp;Milestone</span>
+              <span class="legend-item"><span class="dot" style="color:var(--green)"></span><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></span>
+              <span class="legend-item"><span class="dot" style="color:var(--orange)"></span><span data-i18n-en="In Progress" data-i18n-zh="进行中">In Progress</span></span>
+              <span class="legend-item"><span class="dot" style="color:var(--red)"></span><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></span>
+              <span class="legend-item"><span class="dot" style="color:var(--red)"></span><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span>
+              <span class="legend-item"><span class="dot" style="color:var(--orange)"></span><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span>
+              <span class="legend-item"><span class="dot" style="color:var(--gray)"></span><span data-i18n-en="Not Started" data-i18n-zh="未开始">Not Started</span></span>
+              <span class="legend-item"><span class="msdiamond"></span>&nbsp;<span data-i18n-en="Milestone" data-i18n-zh="里程碑">Milestone</span></span>
             </div>
           </div>
         </div>
@@ -1095,29 +1098,29 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div class="list-toolbar">
               <div class="search-box">
                 <svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input id="listSearch" placeholder="Search tasks / milestones / owners...">
+                <input id="listSearch" placeholder="Search tasks / milestones / owners..." data-i18n-placeholder-en="Search tasks / milestones / owners..." data-i18n-placeholder-zh="搜索任务／里程碑／负责人…">
               </div>
               <select class="select-box" id="phaseFilter">
-                <option value="all">All Phases</option>
-                <option value="1">Month 1</option><option value="2">Month 2</option><option value="3">Month 3</option><option value="4">Month 4</option><option value="5">Month 5</option><option value="6">Month 6</option><option value="7">Month 7</option><option value="8">Month 8</option><option value="9">Month 9</option>
+                <option value="all"><span data-i18n-en="All Phases" data-i18n-zh="所有阶段">All Phases</span></option>
+                <option value="1"><span data-i18n-en="Month 1" data-i18n-zh="第 1 月">Month 1</span></option><option value="2"><span data-i18n-en="Month 2" data-i18n-zh="第 2 月">Month 2</span></option><option value="3"><span data-i18n-en="Month 3" data-i18n-zh="第 3 月">Month 3</span></option><option value="4"><span data-i18n-en="Month 4" data-i18n-zh="第 4 月">Month 4</span></option><option value="5"><span data-i18n-en="Month 5" data-i18n-zh="第 5 月">Month 5</span></option><option value="6"><span data-i18n-en="Month 6" data-i18n-zh="第 6 月">Month 6</span></option><option value="7"><span data-i18n-en="Month 7" data-i18n-zh="第 7 月">Month 7</span></option><option value="8"><span data-i18n-en="Month 8" data-i18n-zh="第 8 月">Month 8</span></option><option value="9"><span data-i18n-en="Month 9" data-i18n-zh="第 9 月">Month 9</span></option>
               </select>
               <div class="status-pills" id="statusPills">
-                <button class="pill active" data-status="all">All Statuses</button>
-                <button class="pill" data-status="notstarted">Not Started</button>
-                <button class="pill" data-status="inprogress">In Progress</button>
-                <button class="pill" data-status="done">Completed</button>
-                <button class="pill" data-status="overdue">Overdue</button>
+                <button class="pill active" data-status="all"><span data-i18n-en="All Statuses" data-i18n-zh="所有状态">All Statuses</span></button>
+                <button class="pill" data-status="notstarted"><span data-i18n-en="Not Started" data-i18n-zh="未开始">Not Started</span></button>
+                <button class="pill" data-status="inprogress"><span data-i18n-en="In Progress" data-i18n-zh="进行中">In Progress</span></button>
+                <button class="pill" data-status="done"><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></button>
+                <button class="pill" data-status="overdue"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></button>
               </div>
               <select class="select-box" id="monthFilter">
-                <option value="all">All Months</option>
+                <option value="all"><span data-i18n-en="All Months" data-i18n-zh="所有月份">All Months</span></option>
                 <option value="1">Jul 2026</option><option value="2">Aug 2026</option><option value="3">Sep 2026</option><option value="4">Oct 2026</option><option value="5">Nov 2026</option><option value="6">Dec 2026</option><option value="7">Jan 2027</option><option value="8">Feb 2027</option><option value="9">Mar 2027</option>
               </select>
-              <button class="export-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+              <button class="export-btn"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span data-i18n-en="Export" data-i18n-zh="导出">Export</span></button>
             </div>
             <div class="rm-table-wrap">
               <table id="listTable">
                 <thead><tr>
-                  <th>ID</th><th>Task / Deliverable</th><th>Month / Phase</th><th>Owner</th><th>Status</th><th>Health</th><th>Progress / Plan</th><th>Next Step</th><th>Due Date</th><th>Milestone Impact</th>
+                  <th><span data-i18n-en="ID" data-i18n-zh="编号">ID</span></th><th><span data-i18n-en="Task / Deliverable" data-i18n-zh="任务／交付物">Task / Deliverable</span></th><th><span data-i18n-en="Month / Phase" data-i18n-zh="月份／阶段">Month / Phase</span></th><th><span data-i18n-en="Owner" data-i18n-zh="负责人">Owner</span></th><th><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></th><th><span data-i18n-en="Health" data-i18n-zh="健康度">Health</span></th><th><span data-i18n-en="Progress / Plan" data-i18n-zh="进度／计划">Progress / Plan</span></th><th><span data-i18n-en="Next Step" data-i18n-zh="下一步">Next Step</span></th><th><span data-i18n-en="Due Date" data-i18n-zh="截止日期">Due Date</span></th><th><span data-i18n-en="Milestone Impact" data-i18n-zh="里程碑影响">Milestone Impact</span></th>
                 </tr></thead>
                 <tbody id="listBody"></tbody>
               </table>
@@ -1125,7 +1128,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div class="list-footer">
               <span id="listCount">0 tasks</span>
               <div class="pager">
-                Rows per page
+                <span data-i18n-en="Rows per page" data-i18n-zh="每页行数">Rows per page</span>
                 <select class="select-box" style="height:28px;padding:0 8px;" id="pageSizeSel"><option>25</option><option>50</option></select>
                 <button>«</button><button>‹</button><span style="padding:0 6px;">1 / 1</span><button>›</button><button>»</button>
               </div>
@@ -1142,35 +1145,35 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <div class="page" id="page-meetings">
     <div class="page-head">
-      <h1>Meetings</h1>
-      <p>Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically</p>
+      <h1><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span></h1>
+      <p><span data-i18n-en="Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically" data-i18n-zh="会议纪要 → AI 提取变更 → 生成待处理更新 → 人工审核 → 写回项目数据,健康度／KPI／阻塞影响图／路线图自动重新计算">Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically</span></p>
     </div>
 
     <div class="meet-body">
       <div>
         <div class="panel">
-          <div class="panel-title" style="margin-bottom:12px;"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg></div>Meetings</div>
+          <div class="panel-title" style="margin-bottom:12px;"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg></div><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span></div>
           <div class="meet-list" id="meetList"></div>
-          <button class="btn-ghost" style="margin-top:12px;width:100%;" onclick="toggleImportForm()">+ Import Meeting</button>
+          <button class="btn-ghost" style="margin-top:12px;width:100%;" onclick="toggleImportForm()"><span data-i18n-en="+ Import Meeting" data-i18n-zh="+ 导入会议">+ Import Meeting</span></button>
           <div class="import-form" id="importForm" style="display:none;">
-            <input type="text" id="impTitle" placeholder="Meeting title, e.g. DayOne Weekly Meeting">
-            <input type="text" id="impDate" placeholder="Date YYYY-MM-DD">
-            <textarea id="impText" placeholder="Paste the raw meeting minutes / transcript…"></textarea>
+            <input type="text" id="impTitle" placeholder="Meeting title, e.g. DayOne Weekly Meeting" data-i18n-placeholder-en="Meeting title, e.g. DayOne Weekly Meeting" data-i18n-placeholder-zh="会议标题,例如 DayOne 周会">
+            <input type="text" id="impDate" placeholder="Date YYYY-MM-DD" data-i18n-placeholder-en="Date YYYY-MM-DD" data-i18n-placeholder-zh="日期 YYYY-MM-DD">
+            <textarea id="impText" placeholder="Paste the raw meeting minutes / transcript…" data-i18n-placeholder-en="Paste the raw meeting minutes / transcript…" data-i18n-placeholder-zh="粘贴原始会议纪要／转录文本…"></textarea>
             <div class="attach-row">
-              <label class="btn-ghost attach-btn" for="impFile">📎 Attach file (image / .pdf / .docx / .md / .txt)</label>
+              <label class="btn-ghost attach-btn" for="impFile"><span data-i18n-en="📎 Attach file (image / .pdf / .docx / .md / .txt)" data-i18n-zh="📎 附加文件(图片／.pdf／.docx／.md／.txt)">📎 Attach file (image / .pdf / .docx / .md / .txt)</span></label>
               <input type="file" id="impFile" accept=".md,.txt,.pdf,.docx,image/png,image/jpeg,image/jpg" style="display:none;" onchange="handleAttachmentUpload(this)">
               <span class="attach-status" id="attachStatus"></span>
             </div>
             <div class="attach-previews" id="attachPreviews"></div>
-            <button class="btn-primary" onclick="importMeeting()">Save Meeting Record</button>
+            <button class="btn-primary" onclick="importMeeting()"><span data-i18n-en="Save Meeting Record" data-i18n-zh="保存会议记录">Save Meeting Record</span></button>
             <div style="font-size:11px;color:var(--text-dimmer);line-height:1.6;">
-              Note: this step only saves the raw text (plus any attached files' extracted text, or images for visual reference). The actual "AI change detection" is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one.
+              <span data-i18n-en="Note: this step only saves the raw text (plus any attached files' extracted text, or images for visual reference). The actual &quot;AI change detection&quot; is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one." data-i18n-zh="注意:此步骤仅保存原始文本(以及所有附加文件提取的文字,或用于查看的图片)。目前实际的“AI 变更检测”由 Claude 在对话中完成 — 将会议纪要粘贴给 Claude,Claude 会以变更提案的形式将待处理更新写入右侧列表,供你逐条批准／拒绝。">Note: this step only saves the raw text (plus any attached files' extracted text, or images for visual reference). The actual "AI change detection" is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one.</span>
             </div>
           </div>
         </div>
 
         <div class="side-card" style="margin-top:14px;">
-          <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Activity / Change Log</h3>
+          <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-i18n-en="Activity / Change Log" data-i18n-zh="活动／变更日志">Activity / Change Log</span></h3>
           <div class="timeline" id="changeLogTimeline"></div>
         </div>
       </div>
@@ -1178,9 +1181,9 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       <div>
         <div class="panel">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
-            <div class="panel-title" style="margin:0;"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>Proposed Updates <span id="propMeetingLabel" style="color:var(--text-dimmer);font-weight:500;"></span></div>
+            <div class="panel-title" style="margin:0;"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span data-i18n-en="Proposed Updates" data-i18n-zh="提议更新">Proposed Updates</span> <span id="propMeetingLabel" style="color:var(--text-dimmer);font-weight:500;"></span></div>
             <div style="display:flex;gap:8px;">
-              <button class="btn-ghost" onclick="approveAllConfirmed()">Approve All Confirmed</button>
+              <button class="btn-ghost" onclick="approveAllConfirmed()"><span data-i18n-en="Approve All Confirmed" data-i18n-zh="批准全部已确认项">Approve All Confirmed</span></button>
             </div>
           </div>
           <div class="summary-chips" id="propSummaryChips"></div>
@@ -1195,45 +1198,45 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <div class="page" id="page-luna">
     <div class="page-head">
-      <h1>Luna Queue</h1>
-      <p>A queue of items Luna (the AI assistant) has flagged for human review, response, or escalation</p>
+      <h1><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span></h1>
+      <p><span data-i18n-en="A queue of items Luna (the AI assistant) has flagged for human review, response, or escalation" data-i18n-zh="Luna(AI 助手)标记为需要人工审核、回复或升级处理的事项队列">A queue of items Luna (the AI assistant) has flagged for human review, response, or escalation</span></p>
     </div>
 
     <div class="banner" style="margin-bottom:18px;">
       <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
       <div>
-        <div class="banner-title">Preview</div>
-        <div class="banner-text">This page is a preview of an upcoming feature — the counts and rows below are placeholder content, not live data. Once wired up, Luna Queue will surface anything the AI assistant thinks needs a human decision: ambiguous Change Proposals, stalled owners, and items worth escalating.</div>
+        <div class="banner-title"><span data-i18n-en="Preview" data-i18n-zh="预览">Preview</span></div>
+        <div class="banner-text"><span data-i18n-en="This page is a preview of an upcoming feature — the counts and rows below are placeholder content, not live data. Once wired up, Luna Queue will surface anything the AI assistant thinks needs a human decision: ambiguous Change Proposals, stalled owners, and items worth escalating." data-i18n-zh="此页面是即将推出功能的预览 — 下方的数量与行均为占位内容,并非实时数据。接入真实数据后,Luna 队列将展示 AI 助手认为需要人工决策的事项:含糊的变更提案、停滞的负责人,以及值得升级的事项。">This page is a preview of an upcoming feature — the counts and rows below are placeholder content, not live data. Once wired up, Luna Queue will surface anything the AI assistant thinks needs a human decision: ambiguous Change Proposals, stalled owners, and items worth escalating.</span></div>
       </div>
     </div>
 
     <div class="stats" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-label">Pending Review</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-label"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></div></div>
         <div class="stat-value">3</div>
-        <div class="stat-sub">Change Proposals awaiting your Approve / Reject</div>
+        <div class="stat-sub"><span data-i18n-en="Change Proposals awaiting your Approve / Reject" data-i18n-zh="等待你批准／拒绝的变更提案">Change Proposals awaiting your Approve / Reject</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label">Waiting for Response</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></div></div>
         <div class="stat-value">2</div>
-        <div class="stat-sub">Owners pinged, no reply yet</div>
+        <div class="stat-sub"><span data-i18n-en="Owners pinged, no reply yet" data-i18n-zh="已提醒负责人,尚无回复">Owners pinged, no reply yet</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label">Escalation Suggested</div></div>
+        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label"><span data-i18n-en="Escalation Suggested" data-i18n-zh="建议升级">Escalation Suggested</span></div></div>
         <div class="stat-value">1</div>
-        <div class="stat-sub">Luna thinks this needs a manager's attention</div>
+        <div class="stat-sub"><span data-i18n-en="Luna thinks this needs a manager's attention" data-i18n-zh="Luna 认为这需要管理者关注">Luna thinks this needs a manager's attention</span></div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Queue</div>
+      <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span data-i18n-en="Queue" data-i18n-zh="队列">Queue</span></div>
       <table>
-        <thead><tr><th>ID</th><th>Item</th><th>Reason</th><th>Status</th></tr></thead>
+        <thead><tr><th><span data-i18n-en="ID" data-i18n-zh="编号">ID</span></th><th><span data-i18n-en="Item" data-i18n-zh="事项">Item</span></th><th><span data-i18n-en="Reason" data-i18n-zh="原因">Reason</span></th><th><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></th></tr></thead>
         <tbody>
-          <tr><td>DT-024</td><td>03 Historical BMS Data</td><td>Root blocker, overdue against original target</td><td><span class="badge red">Overdue</span></td></tr>
-          <tr><td>DT-025</td><td>02 Data Point / API Integration</td><td>Completion date was TBC for 2 weeks</td><td><span class="badge orange">Waiting for Response</span></td></tr>
-          <tr><td>DT-026</td><td>08 Chiller Plant Modelling (E+)</td><td>Geometry flagged as incorrect, no update since 08/19</td><td><span class="badge orange">Waiting for Response</span></td></tr>
-          <tr><td>DT-027</td><td>p14 · 03 Original Target Date change</td><td>Confidence: confirmed, still pending review</td><td><span class="badge violet">Pending Review</span></td></tr>
+          <tr><td>DT-024</td><td><span data-i18n-en="03 Historical BMS Data" data-i18n-zh="03 历史 BMS 数据">03 Historical BMS Data</span></td><td><span data-i18n-en="Root blocker, overdue against original target" data-i18n-zh="根本阻塞项,相对原始目标已逾期">Root blocker, overdue against original target</span></td><td><span class="badge red"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span></td></tr>
+          <tr><td>DT-025</td><td><span data-i18n-en="02 Data Point / API Integration" data-i18n-zh="02 数据点／API 集成">02 Data Point / API Integration</span></td><td><span data-i18n-en="Completion date was TBC for 2 weeks" data-i18n-zh="完成日期悬而未定已2周">Completion date was TBC for 2 weeks</span></td><td><span class="badge orange"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span></td></tr>
+          <tr><td>DT-026</td><td><span data-i18n-en="08 Chiller Plant Modelling (E+)" data-i18n-zh="08 冷机房建模(E+)">08 Chiller Plant Modelling (E+)</span></td><td><span data-i18n-en="Geometry flagged as incorrect, no update since 08/19" data-i18n-zh="几何模型被标记为不正确,自08/19起无更新">Geometry flagged as incorrect, no update since 08/19</span></td><td><span class="badge orange"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span></td></tr>
+          <tr><td>DT-027</td><td><span data-i18n-en="p14 · 03 Original Target Date change" data-i18n-zh="p14 · 03 原始目标日期变更">p14 · 03 Original Target Date change</span></td><td><span data-i18n-en="Confidence: confirmed, still pending review" data-i18n-zh="置信度:已确认,仍待审核">Confidence: confirmed, still pending review</span></td><td><span class="badge violet"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1261,61 +1264,139 @@ if(typeof pdfjsLib !== 'undefined'){
 // between views. Months 1-4 also carry real, granular TASKS[] entries; Months 5-9 have
 // no granular backlog yet, so their `items` (below) are the slide's own checklist bullets.
 const PHASES = [
-  {month:1, title:'Project Kick-Off', dateLabel:'Jul 2026',
+  {month:1, title:'Project Kick-Off', titleZh:'项目启动', dateLabel:'Jul 2026',
    badges:[{label:'VPN ON',color:'green'}],
    items:['Data connectivity established','Cooling system topology mapped','Control policy & tenant SLA alignment']},
-  {month:2, title:'Digital Twin Construction', dateLabel:'Aug 2026',
+  {month:2, title:'Digital Twin Construction', titleZh:'数字孪生构建', dateLabel:'Aug 2026',
    badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
    items:['Digital twin calibrated to real system','Energy baseline model created','Simulation environment ready']},
-  {month:3, title:'AI Optimization Training', dateLabel:'Sep 2026',
+  {month:3, title:'AI Optimization Training', titleZh:'AI 优化训练', dateLabel:'Sep 2026',
    badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
    items:['AI optimization policy trained','Energy savings validated in simulation','Safety guardrails established']},
-  {month:4, title:'Optimization Deployment (Human-in-Loop)', dateLabel:'Oct 2026',
+  {month:4, title:'Optimization Deployment (Human-in-Loop)', titleZh:'优化部署(人机协同)', dateLabel:'Oct 2026',
    badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
    items:['Optimization recommendations live','Operators follow AI suggestions','First real energy reduction observed']},
-  {month:5, title:'Optimization Validation & Auto-Control Build', dateLabel:'Nov 2026',
+  {month:5, title:'Optimization Validation & Auto-Control Build', titleZh:'优化验证与自动控制搭建', dateLabel:'Nov 2026',
    badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN ON → OFF',color:'violet'}],
    items:['Optimization validation & fine-tuning','Auto-control engine building','Control accuracy evaluation','Operator feedback incorporated']},
-  {month:6, title:'Stable Energy Savings', dateLabel:'Dec 2026',
+  {month:6, title:'Stable Energy Savings', titleZh:'稳定节能', dateLabel:'Dec 2026',
    badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
    items:['Sustained energy savings demonstrated','Auto-control model shadowing started','System ready for operational trials']},
-  {month:7, title:'Controlled Auto-Control Trials', dateLabel:'Jan 2027',
+  {month:7, title:'Controlled Auto-Control Trials', titleZh:'受控自动控制试运行', dateLabel:'Jan 2027',
    badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
    items:['Controlled auto-control activation','Safety guardrails verified','No SLA violations']},
-  {month:8, title:'Optimization Refinement', dateLabel:'Feb 2027',
+  {month:8, title:'Optimization Refinement', titleZh:'优化调优', dateLabel:'Feb 2027',
    badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
    items:['Optimization policy refined','Additional energy savings realized','Operator training conducted']},
-  {month:9, title:'Final Validation & Project Completion', dateLabel:'Mar 2027',
+  {month:9, title:'Final Validation & Project Completion', titleZh:'最终验证与项目收尾', dateLabel:'Mar 2027',
    badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
    items:['Energy savings verified','Operational handover completed','Replication roadmap prepared']},
 ];
 const PHASES_BY_MONTH = {}; PHASES.forEach(p=>{ PHASES_BY_MONTH[p.month]=p; });
-function phaseTitle(month){ const p=PHASES_BY_MONTH[month]; return p ? p.title : `Month ${month}`; }
-function phaseLabel(month){ const p=PHASES_BY_MONTH[month]; return p ? `Month ${p.month} · ${p.dateLabel} · ${p.title}` : `Month ${month}`; }
+function phaseTitle(month){ const p=PHASES_BY_MONTH[month]; if(!p) return `Month ${month}`; return (LANG==='zh' && p.titleZh) ? p.titleZh : p.title; }
+function phaseLabel(month){ const p=PHASES_BY_MONTH[month]; if(!p) return monthWord(month); const t=(LANG==='zh' && p.titleZh)?p.titleZh:p.title; return LANG==='zh' ? `第 ${p.month} 月 · ${p.dateLabel} · ${t}` : `Month ${p.month} · ${p.dateLabel} · ${t}`; }
 function miniBadge(b){ return `<span class="badge ${b.color}" style="padding:2px 7px;font-size:9.5px;">${b.label}</span>`; }
 
 const TASKS = [
- {id:'00',name:'VPN / VM Access',en:'Access & connectivity setup',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'Istofa',status:'done',health:'good',progress:100,next:'—',due:'07/18',ms:'—',gs:'2026-07-15',ge:'2026-07-18'},
- {id:'01',name:'Technical Alignment Session',en:'Cooling topology & data-point confirmation',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'RDA + DayOne On-site Team',status:'unconfirmed',health:'none',progress:0,next:'Confirm whether the 08/14 alignment session has been completed',due:'08/14',ms:'—',gs:'2026-08-12',ge:'2026-08-14'},
- {id:'02',name:'Data Point / API Integration',en:'Real-time BMS point exposure',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Anurag / Istofa',status:'inprogress',health:'fine',progress:65,next:'Complete remaining API endpoint integration',due:'08/21',ms:'MS2',gs:'2026-08-12',ge:'2026-09-05'},
- {id:'03',name:'Historical BMS Data',en:'6-month historical extraction',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Hong Qing / Justin',status:'inprogress',health:'risk',progress:50,next:'Continue providing remaining historical data (Justin, target 21 Aug)',due:'08/21',ms:'MS2',gs:'2026-07-31',ge:'2026-08-21',targetOriginal:'2026-08-14'},
- {id:'04',name:'Digital Twin Framework',en:'Data Hall, Chiller & Cooling Tower loops',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:70,next:'Complete remaining module integration; calibration depends on historical data',due:'08/21',ms:'MS2',gs:'2026-08-26',ge:'2026-09-15'},
- {id:'05',name:'Single Data Hall Pilot',en:'First validation scope',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Mingchen / Valdy',status:'inprogress',health:'risk',progress:40,next:'Start calibration for the first Data Hall using available historical data',due:'08/20',ms:'MS2',gs:'2026-08-17',ge:'2026-08-28',targetOriginal:'2026-08-17'},
- {id:'06',name:'Model Calibration Prep',en:'To start after the Technical Alignment Session',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'RDA Modelling Team',status:'notstarted',health:'none',progress:0,next:'Use confirmed topology and available BMS data to prepare for fine-tuning and calibration',due:'08/25',ms:'MS2',gs:'2026-09-01',ge:'2026-09-05'},
- {id:'07',name:'Leakage Detection Definition',en:'Refrigerant-leak detection rules',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:55,next:'Confirm detection rules and thresholds',due:'08/25',ms:'MS2',gs:'2026-09-06',ge:'2026-09-20'},
- {id:'08',name:'Chiller Plant Modelling (E+)',en:'3D visualization model',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'risk',progress:55,next:'Fix chiller plant model geometry (currently flagged as not correct)',due:'08/25',ms:'MS2',gs:'2026-09-05',ge:'2026-10-15'},
- {id:'09',name:'DCWiz Demo Preparation',en:'dcwiz.experimental.rda.ai',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:45,next:'Prepare demo script and data',due:'08/26',ms:'—',gs:'2026-10-01',ge:'2026-10-20'},
- {id:'31',name:'Baseline Energy Model',en:'Snapshot/historical-data-driven',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Mingchen',status:'inprogress',health:'fine',progress:80,next:'Confirm baseline model correctness with Justin / DayOne',due:'09/30',ms:'—',gs:'2026-08-20',ge:'2026-09-25'},
- {id:'32',name:'InfluxDB Continuous Ingestion',en:'Feeds the prototype AI+energy model',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:30,next:'Configure alerting and monitoring (ingestion outage would block prototype model improvement)',due:'09/05',ms:'—',gs:'2026-08-20',ge:'2026-09-10'},
- {id:'10',name:'AI Optimization Training',en:'EnergyPlus 9.5.0 prototype model',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Collect training dataset',due:'09/10',ms:'—',gs:'2026-10-20',ge:'2026-12-10'},
- {id:'11',name:'Simulation Savings Validation',en:'Energy savings validated in simulation',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Define validation plan',due:'09/15',ms:'—',gs:'2026-12-10',ge:'2027-01-10'},
- {id:'12',name:'Safety Guardrail Definition',en:'Safety guardrails established',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Define limits and alerting policy',due:'09/20',ms:'—',gs:'2027-01-10',ge:'2027-02-15'},
- {id:'13',name:'DCVerse/DCWiz Integration',en:'Full-stack deployment',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Complete system integration testing',due:'10/05',ms:'—',gs:'2026-10-05',ge:'2026-10-20'},
- {id:'14',name:'Human-in-the-Loop Rollout',en:'Operators follow AI suggestions',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Phased rollout and monitoring',due:'10/15',ms:'—',gs:'2026-10-15',ge:'2026-11-01'},
- {id:'15',name:'DCWiz Telemetry & What-if Validation',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
+ {id:'00',name:'VPN / VM Access',nameZh:'VPN／虚拟机接入',en:'Access & connectivity setup',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'Istofa',status:'done',health:'good',progress:100,next:'—',due:'07/18',ms:'—',gs:'2026-07-15',ge:'2026-07-18'},
+ {id:'01',name:'Technical Alignment Session',nameZh:'技术对齐会议',en:'Cooling topology & data-point confirmation',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'RDA + DayOne On-site Team',status:'unconfirmed',health:'none',progress:0,next:'Confirm whether the 08/14 alignment session has been completed',due:'08/14',ms:'—',gs:'2026-08-12',ge:'2026-08-14'},
+ {id:'02',name:'Data Point / API Integration',nameZh:'数据点／API 集成',en:'Real-time BMS point exposure',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Anurag / Istofa',status:'inprogress',health:'fine',progress:65,next:'Complete remaining API endpoint integration',due:'08/21',ms:'MS2',gs:'2026-08-12',ge:'2026-09-05'},
+ {id:'03',name:'Historical BMS Data',nameZh:'历史 BMS 数据',en:'6-month historical extraction',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Hong Qing / Justin',status:'inprogress',health:'risk',progress:50,next:'Continue providing remaining historical data (Justin, target 21 Aug)',due:'08/21',ms:'MS2',gs:'2026-07-31',ge:'2026-08-21',targetOriginal:'2026-08-14'},
+ {id:'04',name:'Digital Twin Framework',nameZh:'数字孪生框架',en:'Data Hall, Chiller & Cooling Tower loops',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:70,next:'Complete remaining module integration; calibration depends on historical data',due:'08/21',ms:'MS2',gs:'2026-08-26',ge:'2026-09-15'},
+ {id:'05',name:'Single Data Hall Pilot',nameZh:'单机房试点',en:'First validation scope',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Mingchen / Valdy',status:'inprogress',health:'risk',progress:40,next:'Start calibration for the first Data Hall using available historical data',due:'08/20',ms:'MS2',gs:'2026-08-17',ge:'2026-08-28',targetOriginal:'2026-08-17'},
+ {id:'06',name:'Model Calibration Prep',nameZh:'模型标定准备',en:'To start after the Technical Alignment Session',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'RDA Modelling Team',status:'notstarted',health:'none',progress:0,next:'Use confirmed topology and available BMS data to prepare for fine-tuning and calibration',due:'08/25',ms:'MS2',gs:'2026-09-01',ge:'2026-09-05'},
+ {id:'07',name:'Leakage Detection Definition',nameZh:'泄漏检测定义',en:'Refrigerant-leak detection rules',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:55,next:'Confirm detection rules and thresholds',due:'08/25',ms:'MS2',gs:'2026-09-06',ge:'2026-09-20'},
+ {id:'08',name:'Chiller Plant Modelling (E+)',nameZh:'冷机房建模(E+)',en:'3D visualization model',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'risk',progress:55,next:'Fix chiller plant model geometry (currently flagged as not correct)',due:'08/25',ms:'MS2',gs:'2026-09-05',ge:'2026-10-15'},
+ {id:'09',name:'DCWiz Demo Preparation',nameZh:'DCWiz 演示准备',en:'dcwiz.experimental.rda.ai',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:45,next:'Prepare demo script and data',due:'08/26',ms:'—',gs:'2026-10-01',ge:'2026-10-20'},
+ {id:'31',name:'Baseline Energy Model',nameZh:'能耗基线模型',en:'Snapshot/historical-data-driven',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Mingchen',status:'inprogress',health:'fine',progress:80,next:'Confirm baseline model correctness with Justin / DayOne',due:'09/30',ms:'—',gs:'2026-08-20',ge:'2026-09-25'},
+ {id:'32',name:'InfluxDB Continuous Ingestion',nameZh:'InfluxDB 持续接入',en:'Feeds the prototype AI+energy model',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:30,next:'Configure alerting and monitoring (ingestion outage would block prototype model improvement)',due:'09/05',ms:'—',gs:'2026-08-20',ge:'2026-09-10'},
+ {id:'10',name:'AI Optimization Training',nameZh:'AI 优化训练',en:'EnergyPlus 9.5.0 prototype model',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Collect training dataset',due:'09/10',ms:'—',gs:'2026-10-20',ge:'2026-12-10'},
+ {id:'11',name:'Simulation Savings Validation',nameZh:'仿真节能验证',en:'Energy savings validated in simulation',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Define validation plan',due:'09/15',ms:'—',gs:'2026-12-10',ge:'2027-01-10'},
+ {id:'12',name:'Safety Guardrail Definition',nameZh:'安全护栏定义',en:'Safety guardrails established',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Define limits and alerting policy',due:'09/20',ms:'—',gs:'2027-01-10',ge:'2027-02-15'},
+ {id:'13',name:'DCVerse/DCWiz Integration',nameZh:'DCVerse/DCWiz 集成',en:'Full-stack deployment',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Complete system integration testing',due:'10/05',ms:'—',gs:'2026-10-05',ge:'2026-10-20'},
+ {id:'14',name:'Human-in-the-Loop Rollout',nameZh:'人机协同上线',en:'Operators follow AI suggestions',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Phased rollout and monitoring',due:'10/15',ms:'—',gs:'2026-10-15',ge:'2026-11-01'},
+ {id:'15',name:'DCWiz Telemetry & What-if Validation',nameZh:'DCWiz 遥测与假设分析验证',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
 ];
-const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28',month:2};
+const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',nameZh:'数字孪生标定完成',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28',month:2};
 const TODAY = new Date('2026-08-21');
+
+/* ===================== i18n (EN / ZH switch) =====================
+   Scope (per product decision): UI chrome (nav, headers, buttons, badges,
+   table headers, legends) AND task/milestone/phase names switch language.
+   Freeform authored content — meeting minutes, Next Step notes, Change
+   Proposal evidence/reason quotes, action titles derived from meeting text —
+   stays English always, since translating it would misrepresent the source
+   material. See applyI18n() further below for how static HTML text (marked
+   with data-i18n-en/zh attributes) is switched; everything generated by JS
+   uses the tr()/taskName()/phaseTitle() helpers defined here. */
+let LANG = 'en';
+try{ LANG = localStorage.getItem('dc_lang') || 'en'; }catch(e){}
+
+// EN phrase -> ZH phrase. English strings already appear as literals throughout
+// this file's JS, so they double as dictionary keys — call tr('Blocked') instead
+// of hard-coding 'Blocked', and it resolves to the right language automatically.
+const ZH_MAP = {
+  // Badge / status words
+  'Done':'已完成','In Progress':'进行中','Blocked':'已阻塞','Overdue':'已逾期',
+  'Not Started':'未开始','Planned':'已计划','Unconfirmed':'待确认',
+  'Healthy':'健康','Good':'良好','At Risk':'有风险','Blocking':'阻塞中','On Track':'进度正常',
+  'High':'高','Medium':'中','Low':'低',
+  'Pending Confirmation':'待确认','Ready to Start':'可以开始','To Prepare':'待准备',
+  'To Schedule':'待排期','To Align':'待对齐','To Confirm':'待确认',
+  'Confirmed':'已确认','Inferred':'推断','Unknown':'未知','Pending Review':'待审核',
+  'Approved':'已批准','Rejected':'已拒绝','Preview':'预览',
+  // Field labels (Proposed Updates card header only — see trFieldLabel())
+  'Progress':'进度','Next Step':'下一步','Status':'状态','Target Date':'目标日期','Health':'健康度',
+  'Calibration Accuracy Acceptance Threshold':'标定精度验收阈值','Original Target Date':'原始目标日期','Gantt End Date':'甘特图结束日期',
+  // Misc words / short phrases used inside JS-built strings
+  'Today':'今天','No tasks scheduled yet':'暂无排期任务','Advance':'推进',
+  'New action added':'新增行动项','New:':'新增:','Nothing to batch-approve':'没有可批量批准的项',
+  'No pending 🟢 Confirmed proposals for this meeting':'本次会议没有待处理的🟢已确认提案',
+  'Confirmed updates applied':'条已确认更新已应用','Health / KPIs / Blocker Map / Roadmap recalculated automatically':'健康度／KPI／阻塞影响图／路线图已自动重新计算',
+  'Change Applied':'变更已应用','updated — Health / KPIs / dependency graph recalculated automatically':'已更新 — 健康度／KPI／依赖关系图已自动重新计算',
+  'New action created — Roadmap and Actions updated automatically':'已创建新行动项 — 路线图与行动列表已自动更新',
+  'Update Rejected':'更新已拒绝','This Change Proposal will not be written to project data — the original record is unchanged':'该变更提案不会写入项目数据 — 原始记录保持不变',
+  'Missing information':'信息不完整','Please fill in the meeting title and date':'请填写会议标题和日期',
+  'Meeting record saved':'会议记录已保存','Paste the raw minutes to Claude — Claude will generate pending-review updates here in Change Proposal format':'将会议纪要原文粘贴给 Claude,Claude 会以变更提案的形式在此生成待审核更新',
+  'No pending change proposals for this meeting':'本次会议暂无待处理的变更提案','No change history yet':'暂无变更历史',
+  'Selena Program Brief':'Selena 项目简报','View full brief':'查看完整简报',
+  'The full AI-generated brief is a preview feature — not wired up yet.':'完整 AI 简报是预览功能,尚未接入真实数据。',
+  'Internal Delivery':'内部交付进度','View internal progress':'查看内部进度',
+  'Full internal-progress drill-down is a preview feature — not wired up yet.':'内部进度详情是预览功能,尚未接入真实数据。',
+  // KPI sub-labels
+  'Completion Rate':'完成率','Share':'占比',
+  // Roadmap sidebar
+  'Current Phase Focus':'当前阶段重点','Upcoming Milestones':'即将到来的里程碑','Project Information':'项目信息',
+  'Project Duration':'项目周期','Project Phase':'项目阶段','Current Progress':'当前进度',
+  'Complete API integration and historical data preparation':'完成 API 集成与历史数据准备',
+  'Advance the Digital Twin framework and calibration workflow build-out':'推进数字孪生框架与标定流程搭建',
+  'Single Data Hall pilot calibration and model calibration prep':'单机房试点标定与模型标定准备',
+  'Historical BMS data delivery is delayed, impacting progress':'历史 BMS 数据交付延迟,影响项目进度',
+  'MS3 AI Optimization Policy v1 Complete':'MS3 AI 优化策略 v1 完成',
+  'MS4 DCVerse/DCWiz Integration Complete':'MS4 DCVerse/DCWiz 集成完成',
+  'MS5 Human-in-the-Loop Rollout':'MS5 人机协同上线',
+  'MS6 Project Acceptance & Handover':'MS6 项目验收与交接',
+  'Jul 2026 – Mar 2027 (9 months)':'2026年7月 – 2027年3月(9个月)',
+  'Month 2 / of 9':'第 2 / 9 月',
+  // Meetings page chrome
+  'Evidence':'依据','New action':'新行动项','Pending confirmation (not guessed)':'待确认(未推测)',
+  'Approve':'批准','Reject':'拒绝',
+  // Attachment upload status chrome (dynamic filename/ext portions stay literal)
+  'Reading':'正在读取','Added text from':'已从','to the box above.':'添加文字到上方文本框。',
+  'Could not read':'无法读取','Attached':'已附加','as an image (view it under the box, not auto-transcribed).':'为图片(可在下方查看缩略图,不会自动转写文字)。',
+  'Unsupported file type:':'不支持的文件类型:','Try an image, .pdf, .docx, .md, or .txt.':'请尝试图片、.pdf、.docx、.md 或 .txt 文件。',
+  'PDF reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.':'PDF 阅读器不可用(无法访问 cdnjs.cloudflare.com)。请直接粘贴文字。',
+  'DOCX reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.':'DOCX 阅读器不可用(无法访问 cdnjs.cloudflare.com)。请直接粘贴文字。',
+  'Could not parse':'无法解析',
+};
+function tr(en){ return (LANG==='zh' && ZH_MAP[en]) ? ZH_MAP[en] : en; }
+// Field labels inside narrative Change-Log/Action text stay English (that text is
+// meeting-derived content); only the Proposed Updates card's own header label switches.
+function trFieldLabel(f){ return tr(fieldLabel(f)); }
+function taskName(t){ return (!t) ? '' : (LANG==='zh' && t.nameZh) ? t.nameZh : t.name; }
+function msName(){ return (LANG==='zh' && MILESTONE.nameZh) ? MILESTONE.nameZh : MILESTONE.name; }
+function monthWord(n){ return LANG==='zh' ? `第 ${n} 月` : `Month ${n}`; }
+function taskCountLabel(n){ return LANG==='zh' ? `共 ${n} 项任务` : `${n} tasks`; }
 
 const STATUS_META = {
   done:{label:'Done',color:'green'}, inprogress:{label:'In Progress',color:'orange'},
@@ -1325,8 +1406,8 @@ const STATUS_META = {
 };
 const HEALTH_META = { good:{label:'Healthy',color:'green'}, fine:{label:'Good',color:'cyan'}, risk:{label:'At Risk',color:'orange'}, none:{label:'—',color:'gray'} };
 
-function badge(status){ const m=STATUS_META[status]||{label:status,color:'gray'}; return `<span class="badge ${m.color}">${m.label}</span>`; }
-function healthBadge(h){ const m=HEALTH_META[h]||HEALTH_META.none; if(h==='none') return '<span style="color:var(--text-dimmer)">—</span>'; return `<span class="badge ${m.color}">${m.label}</span>`; }
+function badge(status){ const m=STATUS_META[status]||{label:status,color:'gray'}; return `<span class="badge ${m.color}">${tr(m.label)}</span>`; }
+function healthBadge(h){ const m=HEALTH_META[h]||HEALTH_META.none; if(h==='none') return '<span style="color:var(--text-dimmer)">—</span>'; return `<span class="badge ${m.color}">${tr(m.label)}</span>`; }
 
 /* ===================== PROGRAM DATA STORE — DERIVE LAYER =====================
    TASKS[] above holds RAW authoritative fields (writable only via approved
@@ -1439,26 +1520,26 @@ function slotBadge(id){
   if(id==='MS2') return nodeBadges('MS2');
   const t = TASKS_BY_ID[id];
   if(!t) return healthBadge('none');
-  if(isEffectivelyBlocked(id)) return '<span class="badge red">Blocked</span>';
-  if(isOverdue(t)) return '<span class="badge red">Overdue</span>';
-  if(t.status==='inprogress' && t.health==='risk') return '<span class="badge orange">At Risk</span>';
+  if(isEffectivelyBlocked(id)) return `<span class="badge red">${tr('Blocked')}</span>`;
+  if(isOverdue(t)) return `<span class="badge red">${tr('Overdue')}</span>`;
+  if(t.status==='inprogress' && t.health==='risk') return `<span class="badge orange">${tr('At Risk')}</span>`;
   return badge(t.status);
 }
 // Multi-badge slot (Blocker Impact Map / Dependency View cards) — can stack e.g. Blocked + Overdue.
 function nodeBadges(id){
   if(id==='MS2'){
     const atRisk = EDGES.some(e=>e.to==='MS2' && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from])));
-    return atRisk ? '<span class="badge red">Blocking</span><span class="badge orange">At Risk</span>' : '<span class="badge green">On Track</span>';
+    return atRisk ? `<span class="badge red">${tr('Blocking')}</span><span class="badge orange">${tr('At Risk')}</span>` : `<span class="badge green">${tr('On Track')}</span>`;
   }
   const t = TASKS_BY_ID[id];
   if(!t) return '';
   const out = [];
-  if(isEffectivelyBlocked(id)) out.push('<span class="badge red">Blocked</span>');
-  if(isOverdue(t)) out.push('<span class="badge red">Overdue</span>');
-  if(t.status==='done') out.push('<span class="badge green">Done</span>');
+  if(isEffectivelyBlocked(id)) out.push(`<span class="badge red">${tr('Blocked')}</span>`);
+  if(isOverdue(t)) out.push(`<span class="badge red">${tr('Overdue')}</span>`);
+  if(t.status==='done') out.push(`<span class="badge green">${tr('Done')}</span>`);
   if(out.length===0){
-    if(t.health==='risk') out.push('<span class="badge orange">At Risk</span>');
-    else if(t.status==='inprogress') out.push('<span class="badge blue">In Progress</span>');
+    if(t.health==='risk') out.push(`<span class="badge orange">${tr('At Risk')}</span>`);
+    else if(t.status==='inprogress') out.push(`<span class="badge blue">${tr('In Progress')}</span>`);
     else out.push(badge(t.status));
   }
   return out.join('');
@@ -1512,9 +1593,9 @@ function computeKPIs(){
     subsetdeps: EDGES.filter(e=>e.type==='subset').length,
     depblockers: blockerSourceIds.size, depmsimpacted: msImpacted,
     monthtasks: monthTasks.length, monthdone: monthDone.length,
-    'monthdone-sub': `Completion Rate ${monthTasks.length?(monthDone.length/monthTasks.length*100).toFixed(1):'0.0'}%`,
+    'monthdone-sub': `${tr('Completion Rate')} ${monthTasks.length?(monthDone.length/monthTasks.length*100).toFixed(1):'0.0'}%`,
     monthprog: monthProg.length,
-    'monthprog-sub': `Share ${monthTasks.length?(monthProg.length/monthTasks.length*100).toFixed(1):'0.0'}%`,
+    'monthprog-sub': `${tr('Share')} ${monthTasks.length?(monthProg.length/monthTasks.length*100).toFixed(1):'0.0'}%`,
   };
 }
 function applyKPIs(){
@@ -1711,36 +1792,40 @@ document.querySelectorAll('.pill[data-depfilter]').forEach(btn=>{
 });
 
 /* ===================== SIDEBAR (shared across roadmap subviews) ===================== */
-const sidebarHTML = `
+function sidebarHTML(){ return `
   <div class="side-card">
-    <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24" fill="var(--purple)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Current Phase Focus<span style="margin-left:auto;color:var(--text-dimmer)">⌃</span></h3>
+    <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24" fill="var(--purple)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${tr('Current Phase Focus')}<span style="margin-left:auto;color:var(--text-dimmer)">⌃</span></h3>
     <ul class="checklist">
-      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Complete API integration and historical data preparation</li>
-      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Advance the Digital Twin framework and calibration workflow build-out</li>
-      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Single Data Hall pilot calibration and model calibration prep</li>
-      <li class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Historical BMS data delivery is delayed, impacting progress</li>
+      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${tr('Complete API integration and historical data preparation')}</li>
+      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${tr('Advance the Digital Twin framework and calibration workflow build-out')}</li>
+      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${tr('Single Data Hall pilot calibration and model calibration prep')}</li>
+      <li class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${tr('Historical BMS data delivery is delayed, impacting progress')}</li>
     </ul>
   </div>
   <div class="side-card">
-    <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Upcoming Milestones<span style="margin-left:auto;color:var(--text-dimmer)">⌃</span></h3>
+    <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>${tr('Upcoming Milestones')}<span style="margin-left:auto;color:var(--text-dimmer)">⌃</span></h3>
     <ul class="ms-list">
-      <li><span class="ms-date">08/28</span><span class="ms-name">MS2 Digital Twin Calibrated</span><span class="ms-month">Month 2</span></li>
-      <li><span class="ms-date">09/30</span><span class="ms-name">MS3 AI Optimization Policy v1 Complete</span><span class="ms-month">Month 3</span></li>
-      <li><span class="ms-date">10/31</span><span class="ms-name">MS4 DCVerse/DCWiz Integration Complete</span><span class="ms-month">Month 4</span></li>
-      <li><span class="ms-date">11/30</span><span class="ms-name">MS5 Human-in-the-Loop Rollout</span><span class="ms-month">Month 5</span></li>
-      <li><span class="ms-date">01/31</span><span class="ms-name">MS6 Project Acceptance & Handover</span><span class="ms-month">Month 7</span></li>
+      <li><span class="ms-date">08/28</span><span class="ms-name">MS2 ${msName()}</span><span class="ms-month">${monthWord(2)}</span></li>
+      <li><span class="ms-date">09/30</span><span class="ms-name">${tr('MS3 AI Optimization Policy v1 Complete')}</span><span class="ms-month">${monthWord(3)}</span></li>
+      <li><span class="ms-date">10/31</span><span class="ms-name">${tr('MS4 DCVerse/DCWiz Integration Complete')}</span><span class="ms-month">${monthWord(4)}</span></li>
+      <li><span class="ms-date">11/30</span><span class="ms-name">${tr('MS5 Human-in-the-Loop Rollout')}</span><span class="ms-month">${monthWord(5)}</span></li>
+      <li><span class="ms-date">01/31</span><span class="ms-name">${tr('MS6 Project Acceptance & Handover')}</span><span class="ms-month">${monthWord(7)}</span></li>
     </ul>
-  </div>`;
-document.getElementById('rmSidebarGraph').innerHTML = sidebarHTML;
-document.getElementById('rmSidebarList').innerHTML = sidebarHTML;
-document.getElementById('rmSidebarGantt').innerHTML = sidebarHTML + `
+  </div>`; }
+function sidebarGanttExtra(){ return `
   <div class="side-card">
-    <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Project Information</h3>
-    <div class="info-row"><span>Project Duration</span><b>Jul 2026 – Mar 2027 (9 months)</b></div>
-    <div class="info-row"><span>Project Phase</span><b>Month 2 / of 9</b></div>
-    <div class="info-row"><span>Current Progress</span><b>28.6%</b></div>
+    <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>${tr('Project Information')}</h3>
+    <div class="info-row"><span>${tr('Project Duration')}</span><b>${tr('Jul 2026 – Mar 2027 (9 months)')}</b></div>
+    <div class="info-row"><span>${tr('Project Phase')}</span><b>${tr('Month 2 / of 9')}</b></div>
+    <div class="info-row"><span>${tr('Current Progress')}</span><b>28.6%</b></div>
     <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:28.6%;background:var(--purple)"></div></div></div>
-  </div>`;
+  </div>`; }
+function renderSidebars(){
+  document.getElementById('rmSidebarGraph').innerHTML = sidebarHTML();
+  document.getElementById('rmSidebarList').innerHTML = sidebarHTML();
+  document.getElementById('rmSidebarGantt').innerHTML = sidebarHTML() + sidebarGanttExtra();
+}
+renderSidebars();
 
 /* ===================== LIST VIEW RENDER ===================== */
 function renderList(){
@@ -1768,8 +1853,8 @@ function renderList(){
     const barColor = t.progress>=75?'var(--green)':t.progress>=50?'var(--orange)':t.progress>=25?'var(--red)':'var(--gray)';
     body.innerHTML += `<tr>
       <td>${t.id}</td>
-      <td class="name-cell">${t.name}<span class="en">${t.en}</span></td>
-      <td>Month ${t.month}</td>
+      <td class="name-cell">${taskName(t)}<span class="en">${t.en}</span></td>
+      <td>${monthWord(t.month)}</td>
       <td>${t.owner}</td>
       <td>${badge(t.status)}</td>
       <td>${healthBadge(t.health)}</td>
@@ -1779,7 +1864,7 @@ function renderList(){
       <td>${t.ms!=='—'?`<span class="badge violet">◆ ${t.ms}</span>`:'—'}</td>
     </tr>`;
   });
-  document.getElementById('listCount').textContent = `${rows.length} tasks`;
+  document.getElementById('listCount').textContent = taskCountLabel(rows.length);
 }
 document.getElementById('listSearch').addEventListener('input',renderList);
 document.getElementById('phaseFilter').addEventListener('change',renderList);
@@ -1828,19 +1913,20 @@ function buildGantt(){
     const h = r.kind==='phase' ? PHASE_H : TASK_H;
     r.top = y; r.h = h;
     if(r.kind==='phase'){
-      leftRows.innerHTML += `<div class="gr gr-phase"><span>Month ${r.ph.month} · ${r.ph.title}</span></div>`;
+      const phTitle = (LANG==='zh' && r.ph.titleZh) ? r.ph.titleZh : r.ph.title;
+      leftRows.innerHTML += `<div class="gr gr-phase"><span>${monthWord(r.ph.month)} · ${phTitle}</span></div>`;
       rowsEl.innerHTML += `<div class="gantt-row-bg phase-bg" style="height:${h}px"></div>`;
     } else if(r.kind==='empty'){
-      leftRows.innerHTML += `<div class="gr gr-empty"><span>No tasks scheduled yet</span></div>`;
+      leftRows.innerHTML += `<div class="gr gr-empty"><span>${tr('No tasks scheduled yet')}</span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else if(r.kind==='milestone'){
-      leftRows.innerHTML += `<div class="gr"><span class="gid">◆</span><span class="gname">${MILESTONE.name}</span><span></span></div>`;
+      leftRows.innerHTML += `<div class="gr"><span class="gid">◆</span><span class="gname">${msName()}</span><span></span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else {
       const t=r.t;
-      leftRows.innerHTML += `<div class="gr"><span class="gid">${t.id}</span><span class="gname">${t.name}</span><span>${badgeSmall(t.status)}</span></div>`;
+      leftRows.innerHTML += `<div class="gr"><span class="gid">${t.id}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     }
@@ -1896,10 +1982,10 @@ function buildGantt(){
   const todayOffset = pct(dayOffset(TODAY));
   const line = document.createElement('div');
   line.className='today-line'; line.style.left = todayOffset+'%';
-  line.innerHTML = `<div class="today-tag">Today</div>`;
+  line.innerHTML = `<div class="today-tag">${tr('Today')}</div>`;
   rowsEl.appendChild(line);
 }
-function badgeSmall(status){ const m=STATUS_META[status]||{label:'',color:'gray'}; return `<span class="badge ${m.color}" style="padding:2px 7px;font-size:10px;">${m.label}</span>`; }
+function badgeSmall(status){ const m=STATUS_META[status]||{label:'',color:'gray'}; return `<span class="badge ${m.color}" style="padding:2px 7px;font-size:10px;">${tr(m.label)}</span>`; }
 buildGantt();
 
 /* ===================== ACTIONS (derived from TASKS + approved proposals) ===================== */
@@ -1907,6 +1993,7 @@ function buildBaselineActions(){
   return TASKS.filter(t=>t.status!=='done' && t.status!=='notstarted').map(t=>({
     id:'T'+t.id,
     title: (t.next && t.next!=='—') ? t.next : `Advance ${t.name}`,
+    titleFallback: !(t.next && t.next!=='—'),
     owner: t.owner,
     status: isEffectivelyBlocked(t.id) ? 'Blocked' : (isOverdue(t) ? 'Overdue' : 'In Progress'),
     due: t.due,
@@ -1916,26 +2003,31 @@ function buildBaselineActions(){
   }));
 }
 let ACTIONS = buildBaselineActions();
+function actionTitle(a){
+  if(!a.titleFallback) return a.title;
+  const t = a.relatedTask ? TASKS_BY_ID[a.relatedTask] : null;
+  return t ? `${tr('Advance')} ${taskName(t)}` : a.title;
+}
 
-function priorityBadge(p){ return p==='high' ? '<span class="badge red">High</span>' : p==='medium' ? '<span class="badge orange">Medium</span>' : '<span class="badge gray">Low</span>'; }
+function priorityBadge(p){ return p==='high' ? `<span class="badge red">${tr('High')}</span>` : p==='medium' ? `<span class="badge orange">${tr('Medium')}</span>` : `<span class="badge gray">${tr('Low')}</span>`; }
 function actionStatusBadge(s){
   const map = {'Blocked':'red','Overdue':'red','In Progress':'orange','Pending Confirmation':'violet','Ready to Start':'blue','To Prepare':'gray','To Schedule':'gray','To Align':'gray','To Confirm':'violet'};
-  return `<span class="badge ${map[s]||'gray'}">${s}</span>`;
+  return `<span class="badge ${map[s]||'gray'}">${tr(s)}</span>`;
 }
 function renderActionsTables(){
   const pr = {high:0,medium:1,low:2};
   const sorted = [...ACTIONS].sort((a,b)=>(pr[a.priority]??1)-(pr[b.priority]??1));
   const top5Body = document.getElementById('top5ActionsBody');
   if(top5Body){
-    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${a.title}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
+    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${actionTitle(a)}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
   }
   const recoveryBody = document.getElementById('recoveryActionsBody');
   if(recoveryBody){
     const recovery = ACTIONS.filter(a=>['03','05'].includes(a.relatedTask) || a.priority==='high');
     recoveryBody.innerHTML = recovery.map((a,i)=>{
       const rt = a.relatedTask ? TASKS_BY_ID[a.relatedTask] : null;
-      const impact = rt ? `→ ${rt.name}${rt.ms==='MS2' ? ' → MS2' : ''}` : '—';
-      return `<tr><td>${i+1}</td><td>${a.title}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${impact}</td><td>${actionStatusBadge(a.status)}</td></tr>`;
+      const impact = rt ? `→ ${taskName(rt)}${rt.ms==='MS2' ? ' → MS2' : ''}` : '—';
+      return `<tr><td>${i+1}</td><td>${actionTitle(a)}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${impact}</td><td>${actionStatusBadge(a.status)}</td></tr>`;
     }).join('');
   }
 }
@@ -2026,14 +2118,14 @@ const CHANGELOG = [
 
 function fieldLabel(f){ return {progress:'Progress',next:'Next Step',status:'Status',due:'Target Date',health:'Health',calibrationTarget:'Calibration Accuracy Acceptance Threshold',targetOriginal:'Original Target Date',ge:'Gantt End Date'}[f] || f; }
 function formatFieldVal(field, v){
-  if(v===null || v===undefined) return '<span style="color:var(--text-dimmer)">Pending confirmation</span>';
+  if(v===null || v===undefined) return `<span style="color:var(--text-dimmer)">${tr('Pending Confirmation')}</span>`;
   if(field==='progress') return v+'%';
   return String(v);
 }
 function confBadge(c){
-  if(c==='confirmed') return '<span class="conf-badge confirmed">🟢 Confirmed</span>';
-  if(c==='inferred') return '<span class="conf-badge inferred">🟡 Inferred</span>';
-  return '<span class="conf-badge unknown">⚪ Unknown</span>';
+  if(c==='confirmed') return `<span class="conf-badge confirmed">🟢 ${tr('Confirmed')}</span>`;
+  if(c==='inferred') return `<span class="conf-badge inferred">🟡 ${tr('Inferred')}</span>`;
+  return `<span class="conf-badge unknown">⚪ ${tr('Unknown')}</span>`;
 }
 function nowLabel(){ return '2026-08-19'; }
 
@@ -2062,21 +2154,24 @@ function approveProposal(id){
   if(!p || p.status!=='pending') return;
   applyProposal(p);
   render();
-  showToast('Change Applied', p.entityType==='task' ? `${TASKS_BY_ID[p.entityId]?.name||p.entityId} updated — Health / KPIs / dependency graph recalculated automatically` : 'New action created — Roadmap and Actions updated automatically');
+  const body = p.entityType==='task'
+    ? `${taskName(TASKS_BY_ID[p.entityId])||p.entityId} ${tr('updated — Health / KPIs / dependency graph recalculated automatically')}`
+    : tr('New action created — Roadmap and Actions updated automatically');
+  showToast(tr('Change Applied'), body);
 }
 function rejectProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status!=='pending') return;
   p.status = 'rejected';
   render();
-  showToast('Update Rejected', 'This Change Proposal will not be written to project data — the original record is unchanged');
+  showToast(tr('Update Rejected'), tr('This Change Proposal will not be written to project data — the original record is unchanged'));
 }
 function approveAllConfirmed(){
   const targets = PROPOSALS.filter(p=>p.meetingId===currentMeetingId && p.status==='pending' && p.confidence==='confirmed');
-  if(targets.length===0){ showToast('Nothing to batch-approve', 'No pending 🟢 Confirmed proposals for this meeting'); return; }
+  if(targets.length===0){ showToast(tr('Nothing to batch-approve'), tr('No pending 🟢 Confirmed proposals for this meeting')); return; }
   targets.forEach(applyProposal);
   render();
-  showToast(`${targets.length} Confirmed updates applied`, 'Health / KPIs / Blocker Map / Roadmap recalculated automatically');
+  showToast(`${targets.length} ${tr('Confirmed updates applied')}`, tr('Health / KPIs / Blocker Map / Roadmap recalculated automatically'));
 }
 
 function toggleImportForm(){
@@ -2097,13 +2192,13 @@ function handleAttachmentUpload(input){
   const name = file.name;
   const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
   const statusEl = document.getElementById('attachStatus');
-  statusEl.textContent = `Reading ${name}…`;
+  statusEl.textContent = `${tr('Reading')} ${name}…`;
 
   const appendText = (extractedText, label) => {
     const ta = document.getElementById('impText');
     const block = `\n\n[Attached ${label}: ${name}]\n${extractedText}`;
     ta.value = ta.value ? ta.value + block : block.trim();
-    statusEl.textContent = `Added text from ${name} to the box above.`;
+    statusEl.textContent = `${tr('Added text from')} ${name} ${tr('to the box above.')}`;
     pendingAttachments.push({name, kind:'text'});
     renderAttachPreviews();
   };
@@ -2111,10 +2206,10 @@ function handleAttachmentUpload(input){
   if(ext==='md' || ext==='txt'){
     const reader = new FileReader();
     reader.onload = e => appendText(e.target.result, 'file');
-    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.onerror = () => { statusEl.textContent = `${tr('Could not read')} ${name}.`; };
     reader.readAsText(file);
   } else if(ext==='pdf'){
-    if(typeof pdfjsLib==='undefined'){ statusEl.textContent = `PDF reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.`; return; }
+    if(typeof pdfjsLib==='undefined'){ statusEl.textContent = tr('PDF reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.'); return; }
     const reader = new FileReader();
     reader.onload = async (e) => {
       try{
@@ -2126,19 +2221,19 @@ function handleAttachmentUpload(input){
           out += content.items.map(it=>it.str).join(' ') + '\n\n';
         }
         appendText(out.trim() || '(No extractable text found — this PDF may be scanned/image-only.)', 'PDF');
-      }catch(err){ statusEl.textContent = `Could not parse ${name}: ${err.message}`; }
+      }catch(err){ statusEl.textContent = `${tr('Could not parse')} ${name}: ${err.message}`; }
     };
-    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.onerror = () => { statusEl.textContent = `${tr('Could not read')} ${name}.`; };
     reader.readAsArrayBuffer(file);
   } else if(ext==='docx'){
-    if(typeof mammoth==='undefined'){ statusEl.textContent = `DOCX reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.`; return; }
+    if(typeof mammoth==='undefined'){ statusEl.textContent = tr('DOCX reader unavailable (no network access to cdnjs.cloudflare.com). Try pasting the text directly instead.'); return; }
     const reader = new FileReader();
     reader.onload = (e) => {
       mammoth.extractRawText({arrayBuffer:e.target.result})
         .then(result => appendText(result.value.trim() || '(No text found in this document.)', 'Word document'))
-        .catch(err => { statusEl.textContent = `Could not parse ${name}: ${err.message}`; });
+        .catch(err => { statusEl.textContent = `${tr('Could not parse')} ${name}: ${err.message}`; });
     };
-    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.onerror = () => { statusEl.textContent = `${tr('Could not read')} ${name}.`; };
     reader.readAsArrayBuffer(file);
   } else if(['png','jpg','jpeg'].includes(ext)){
     const reader = new FileReader();
@@ -2147,13 +2242,13 @@ function handleAttachmentUpload(input){
       const ta = document.getElementById('impText');
       const note = `\n\n[Attached image: ${name} — see the thumbnail below; images aren't auto-transcribed, so paste/describe any relevant text here.]`;
       ta.value = ta.value + note;
-      statusEl.textContent = `Attached ${name} as an image (view it under the box, not auto-transcribed).`;
+      statusEl.textContent = `${tr('Attached')} ${name} ${tr('as an image (view it under the box, not auto-transcribed).')}`;
       renderAttachPreviews();
     };
-    reader.onerror = () => { statusEl.textContent = `Could not read ${name}.`; };
+    reader.onerror = () => { statusEl.textContent = `${tr('Could not read')} ${name}.`; };
     reader.readAsDataURL(file);
   } else {
-    statusEl.textContent = `Unsupported file type: .${ext||'?'}. Try an image, .pdf, .docx, .md, or .txt.`;
+    statusEl.textContent = `${tr('Unsupported file type:')} .${ext||'?'}. ${tr('Try an image, .pdf, .docx, .md, or .txt.')}`;
   }
   input.value = ''; // allow re-selecting the same file later
 }
@@ -2172,7 +2267,7 @@ function importMeeting(){
   const title = document.getElementById('impTitle').value.trim();
   const date = document.getElementById('impDate').value.trim();
   const text = document.getElementById('impText').value.trim();
-  if(!title || !date){ showToast('Missing information', 'Please fill in the meeting title and date'); return; }
+  if(!title || !date){ showToast(tr('Missing information'), tr('Please fill in the meeting title and date')); return; }
   const id = 'm'+(MEETINGS.length+1);
   const imageAttachments = pendingAttachments.filter(a=>a.kind==='image');
   MEETINGS.unshift({id, title, date, summary: text ? (text.slice(0,60)+(text.length>60?'…':'')) : '(Awaiting Claude to parse Change Proposals)', attachments: imageAttachments});
@@ -2182,7 +2277,7 @@ function importMeeting(){
   document.getElementById('attachStatus').textContent = '';
   document.getElementById('importForm').style.display='none';
   renderMeetingsPage();
-  showToast('Meeting record saved', 'Paste the raw minutes to Claude — Claude will generate pending-review updates here in Change Proposal format');
+  showToast(tr('Meeting record saved'), tr('Paste the raw minutes to Claude — Claude will generate pending-review updates here in Change Proposal format'));
 }
 
 function selectMeeting(id){ currentMeetingId = id; renderMeetingsPage(); }
@@ -2209,31 +2304,31 @@ function renderProposalList(){
   const inferredCount = props.filter(p=>p.confidence==='inferred').length;
   const unknownCount = props.filter(p=>p.confidence==='unknown').length;
   if(chipsEl){
-    chipsEl.innerHTML = `<span class="badge green">🟢 ${confirmedCount} Confirmed</span><span class="badge orange">🟡 ${inferredCount} Inferred</span><span class="badge gray">⚪ ${unknownCount} Unknown</span><span class="badge violet">${pending.length} Pending Review</span>`;
+    chipsEl.innerHTML = `<span class="badge green">🟢 ${confirmedCount} ${tr('Confirmed')}</span><span class="badge orange">🟡 ${inferredCount} ${tr('Inferred')}</span><span class="badge gray">⚪ ${unknownCount} ${tr('Unknown')}</span><span class="badge violet">${pending.length} ${tr('Pending Review')}</span>`;
   }
   listEl.innerHTML = props.map(p=>{
-    const entityLabel = p.entityType==='task' ? `${p.entityId} ${TASKS_BY_ID[p.entityId]?.name||''}` : (p.newValue?.title||'New action');
+    const entityLabel = p.entityType==='task' ? `${p.entityId} ${taskName(TASKS_BY_ID[p.entityId])||''}` : (p.newValue?.title||tr('New action'));
     const diffHtml = p.entityType==='task'
-      ? `<div class="prop-diff"><span class="old">${formatFieldVal(p.field,p.oldValue)}</span>→<span class="new">${p.confidence==='unknown' ? 'Pending confirmation (not guessed)' : formatFieldVal(p.field,p.newValue)}</span></div>`
-      : `<div class="prop-diff"><span class="new">New: ${p.newValue.title} (${p.newValue.owner} · ${p.newValue.due||'—'})</span></div>`;
-    const statusTag = p.status==='approved' ? '<span class="prop-status-tag approved">Approved</span>' : p.status==='rejected' ? '<span class="prop-status-tag rejected">Rejected</span>' : '';
-    const actionsHtml = p.status==='pending' ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ Approve</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ Reject</button></div>` : statusTag;
+      ? `<div class="prop-diff"><span class="old">${formatFieldVal(p.field,p.oldValue)}</span>→<span class="new">${p.confidence==='unknown' ? tr('Pending confirmation (not guessed)') : formatFieldVal(p.field,p.newValue)}</span></div>`
+      : `<div class="prop-diff"><span class="new">${tr('New:')} ${p.newValue.title} (${p.newValue.owner} · ${p.newValue.due||'—'})</span></div>`;
+    const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}</span>` : '';
+    const actionsHtml = p.status==='pending' ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ ${tr('Approve')}</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ ${tr('Reject')}</button></div>` : statusTag;
     return `<div class="proposal-card ${p.status!=='pending'?p.status:''}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-        <div style="font-weight:700;font-size:13px;">${entityLabel}${p.entityType==='task' ? ' · '+fieldLabel(p.field) : ''}</div>
+        <div style="font-weight:700;font-size:13px;">${entityLabel}${p.entityType==='task' ? ' · '+trFieldLabel(p.field) : ''}</div>
         ${confBadge(p.confidence)}
       </div>
       ${diffHtml}
-      <div class="prop-evidence"><b>Evidence (${meeting?meeting.title:''}):</b> "${p.evidence}"</div>
+      <div class="prop-evidence"><b>${tr('Evidence')} (${meeting?meeting.title:''}):</b> "${p.evidence}"</div>
       <div class="prop-reason">${p.reason}</div>
       ${actionsHtml}
     </div>`;
-  }).join('') || '<div style="color:var(--text-dimmer);font-size:12.5px;padding:20px 0;text-align:center;">No pending change proposals for this meeting</div>';
+  }).join('') || `<div style="color:var(--text-dimmer);font-size:12.5px;padding:20px 0;text-align:center;">${tr('No pending change proposals for this meeting')}</div>`;
 }
 function renderChangeLog(){
   const el = document.getElementById('changeLogTimeline');
   if(!el) return;
-  el.innerHTML = CHANGELOG.map(c=>`<div class="timeline-item"><div class="tl-date">${c.date}</div><div class="tl-text">${c.text}</div></div>`).join('') || '<div style="color:var(--text-dimmer);font-size:12px;">No change history yet</div>';
+  el.innerHTML = CHANGELOG.map(c=>`<div class="timeline-item"><div class="tl-date">${c.date}</div><div class="tl-text">${c.text}</div></div>`).join('') || `<div style="color:var(--text-dimmer);font-size:12px;">${tr('No change history yet')}</div>`;
 }
 function renderMeetingsPage(){
   renderMeetList();
@@ -2269,6 +2364,51 @@ function render(){
   if(document.getElementById('page-meetings').classList.contains('active')) renderMeetingsPage();
 }
 render();
+
+/* ===================== i18n: static HTML switch + language toggle ===================== */
+// Walks every element marked with data-i18n-en/zh (added by a build-time pass over the
+// static page chrome) and sets its text to the current LANG. JS-generated content (tables,
+// cards, badges, sidebars) is handled separately by the tr()/taskName()/etc. helpers above —
+// this only covers text that's baked directly into the HTML.
+function applyI18n(){
+  document.querySelectorAll('[data-i18n-en]').forEach(el=>{
+    const zh = el.getAttribute('data-i18n-zh');
+    el.textContent = (LANG==='zh' && zh) ? zh : el.getAttribute('data-i18n-en');
+  });
+  document.querySelectorAll('[data-i18n-en-html]').forEach(el=>{
+    const zh = el.getAttribute('data-i18n-zh-html');
+    el.innerHTML = (LANG==='zh' && zh) ? zh : el.getAttribute('data-i18n-en-html');
+  });
+  document.querySelectorAll('[data-i18n-placeholder-en]').forEach(el=>{
+    const zh = el.getAttribute('data-i18n-placeholder-zh');
+    el.setAttribute('placeholder', (LANG==='zh' && zh) ? zh : el.getAttribute('data-i18n-placeholder-en'));
+  });
+}
+function updateLangToggleUI(){
+  const box = document.getElementById('langToggle');
+  if(!box) return;
+  box.querySelectorAll('[data-lang-opt]').forEach(el=>{
+    const on = el.dataset.langOpt===LANG;
+    el.style.background = on ? 'var(--purple)' : 'transparent';
+    el.style.color = on ? '#fff' : 'var(--text-dim)';
+  });
+}
+function setLang(lang){
+  if(lang!=='en' && lang!=='zh') return;
+  LANG = lang;
+  try{ localStorage.setItem('dc_lang', LANG); }catch(e){}
+  applyI18n();
+  updateLangToggleUI();
+  renderSidebars();
+  renderList();
+  buildGantt();
+  render();
+}
+document.getElementById('langToggle').querySelectorAll('[data-lang-opt]').forEach(el=>{
+  el.addEventListener('click', ()=> setLang(el.dataset.langOpt));
+});
+applyI18n();
+updateLangToggleUI();
 
 /* set updated timestamp to now (Singapore) */
 document.getElementById('updatedTime').textContent = '2026-08-21 09:15';
