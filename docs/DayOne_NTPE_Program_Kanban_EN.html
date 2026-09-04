@@ -1167,7 +1167,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <div class="attach-previews" id="attachPreviews"></div>
             <button class="btn-primary" onclick="importMeeting()"><span data-i18n-en="Save Meeting Record" data-i18n-zh="保存会议记录">Save Meeting Record</span></button>
             <div style="font-size:11px;color:var(--text-dimmer);line-height:1.6;">
-              <span data-i18n-en="Note: this step only saves the raw text (plus any attached files' extracted text, or images for visual reference). The actual &quot;AI change detection&quot; is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one." data-i18n-zh="注意:此步骤仅保存原始文本(以及所有附加文件提取的文字,或用于查看的图片)。目前实际的“AI 变更检测”由 Claude 在对话中完成 — 将会议纪要粘贴给 Claude,Claude 会以变更提案的形式将待处理更新写入右侧列表,供你逐条批准／拒绝。">Note: this step only saves the raw text (plus any attached files' extracted text, or images for visual reference). The actual "AI change detection" is currently done by Claude in chat — paste the minutes to Claude, and Claude will write pending updates into the list on the right in Change Proposal format for you to Approve / Reject one by one.</span>
+              <span data-i18n-en="Saving the record also parses the minutes: recognised task updates — progress, target dates, status, next steps and assigned follow-ups — appear on the right as Change Proposals for you to Approve or Reject one by one. Nothing is written to project data until you approve it, and any value the minutes leave open (TBC) becomes a confirmation task rather than a guess." data-i18n-zh="保存记录的同时会自动解析纪要:识别出的任务更新——进度、目标日期、状态、下一步以及指派的跟进项——会以变更提案的形式出现在右侧,供你逐条批准或拒绝。在你批准之前不会写入项目数据;纪要中留白(TBC)的内容会生成一条待确认任务,而不是猜一个值。">Saving the record also parses the minutes: recognised task updates — progress, target dates, status, next steps and assigned follow-ups — appear on the right as Change Proposals for you to Approve or Reject one by one. Nothing is written to project data until you approve it, and any value the minutes leave open (TBC) becomes a confirmation task rather than a guess.</span>
             </div>
           </div>
         </div>
@@ -1183,7 +1183,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
             <div class="panel-title" style="margin:0;"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span data-i18n-en="Proposed Updates" data-i18n-zh="提议更新">Proposed Updates</span> <span id="propMeetingLabel" style="color:var(--text-dimmer);font-weight:500;"></span></div>
             <div style="display:flex;gap:8px;">
-              <button class="btn-ghost" onclick="approveAllConfirmed()"><span data-i18n-en="Approve All Confirmed" data-i18n-zh="批准全部已确认项">Approve All Confirmed</span></button>
+              <button class="btn-ghost" onclick="reparseMeeting(currentMeetingId)" title="Re-run extraction on this meeting's stored minutes"><span data-i18n-en="Re-parse minutes" data-i18n-zh="重新解析纪要">Re-parse minutes</span></button><button class="btn-ghost" onclick="approveAllConfirmed()"><span data-i18n-en="Approve All Confirmed" data-i18n-zh="批准全部已确认项">Approve All Confirmed</span></button>
             </div>
           </div>
           <div class="summary-chips" id="propSummaryChips"></div>
@@ -1363,6 +1363,14 @@ const ZH_MAP = {
   'The full AI-generated brief is a preview feature — not wired up yet.':'完整 AI 简报是预览功能,尚未接入真实数据。',
   'Internal Delivery':'内部交付进度','View internal progress':'查看内部进度',
   'Full internal-progress drill-down is a preview feature — not wired up yet.':'内部进度详情是预览功能,尚未接入真实数据。',
+  // Auto-extraction (minutes → Change Proposals)
+  'Reading the minutes and drafting Change Proposals…':'正在解析会议纪要并生成变更提案…',
+  'updates extracted':'条更新已提取','No updates extracted':'未提取到更新',
+  'Review each one and Approve or Reject — nothing is written to project data until you do':'请逐条批准或拒绝 — 在此之前不会写入项目数据',
+  'No task-linked changes were recognised in these minutes':'未能从纪要中识别出与任务关联的变更',
+  'No minutes text was pasted, so there was nothing to extract':'没有粘贴纪要正文,因此没有可提取的内容',
+  'Nothing to re-parse':'没有可重新解析的内容','This meeting has no raw minutes stored':'该会议没有保存纪要原文',
+  'Re-parse minutes':'重新解析纪要',
   // KPI sub-labels
   'Completion Rate':'完成率','Share':'占比',
   // Roadmap sidebar
@@ -2263,21 +2271,326 @@ function renderAttachPreviews(){
 }
 function removeAttachment(i){ pendingAttachments.splice(i,1); renderAttachPreviews(); }
 
-function importMeeting(){
+/* ===================== MINUTES → CHANGE PROPOSALS (auto-extraction) =====================
+   Importing a meeting now produces reviewable Change Proposals by itself, instead of a
+   human relaying the raw text to an AI and pasting the result back in.
+
+   Two interchangeable paths, identical output shape:
+     · AI_EXTRACTOR_ENDPOINT set → POST the raw minutes to that backend and use the
+       proposals it returns. A backend can safely hold an API key; this page never should,
+       because the file gets shared around.
+     · Otherwise (the default)   → extractProposalsLocal(), a deterministic rule engine that
+       runs entirely offline. It is also the fallback whenever the remote call fails, so a
+       missing or broken backend degrades to "fewer, simpler proposals", never to a broken
+       import.
+
+   The product rule both paths obey: never invent a value. A sentence that names a task but
+   gives no definite figure produces an `unknown` proposal plus a follow-up action to confirm
+   it — the same treatment a careful reviewer gives a "TBC" in the minutes. Everything lands
+   as `pending`; nothing is written to program data until a human clicks Approve. */
+
+const AI_EXTRACTOR_ENDPOINT = '';   // e.g. 'http://localhost:8787/extract' — see AI_EXTRACTOR_CONTRACT below
+
+/* AI_EXTRACTOR_CONTRACT — what a backend at AI_EXTRACTOR_ENDPOINT must speak.
+   Request : POST JSON { text, meetingId, tasks:[{id,name,status,progress,next,due,ge,targetOriginal}] }
+   Response: JSON { proposals:[ … ] } where each proposal is exactly the shape this page already
+             stores in PROPOSALS[]:
+               { entityType:'task', entityId:'03', field:'progress'|'next'|'status'|'due'|'ge'|'targetOriginal',
+                 oldValue, newValue, confidence:'confirmed'|'inferred'|'unknown',
+                 evidence:'<verbatim quote from the minutes>', reason:'<why>' }
+               { entityType:'action', entityId:'<related task id>',
+                 newValue:{title,owner,status,due,priority}, confidence, evidence, reason }
+             `id`, `meetingId` and `status:'pending'` are filled in by this page, so a backend
+             may omit them. An `unknown` proposal should carry followupTitle/followupOwner.
+   A backend gets the same instruction the rule engine follows: quote evidence verbatim, and
+   never guess a value that the minutes do not actually state. */
+
+// Extraction-only vocabulary: how each task tends to be *named in the minutes*, which is rarely
+// the exact task title. Kept beside the extractor rather than on TASKS[] because this is parser
+// tuning, not program data.
+const TASK_ALIASES = {
+  '00': ['vpn','vm access','virtual machine','虚拟机'],
+  '01': ['technical alignment','alignment session','alignment meeting','技术对齐'],
+  '02': ['data point','api integration','api data point','bms/pms api','pms/bms','data point api','数据点','api 集成'],
+  '03': ['historical bms data','historical data','historical extraction','bms data','历史数据','历史 bms'],
+  '04': ['digital twin framework','twin framework','framework component','数字孪生框架'],
+  '05': ['single data hall pilot','data hall pilot','one data hall','first data hall','单机房','试点'],
+  '06': ['model calibration prep','calibration prep','calibration preparation','sensor location','标定准备','模型标定'],
+  '07': ['leakage detection','refrigerant leak','leak detection','泄漏检测'],
+  '08': ['chiller plant model','chiller plant','chiller model','plant geometry','冷机房','冷水机'],
+  '09': ['dcwiz demo','demo preparation','demo script','演示准备'],
+  '31': ['baseline energy model','energy baseline','baseline model','benchmark methodology','能耗基线','基线模型'],
+  '32': ['influxdb','continuous ingestion','data ingestion','持续接入','数据接入'],
+  '10': ['ai optimization training','optimization training','training dataset','ai 优化训练'],
+  '11': ['simulation savings','savings validation','simulation validation','仿真节能','节能验证'],
+  '12': ['safety guardrail','guardrail','safety limit','安全护栏'],
+  '13': ['dcverse','dcwiz integration','full-stack deployment','集成部署'],
+  '14': ['human-in-the-loop','human in the loop','operator follow','人机协同'],
+  '15': ['telemetry','what-if','what if analysis','遥测','假设分析'],
+};
+const KNOWN_OWNERS = ['Hong Qing','Mingchen','Anurag','Istofa','Justin','Valdy','Selena','Sherry','RDA Modelling Team','RDA','DayOne'];
+
+function _mx(s){ return (s||'').replace(/\s+/g,' ').trim(); }
+
+/* --- date parsing: 2026/08/28 · 2026-08-28 · 28 Aug 2026 · Aug 28, 2026 · 28 Aug · 08/28 --- */
+const _MONTHS = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function _mkDate(y,mo,d){
+  if(!(mo>=1&&mo<=12)||!(d>=1&&d<=31)) return null;
+  const p=n=>String(n).padStart(2,'0');
+  return {iso:`${y}-${p(mo)}-${p(d)}`, md:`${p(mo)}/${p(d)}`};
+}
+// The program runs Jul 2026 → Mar 2027, so a date written without a year is unambiguous.
+function _yearFor(mo){ return mo>=7 ? 2026 : 2027; }
+function _parseDate(str){
+  if(!str) return null;
+  let m = str.match(/\b(20\d{2})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\b/);
+  if(m) return _mkDate(+m[1], +m[2], +m[3]);
+  m = str.match(/\b(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(20\d{2})\b/);
+  if(m && _MONTHS[m[2].slice(0,3).toLowerCase()]) return _mkDate(+m[3], _MONTHS[m[2].slice(0,3).toLowerCase()], +m[1]);
+  m = str.match(/\b([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(20\d{2})\b/);
+  if(m && _MONTHS[m[1].slice(0,3).toLowerCase()]) return _mkDate(+m[3], _MONTHS[m[1].slice(0,3).toLowerCase()], +m[2]);
+  m = str.match(/\b(\d{1,2})\s+([A-Za-z]{3,9})\b/);
+  if(m && _MONTHS[m[2].slice(0,3).toLowerCase()]){ const mo=_MONTHS[m[2].slice(0,3).toLowerCase()]; return _mkDate(_yearFor(mo), mo, +m[1]); }
+  m = str.match(/\b(\d{1,2})\/(\d{1,2})\b(?!\/)/);
+  if(m){ const mo=+m[1]; return mo<=12 ? _mkDate(_yearFor(mo), mo, +m[2]) : null; }
+  return null;
+}
+
+/* --- which task is this sentence about? Name/alias driven, since minutes rarely use task IDs. --- */
+function _matchTask(unit){
+  const low = unit.toLowerCase();
+  let best = null;
+  TASKS.forEach(t=>{
+    let score = 0, exact = false;
+    if(low.includes(t.name.toLowerCase())){ score += 10; exact = true; }
+    if(t.nameZh && unit.includes(t.nameZh)){ score += 10; exact = true; }
+    if(new RegExp('(?:task|item|#|编号)\\s*0?'+t.id+'\\b','i').test(unit)){ score += 10; exact = true; }
+    (TASK_ALIASES[t.id]||[]).forEach(a=>{ if(low.includes(a)) score += Math.max(4, Math.round(a.length/3)); });
+    if(score>0 && (!best || score>best.score)) best = {task:t, score, exact};
+  });
+  return (best && best.score>=4) ? best : null;
+}
+
+const _UNKNOWN_RE = /\b(tbc|tbd|to be confirmed|to be decided|not yet confirmed|still discussing|under discussion|pending confirmation)\b|待定|待确认|未确认|尚未确定/i;
+const _HEDGE_RE   = /\b(should|may|might|likely|probably|expects? to|aiming (?:to|for)|hope to|plans? to|tentative|roughly|approximately)\b|预计|可能|大概|初步|暂定/i;
+// "one data hall", "first batch", "partial" — the sentence reports a slice of the task, not the whole thing.
+const _PARTIAL_RE = /\b(one|first|single|partial|initial|batch|subset|per|each)\b|部分|首个|第一/i;
+function _confidence(unit, exactMatch){
+  if(_UNKNOWN_RE.test(unit)) return 'unknown';
+  if(_HEDGE_RE.test(unit) || !exactMatch) return 'inferred';
+  return 'confirmed';
+}
+function _findOwner(unit, fallback){
+  // These minutes follow '… — Expected Completion <date>, <Owner>.' — that trailing name is the
+  // assignment, so trust it ahead of any other name mentioned mid-sentence.
+  const tail = unit.match(/(?:expected completion|target|due)[^,，]*[,，]\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)\s*[.。]?\s*$/i);
+  if(tail) return tail[1];
+  const at = unit.match(/@([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)/);
+  if(at) return at[1];
+  const hits = KNOWN_OWNERS.filter(o=>new RegExp('\\b'+o+'\\b','i').test(unit));
+  // 'align with DayOne' names a counterparty, not an owner — prefer a person when one is present.
+  const people = hits.filter(o=>!/^(RDA|DayOne)$/i.test(o));
+  const pick = people.length ? people : hits;
+  return pick.length ? pick.slice(0,2).join(' / ') : (fallback || 'Unassigned');
+}
+// Strip a leading '"Item":' label and the trailing '— Expected Completion <date>, <owner>' tail,
+// leaving the actual instruction to use as a Next Step / action title.
+function _cleanClause(unit){
+  let s = unit;
+  s = s.replace(/^["“][^"”]{0,60}["”]\s*[:：]\s*/, '');
+  s = s.replace(/^[^:：]{0,40}[:：]\s*(?=[A-Z@一-龥])/, '');
+  s = s.replace(/\s*[—–-]\s*(expected completion|target|due|完成时间)\b.*$/i, '');
+  s = s.replace(/\s*\((?:expected completion|target|due)[^)]*\)/ig, '');
+  s = _mx(s).replace(/[.;,]+$/,'');
+  return s.length>180 ? s.slice(0,177)+'…' : s;
+}
+
+/* Split raw minutes into reviewable units, remembering which section each came from.
+   One line often carries several items: 'Weekly Progress — "A": Done; "B": In Progress'. */
+function _segments(text){
+  const out = [];
+  let section = '';
+  (text||'').split(/\r?\n/).forEach(rawLine=>{
+    const line = _mx(rawLine);
+    if(!line) return;
+    const head = line.match(/^(weekly progress|next week|next steps?|action items?|discussion|decisions?|risks?|本周进展|下周计划|下一步|行动项|讨论|决议)\b\s*[:：—–-]?\s*(.*)$/i);
+    if(head){ section = head[1].toLowerCase(); if(!head[2]) return; }
+    const body = head ? head[2] : line;
+    // Lookahead-only split (no lookbehind — keeps older Safari able to parse this file at all).
+    body.replace(/([.;])\s+(?=["“]?[A-Z0-9@])/g, '$1\u0000').split('\u0000').forEach(part=>{
+      const unit = _mx(part).replace(/^[-•*•\d.)\s]+/,'');
+      if(unit.length>=8) out.push({unit, section});
+    });
+  });
+  return out;
+}
+
+function extractProposalsLocal(text, meetingId){
+  const props = [];
+  const claimed = new Set();   // one field per task per meeting — the first, most specific hit wins
+  let n = 0;
+  const add = p => {
+    const key = `${p.entityType}:${p.entityId}:${p.field||'action:'+(p.newValue&&p.newValue.title)}`;
+    if(claimed.has(key)) return;
+    claimed.add(key);
+    props.push(Object.assign({id:`x${meetingId}-${++n}`, meetingId, status:'pending'}, p));
+  };
+
+  _segments(text).forEach(seg=>{
+    const unit = seg.unit, section = seg.section;
+    const hit = _matchTask(unit);
+    if(!hit) return;                       // no task named → no proposal, rather than a guessed one
+    const t = hit.task;
+    const conf = _confidence(unit, hit.exact);
+    const evidence = unit.length>300 ? unit.slice(0,297)+'…' : unit;
+    const partial = _PARTIAL_RE.test(unit);
+    const nextish  = /^(next week|next steps?|下周计划|下一步)$/.test(section);
+    const actionish = /^(action items?|行动项)$/.test(section);
+    const before = props.length;           // did this sentence yield any field update?
+
+    /* --- 1. explicit progress percentage --- */
+    const pm = unit.match(/(\d{1,3})\s*%/);
+    if(pm){
+      const pct = Math.min(100, +pm[1]);
+      if(pct !== t.progress) add({entityType:'task', entityId:t.id, field:'progress', oldValue:t.progress, newValue:pct,
+        confidence:conf, evidence, reason:`The minutes state a completion figure of ${pct}% for ${t.name}, against the ${t.progress}% currently recorded.`});
+    }
+
+    /* --- 2. target / completion date --- */
+    const dateCtx = unit.match(/(?:expected completion|target(?:\s*date)?|due|deadline|完成时间|目标日期)\s*[:：]?\s*([^,，.;)]{3,24})/i);
+    if(dateCtx){
+      if(_UNKNOWN_RE.test(dateCtx[1]) || _UNKNOWN_RE.test(unit)){
+        // The minutes explicitly leave the date open — record that, don't guess a value.
+        if(t.due) add({entityType:'task', entityId:t.id, field:'due', oldValue:t.due, newValue:null, confidence:'unknown',
+          evidence, reason:`The minutes name ${t.name} but leave its completion date unconfirmed — no date is guessed; a follow-up action is created instead.`,
+          followupTitle:`Confirm the target date for ${t.name}`, followupOwner:_findOwner(unit, t.owner)});
+      } else {
+        const d = _parseDate(dateCtx[1]) || _parseDate(unit);
+        if(d){
+          if(d.md !== t.due) add({entityType:'task', entityId:t.id, field:'due', oldValue:t.due, newValue:d.md, confidence:conf,
+            evidence, reason:`The minutes set a completion date of ${d.iso} for ${t.name}, replacing the recorded ${t.due} target.`});
+          if(t.ge && d.iso !== t.ge) add({entityType:'task', entityId:t.id, field:'ge', oldValue:t.ge, newValue:d.iso, confidence:conf,
+            evidence, reason:'Keeps the Roadmap Gantt bar in sync with the updated target date.'});
+          // A stale original target keeps flagging the task Overdue even after a new date is agreed.
+          if(t.targetOriginal && d.iso > t.targetOriginal) add({entityType:'task', entityId:t.id, field:'targetOriginal', oldValue:t.targetOriginal, newValue:d.iso, confidence:conf,
+            evidence, reason:`The original ${t.targetOriginal} target has been superseded; carrying it forward would keep flagging ${t.name} as Overdue against a date the team has already re-baselined.`});
+        }
+      }
+    }
+
+    /* --- 3. status words. Guarded three ways, because a wrong auto-Done is the costliest mistake
+       this parser can make: "85% complete" is a progress figure, "in progress" contradicts done,
+       and a partial-scope sentence ("one Data Hall", "first batch") reports a slice of the task. */
+    const pctComplete = /\d{1,3}\s*%\s*(?:complete|completed|done)/i.test(unit);
+    const inProgress  = /\bin progress\b|进行中/i.test(unit);
+    const doneWord    = /\b(done|completed|finished)\b|已完成/i.test(unit) || /\bcomplete\b/i.test(unit);
+    const negated     = /\bnot\s+(?:yet\s+)?(?:done|complete|completed)\b|未完成/i.test(unit);
+    if(doneWord && !pctComplete && !inProgress && !partial && !negated){
+      if(t.status !== 'done') add({entityType:'task', entityId:t.id, field:'status', oldValue:t.status, newValue:'done', confidence:conf,
+        evidence, reason:`The minutes report ${t.name} as complete.`});
+    } else if(/\bblocked\b|\bblocker\b|阻塞/i.test(unit)){
+      if(t.status !== 'blocked') add({entityType:'task', entityId:t.id, field:'status', oldValue:t.status, newValue:'blocked', confidence:conf,
+        evidence, reason:`The minutes describe ${t.name} as blocked.`});
+    } else if(inProgress && t.status !== 'inprogress' && t.status !== 'done'){
+      add({entityType:'task', entityId:t.id, field:'status', oldValue:t.status, newValue:'inprogress', confidence:conf,
+        evidence, reason:`The minutes report work underway on ${t.name}, which is currently recorded as ${STATUS_META[t.status] ? STATUS_META[t.status].label : t.status}.`});
+    }
+
+    /* --- 4. next step, from a forward-looking section --- */
+    if(nextish){
+      const clause = _cleanClause(unit);
+      if(clause.length>=12 && clause.toLowerCase() !== (t.next||'').toLowerCase()){
+        add({entityType:'task', entityId:t.id, field:'next', oldValue:t.next, newValue:clause, confidence:conf,
+          evidence, reason:`The ${section} section states what happens next for ${t.name}.`});
+      }
+    }
+
+    /* --- 5. a named action item: someone is explicitly asked to do something.
+       Only when the sentence produced no field update above — otherwise a "Next Week" row would
+       land twice, once as the task's Next Step and again as a near-identical action. */
+    if(props.length === before){
+      const owner = _findOwner(unit, null);
+      const imperative = /\b(follow up|arrange|prepare|verify|align|assess|schedule|confirm|provide|share|review|investigate|deliver|finalise|finalize)\b/i.test(unit);
+      if(owner && imperative && (actionish || nextish || /@[A-Z]/.test(unit))){
+        const title = _cleanClause(unit);
+        const d = _parseDate(unit);
+        if(title.length>=12) add({entityType:'action', entityId:t.id,
+          newValue:{title, owner, status:'To Confirm', due:(d?d.md:'—'), priority: t.health==='risk' ? 'high' : 'medium'},
+          confidence:conf, evidence, reason:`An assigned follow-up raised in the meeting, related to ${t.name}.`});
+      }
+    }
+  });
+
+  return props;
+}
+
+/* Remote path. Falls back to the local rule engine on any failure — network, CORS, a backend
+   that is down, or a response that does not match the contract above. */
+async function extractProposals(text, meetingId){
+  if(AI_EXTRACTOR_ENDPOINT){
+    try{
+      const res = await fetch(AI_EXTRACTOR_ENDPOINT, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({text, meetingId, tasks: TASKS.map(t=>({id:t.id,name:t.name,status:t.status,progress:t.progress,next:t.next,due:t.due,ge:t.ge,targetOriginal:t.targetOriginal}))})
+      });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      if(Array.isArray(data.proposals) && data.proposals.length){
+        return data.proposals.map((p,i)=>Object.assign({id:`a${meetingId}-${i+1}`, meetingId, status:'pending'}, p));
+      }
+      throw new Error('empty response');
+    }catch(err){
+      console.warn('[extractProposals] AI extractor unavailable, using the local rule engine:', err.message);
+    }
+  }
+  return extractProposalsLocal(text, meetingId);
+}
+
+/* Runs extraction for a meeting that is already saved, replaces that meeting's
+   auto-extracted proposals, and leaves any human decisions untouched. */
+async function reparseMeeting(id){
+  const m = MEETINGS.find(x=>x.id===id);
+  if(!m || !m.raw){ showToast(tr('Nothing to re-parse'), tr('This meeting has no raw minutes stored')); return; }
+  // Drop previous auto-extracted proposals that are still pending; keep approved/rejected ones as audit history.
+  for(let i=PROPOSALS.length-1;i>=0;i--){
+    const p = PROPOSALS[i];
+    if(p.meetingId===id && p.status==='pending' && /^[xa]/.test(p.id)) PROPOSALS.splice(i,1);
+  }
+  const found = await extractProposals(m.raw, id);
+  found.forEach(p=>PROPOSALS.push(p));
+  renderMeetingsPage(); updatePendingBadge();
+  showToast(`${found.length} ${tr('updates extracted')}`, found.length ? tr('Review each one and Approve or Reject — nothing is written to project data until you do') : tr('No task-linked changes were recognised in these minutes'));
+}
+
+async function importMeeting(){
   const title = document.getElementById('impTitle').value.trim();
   const date = document.getElementById('impDate').value.trim();
   const text = document.getElementById('impText').value.trim();
   if(!title || !date){ showToast(tr('Missing information'), tr('Please fill in the meeting title and date')); return; }
   const id = 'm'+(MEETINGS.length+1);
   const imageAttachments = pendingAttachments.filter(a=>a.kind==='image');
-  MEETINGS.unshift({id, title, date, summary: text ? (text.slice(0,60)+(text.length>60?'…':'')) : '(Awaiting Claude to parse Change Proposals)', attachments: imageAttachments});
+  // `raw` is kept on the record so the minutes can be re-parsed later (rule tweaks, or an AI
+  // backend attached after the fact) without the user having to paste them again.
+  MEETINGS.unshift({id, title, date, raw: text,
+    summary: text ? (text.slice(0,60)+(text.length>60?'…':'')) : '(No minutes text — nothing to extract)',
+    attachments: imageAttachments});
   currentMeetingId = id;
   document.getElementById('impTitle').value=''; document.getElementById('impDate').value=''; document.getElementById('impText').value='';
   pendingAttachments = []; renderAttachPreviews();
   document.getElementById('attachStatus').textContent = '';
   document.getElementById('importForm').style.display='none';
   renderMeetingsPage();
-  showToast(tr('Meeting record saved'), tr('Paste the raw minutes to Claude — Claude will generate pending-review updates here in Change Proposal format'));
+
+  if(!text){ showToast(tr('Meeting record saved'), tr('No minutes text was pasted, so there was nothing to extract')); return; }
+  showToast(tr('Meeting record saved'), tr('Reading the minutes and drafting Change Proposals…'));
+  const found = await extractProposals(text, id);
+  found.forEach(p=>PROPOSALS.push(p));
+  renderMeetingsPage(); updatePendingBadge();
+  showToast(
+    found.length ? `${found.length} ${tr('updates extracted')}` : tr('No updates extracted'),
+    found.length ? tr('Review each one and Approve or Reject — nothing is written to project data until you do')
+                 : tr('No task-linked changes were recognised in these minutes')
+  );
 }
 
 function selectMeeting(id){ currentMeetingId = id; renderMeetingsPage(); }
