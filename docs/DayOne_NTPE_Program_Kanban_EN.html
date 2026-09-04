@@ -437,7 +437,9 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .prop-actions{display:flex;gap:8px;}
 .btn-approve{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.4);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
 .btn-reject{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
-.prop-status-tag{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.btn-withdraw{background:transparent;color:var(--text-dim);border:1px solid var(--border2);border-radius:7px;padding:5px 12px;font-size:11.5px;font-weight:700;cursor:pointer;}
+.btn-withdraw:hover{color:var(--text);border-color:var(--text-dimmer);}
+.prop-status-tag{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;}
 .prop-status-tag.approved{background:var(--green-bg);color:var(--green);}
 .prop-status-tag.rejected{background:var(--red-bg);color:var(--red);}
 .timeline{display:flex;flex-direction:column;gap:0;}
@@ -1363,6 +1365,11 @@ const ZH_MAP = {
   'The full AI-generated brief is a preview feature — not wired up yet.':'完整 AI 简报是预览功能,尚未接入真实数据。',
   'Internal Delivery':'内部交付进度','View internal progress':'查看内部进度',
   'Full internal-progress drill-down is a preview feature — not wired up yet.':'内部进度详情是预览功能,尚未接入真实数据。',
+  // Withdrawing an approval / rejection
+  'Withdraw':'撤回','Update withdrawn':'已撤回',
+  'The change was reversed — Approve / Reject are available again':'变更已回退 — 可以重新批准或拒绝',
+  'The rejection was undone — this proposal is back in review':'已取消拒绝 — 该提案回到待审核状态',
+  'A later change to this field was rolled back as well.':'该字段之后的一次变更也一并回退了。',
   // Auto-extraction (minutes → Change Proposals)
   'Reading the minutes and drafting Change Proposals…':'正在解析会议纪要并生成变更提案…',
   'updates extracted':'条更新已提取','No updates extracted':'未提取到更新',
@@ -2137,25 +2144,71 @@ function confBadge(c){
 }
 function nowLabel(){ return '2026-08-19'; }
 
+/* Approving writes into program data, so withdrawing has to put it back exactly. Each apply
+   records what it touched — the field's previous value, the ACTIONS rows it created and its
+   Change Log entries — and withdrawProposal() reverses that journal by object identity rather
+   than by re-deriving ids that may have shifted in the meantime. */
+let _actionSeq = 0;
 function applyProposal(p){
+  const journal = {taskId:null, field:null, prevValue:undefined, actions:[], logs:[]};
+  const addLog = entry => { CHANGELOG.unshift(entry); journal.logs.push(entry); };
+  const addAction = row => { ACTIONS.unshift(row); journal.actions.push(row); };
   if(p.entityType==='task'){
     const t = TASKS_BY_ID[p.entityId];
     if(t){
       const old = t[p.field];
+      journal.taskId = t.id; journal.field = p.field; journal.prevValue = old;
       if(p.confidence==='unknown'){
         t[p.field] = null;
-        CHANGELOG.unshift({date:nowLabel(), text:`<b>${t.id} ${t.name}</b>'s <b>${fieldLabel(p.field)}</b> marked pending confirmation (the meeting gave no definitive answer — not guessed); a follow-up action was created.`});
-        ACTIONS.unshift({id:'A'+(ACTIONS.length+1), title:p.followupTitle||`Confirm ${t.name}'s ${fieldLabel(p.field)}`, owner:p.followupOwner||'Unassigned', status:'Pending Confirmation', due:'—', priority:'medium', relatedTask:t.id, source:p.meetingId});
+        addLog({date:nowLabel(), text:`<b>${t.id} ${t.name}</b>'s <b>${fieldLabel(p.field)}</b> marked pending confirmation (the meeting gave no definitive answer — not guessed); a follow-up action was created.`});
+        addAction({id:'A'+(++_actionSeq), title:p.followupTitle||`Confirm ${t.name}'s ${fieldLabel(p.field)}`, owner:p.followupOwner||'Unassigned', status:'Pending Confirmation', due:'—', priority:'medium', relatedTask:t.id, source:p.meetingId});
       } else {
         t[p.field] = p.newValue;
-        CHANGELOG.unshift({date:nowLabel(), text:`<b>${t.id} ${t.name}</b>'s <b>${fieldLabel(p.field)}</b>: ${formatFieldVal(p.field,old)} → <b>${formatFieldVal(p.field,p.newValue)}</b>`});
+        addLog({date:nowLabel(), text:`<b>${t.id} ${t.name}</b>'s <b>${fieldLabel(p.field)}</b>: ${formatFieldVal(p.field,old)} → <b>${formatFieldVal(p.field,p.newValue)}</b>`});
       }
     }
   } else if(p.entityType==='action'){
-    ACTIONS.unshift({id:'A'+(ACTIONS.length+1), title:p.newValue.title, owner:p.newValue.owner, status:p.newValue.status, due:p.newValue.due, priority:p.newValue.priority||'medium', relatedTask:p.entityId, source:p.meetingId});
-    CHANGELOG.unshift({date:nowLabel(), text:`New action added: <b>${p.newValue.title}</b> (${p.newValue.owner})`});
+    addAction({id:'A'+(++_actionSeq), title:p.newValue.title, owner:p.newValue.owner, status:p.newValue.status, due:p.newValue.due, priority:p.newValue.priority||'medium', relatedTask:p.entityId, source:p.meetingId});
+    addLog({date:nowLabel(), text:`New action added: <b>${p.newValue.title}</b> (${p.newValue.owner})`});
   }
+  p._applied = journal;
   p.status = 'approved';
+}
+
+/* Undo an Approve or a Reject: restore the task field, drop the rows the approval created, and
+   put the proposal back in review so Approve / Reject are live again. */
+function withdrawProposal(id){
+  const p = PROPOSALS.find(x=>x.id===id);
+  if(!p || p.status==='pending') return;
+  const wasApproved = p.status==='approved';
+  const j = p._applied;
+  let clash = '';
+  if(j){
+    if(j.taskId && j.field){
+      const t = TASKS_BY_ID[j.taskId];
+      if(t){
+        // If something else changed this field after the approval, say so rather than silently
+        // reverting a value this proposal never wrote.
+        const wrote = (p.confidence==='unknown') ? null : p.newValue;
+        if(t[j.field] !== wrote) clash = ' ' + tr('A later change to this field was rolled back as well.');
+        t[j.field] = j.prevValue;
+      }
+    }
+    j.actions.forEach(row=>{ const i = ACTIONS.indexOf(row); if(i>=0) ACTIONS.splice(i,1); });
+    j.logs.forEach(entry=>{ const i = CHANGELOG.indexOf(entry); if(i>=0) CHANGELOG.splice(i,1); });
+    delete p._applied;
+  }
+  p.status = 'pending';
+  if(wasApproved){
+    const what = p.entityType==='task'
+      ? `<b>${p.entityId} ${TASKS_BY_ID[p.entityId] ? TASKS_BY_ID[p.entityId].name : ''}</b>'s <b>${fieldLabel(p.field)}</b>`
+      : `<b>${p.newValue.title}</b>`;
+    CHANGELOG.unshift({date:nowLabel(), text:`Withdrawn: ${what} was restored to its previous value and is back in review.${clash}`});
+  }
+  render();
+  showToast(tr('Update withdrawn'),
+    wasApproved ? tr('The change was reversed — Approve / Reject are available again') + clash
+                : tr('The rejection was undone — this proposal is back in review'));
 }
 function approveProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
@@ -2625,7 +2678,9 @@ function renderProposalList(){
       ? `<div class="prop-diff"><span class="old">${formatFieldVal(p.field,p.oldValue)}</span>→<span class="new">${p.confidence==='unknown' ? tr('Pending confirmation (not guessed)') : formatFieldVal(p.field,p.newValue)}</span></div>`
       : `<div class="prop-diff"><span class="new">${tr('New:')} ${p.newValue.title} (${p.newValue.owner} · ${p.newValue.due||'—'})</span></div>`;
     const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}</span>` : '';
-    const actionsHtml = p.status==='pending' ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ ${tr('Approve')}</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ ${tr('Reject')}</button></div>` : statusTag;
+    const actionsHtml = p.status==='pending'
+      ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ ${tr('Approve')}</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ ${tr('Reject')}</button></div>`
+      : `<div class="prop-actions" style="align-items:center;">${statusTag}<button class="btn-withdraw" onclick="withdrawProposal('${p.id}')">↩ ${tr('Withdraw')}</button></div>`;
     return `<div class="proposal-card ${p.status!=='pending'?p.status:''}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
         <div style="font-weight:700;font-size:13px;">${entityLabel}${p.entityType==='task' ? ' · '+trFieldLabel(p.field) : ''}</div>
@@ -2671,6 +2726,10 @@ function render(){
   applyKPIs();
   applyLiveBadges();
   renderActionsTables();
+  // Approving/withdrawing a target-date or status change has to reach the Roadmap too, not just
+  // the KPI row — these rebuild from TASKS[], so they stay in step with whatever was just written.
+  renderList();
+  buildGantt();
   if(document.getElementById('page-blocker').classList.contains('active')) drawBimConnectors();
   if(document.getElementById('page-dependency').classList.contains('active')) drawDepConnectors();
   updatePendingBadge();
