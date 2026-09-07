@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/tickets.store.json
+*.log
+.DS_Store
+data/program.state.json
+data/*-conversation-ref.json

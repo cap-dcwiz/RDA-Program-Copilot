@@ -1,0 +1,49 @@
+{
+  "program": {
+    "id": "dayone-ntpe",
+    "name": "DayOne NTPE",
+    "today": "2026-08-21"
+  },
+  "milestones": [
+    { "id": "MS2", "name": "MS2 Digital Twin Calibrated", "due": "2026-08-28", "month": 2 }
+  ],
+  "tasks": [
+    { "id": "02", "name": "Data Point / API Integration", "owner": "Istofa", "status": "inprogress", "health": "fine", "due": "2026-08-21", "ms": "MS2" },
+    { "id": "03", "name": "Historical BMS Data", "owner": "Hong Qing / Justin", "status": "inprogress", "health": "risk", "due": "2026-08-21", "ms": "MS2", "targetOriginal": "2026-08-14", "overdueOverride": true },
+    { "id": "04", "name": "Digital Twin Framework", "owner": "Valdy", "status": "inprogress", "health": "fine", "due": "2026-08-21", "ms": "MS2" },
+    { "id": "05", "name": "Single Data Hall Pilot", "owner": "Mingchen / Valdy", "status": "inprogress", "health": "risk", "due": "2026-08-20", "ms": "MS2", "targetOriginal": "2026-08-17" },
+    { "id": "31", "name": "Baseline Energy Model", "owner": "Mingchen", "status": "inprogress", "health": "fine", "due": "2026-09-30", "ms": null },
+    { "id": "32", "name": "InfluxDB Continuous Ingestion", "owner": "Valdy", "status": "inprogress", "health": "fine", "due": "2026-09-05", "ms": null },
+    { "id": "08", "name": "Chiller Plant Modelling (E+)", "owner": "Valdy", "status": "inprogress", "health": "risk", "due": "2026-09-05", "ms": null, "lastUpdated": "2026-08-13" },
+    { "id": "09", "name": "DCWiz Demo Preparation", "owner": "Valdy", "status": "inprogress", "health": "fine", "due": null, "ms": null }
+  ],
+  "dependencies": [
+    { "from": "03", "to": "05", "type": "part-of", "note": "Single Data Hall Pilot is a subset of Historical BMS Data scope" },
+    { "from": "03", "to": "04", "type": "hard", "note": "Digital Twin Framework calibration requires historical data" },
+    { "from": "04", "to": "MS2", "type": "hard" },
+    { "from": "05", "to": "MS2", "type": "hard" },
+    { "from": "03", "to": "31", "type": "soft", "note": "Baseline model benefits from full historical set but can proceed on partial data" },
+    { "from": "04", "to": "32", "type": "soft" }
+  ],
+  "stakeholders": [
+    { "id": "hongqing", "name": "Hong Qing", "company": "RDA", "role": "Blocker Owner · Historical BMS Data", "teamsUpn": "" },
+    { "id": "justin", "name": "Justin", "company": "DayOne", "role": "Blocker Owner · Historical BMS Data (customer side)", "teamsUpn": "" },
+    { "id": "valdy", "name": "Valdy", "company": "RDA", "role": "Task Owner · Digital Twin Framework / InfluxDB / Chiller Plant", "teamsUpn": "" },
+    { "id": "mingchen", "name": "Mingchen", "company": "RDA", "role": "Task Owner · Single Data Hall Pilot / Baseline Energy Model", "teamsUpn": "" },
+    { "id": "istofa", "name": "Istofa", "company": "DayOne", "role": "Task Owner · Data Point / API Integration", "teamsUpn": "" },
+    { "id": "selena", "name": "Selena", "company": "RDA", "role": "Program Manager · Delivery Control Room reviewer", "teamsUpn": "" },
+    { "id": "sherry", "name": "Sherry", "company": "RDA", "role": "Delivery Control Room reviewer", "teamsUpn": "" }
+  ],
+  "taskOwnerMap": {
+    "02": "istofa",
+    "03": ["hongqing", "justin"],
+    "04": "valdy",
+    "05": ["mingchen", "valdy"],
+    "31": "mingchen",
+    "32": "valdy",
+    "08": "valdy"
+  },
+  "blockerOwnerOverride": {
+    "03": ["hongqing", "justin"]
+  }
+}
