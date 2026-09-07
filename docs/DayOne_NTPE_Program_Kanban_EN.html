@@ -437,6 +437,20 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .prop-actions{display:flex;gap:8px;}
 .btn-approve{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.4);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
 .btn-reject{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+/* Edge-of-page hint for scroll-to-next-view. Shown only while you are actually at an edge with
+   somewhere to go, and it fills up as you keep scrolling, so the jump is something you can feel
+   coming rather than something that happens to you. */
+.snap-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:60;
+  display:none;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:999px;
+  background:var(--panel2);border:1px solid var(--border2);box-shadow:0 10px 34px rgba(0,0,0,.5);
+  font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;user-select:none;}
+.snap-hint.show{display:flex;}
+.snap-hint.at-top{bottom:auto;top:16px;}
+.snap-hint b{color:var(--text);}
+.snap-hint .bar{width:54px;height:3px;border-radius:2px;background:var(--border2);overflow:hidden;}
+.snap-hint .bar i{display:block;height:100%;width:0;background:var(--purple);}
+.snap-hint .x{opacity:.45;padding:0 6px;font-size:13px;line-height:1;}
+.snap-hint .x:hover{opacity:1;color:var(--text);}
 .btn-withdraw{background:transparent;color:var(--text-dim);border:1px solid var(--border2);border-radius:7px;padding:5px 12px;font-size:11.5px;font-weight:700;cursor:pointer;}
 .btn-withdraw:hover{color:var(--text);border-color:var(--text-dimmer);}
 .prop-status-tag{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;}
@@ -1185,7 +1199,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
             <div class="panel-title" style="margin:0;"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span data-i18n-en="Proposed Updates" data-i18n-zh="提议更新">Proposed Updates</span> <span id="propMeetingLabel" style="color:var(--text-dimmer);font-weight:500;"></span></div>
             <div style="display:flex;gap:8px;">
-              <button class="btn-ghost" onclick="reparseMeeting(currentMeetingId)" title="Re-run extraction on this meeting's stored minutes"><span data-i18n-en="Re-parse minutes" data-i18n-zh="重新解析纪要">Re-parse minutes</span></button><button class="btn-ghost" onclick="approveAllConfirmed()"><span data-i18n-en="Approve All Confirmed" data-i18n-zh="批准全部已确认项">Approve All Confirmed</span></button>
+              <button class="btn-ghost" onclick="reparseMeeting(currentMeetingId)" title="Re-run extraction on this meeting's stored minutes"><span data-i18n-en="Re-parse minutes" data-i18n-zh="重新解析纪要">Re-parse minutes</span></button><button class="btn-ghost" onclick="approveAllConfirmed()"><span data-i18n-en="Approve All Confirmed" data-i18n-zh="批准全部已确认项">Approve All Confirmed</span></button><button class="btn-primary" id="pushLunaBtn" style="display:none;" onclick="pushToLuna()" title="Send approved changes to Luna so it can chase the owners in Teams"></button><button class="btn-withdraw" onclick="resetState()" title="Discard imported meetings and review decisions, back to this file's built-in data"><span data-i18n-en="Reset" data-i18n-zh="重置">Reset</span></button>
             </div>
           </div>
           <div class="summary-chips" id="propSummaryChips"></div>
@@ -1247,6 +1261,12 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 </div>
 
 <div id="toast"><div class="toast-title" id="toastTitle">Program updated</div><div class="toast-body" id="toastBody"></div></div>
+
+<div class="snap-hint" id="snapHint">
+  <span id="snapHintText"></span>
+  <span class="bar"><i id="snapHintFill"></i></span>
+  <span class="x" id="snapHintOff" title="Turn off scroll-to-next-view">✕</span>
+</div>
 
 <!-- Optional client-side file readers for the Meetings "Attach file" control (PDF / DOCX text
      extraction). Loaded from cdnjs; if the browser has no network access to reach it, the
@@ -1365,6 +1385,29 @@ const ZH_MAP = {
   'The full AI-generated brief is a preview feature — not wired up yet.':'完整 AI 简报是预览功能,尚未接入真实数据。',
   'Internal Delivery':'内部交付进度','View internal progress':'查看内部进度',
   'Full internal-progress drill-down is a preview feature — not wired up yet.':'内部进度详情是预览功能,尚未接入真实数据。',
+  // Scroll-to-next-view
+  'Keep scrolling for':'继续滑动前往','Keep scrolling back to':'继续上滑返回',
+  'Scroll navigation off':'已关闭滑动翻页','Use the tabs or the icon rail to switch views':'可以用顶部标签或左侧图标栏切换视图',
+  // Empty-extraction diagnostics
+  'Nothing was extracted from these minutes':'未能从这份纪要中提取到任何更新',
+  'Scanned':'已扫描','sentences':'个句子','none of which named a task this page tracks.':'其中没有任何一句提到本页跟踪的任务。',
+  'Sentences it could not place:':'无法归类的句子:',
+  'It looks for these task names (or their aliases):':'解析器识别的任务名称(或其别名):',
+  'If your minutes name these tasks differently, add the wording to TASK_ALIASES near the top of this file.':'如果你的纪要里用了别的叫法,请把该叫法加到本文件顶部的 TASK_ALIASES 中。',
+  // Session persistence
+  'Changes are not being saved':'当前修改不会被保存',
+  'This browser is blocking local storage, so a refresh will reset the page':'浏览器禁用了本地存储,刷新后页面会恢复初始数据',
+  'Reset everything?':'确认重置?','Click Reset again within 5 seconds to discard all imported meetings and review decisions':'5 秒内再点一次「重置」,将丢弃所有导入的会议和审核决定',
+  // Luna handoff
+  'Push to Luna':'推送到 Luna','Pushing to Luna…':'正在推送到 Luna…','approved updates':'条已批准更新',
+  'tickets drafted in Luna':'条 Ticket 已在 Luna 中生成',
+  'Luna re-ran blocker detection and sent them to the Delivery Control Room for review':'Luna 已重新运行阻塞检测,并发送到 Delivery Control Room 待审核',
+  'change(s) skipped':'条变更被跳过','already open (deduped)':'条已有进行中的 Ticket(已去重)',
+  'Nothing new to chase — every affected task already has an open ticket in Luna':'没有新的跟进项 — 涉及的任务在 Luna 中都已有进行中的 Ticket',
+  'Luna updated, but could not post to Teams':'Luna 数据已更新,但无法发送到 Teams',
+  'Could not reach Luna':'无法连接 Luna','Check the bot is running and LUNA_ENDPOINT is correct':'请确认机器人已启动且 LUNA_ENDPOINT 配置正确',
+  'Luna is not connected':'尚未连接 Luna',
+  "Set LUNA_ENDPOINT near the top of this file to your bot's /api/apply-changes URL":'请在本文件顶部把 LUNA_ENDPOINT 设为机器人的 /api/apply-changes 地址',
   // Withdrawing an approval / rejection
   'Withdraw':'撤回','Update withdrawn':'已撤回',
   'The change was reversed — Approve / Reject are available again':'变更已回退 — 可以重新批准或拒绝',
@@ -2148,11 +2191,13 @@ function nowLabel(){ return '2026-08-19'; }
    records what it touched — the field's previous value, the ACTIONS rows it created and its
    Change Log entries — and withdrawProposal() reverses that journal by object identity rather
    than by re-deriving ids that may have shifted in the meantime. */
-let _actionSeq = 0;
+let _actionSeq = 0, _logSeq = 0;
 function applyProposal(p){
-  const journal = {taskId:null, field:null, prevValue:undefined, actions:[], logs:[]};
-  const addLog = entry => { CHANGELOG.unshift(entry); journal.logs.push(entry); };
-  const addAction = row => { ACTIONS.unshift(row); journal.actions.push(row); };
+  // The journal records ids, not object references, so it still works after being saved to
+  // localStorage and read back on the next page load.
+  const journal = {taskId:null, field:null, prevValue:undefined, actionIds:[], logIds:[]};
+  const addLog = entry => { entry._id = 'L'+(++_logSeq); CHANGELOG.unshift(entry); journal.logIds.push(entry._id); };
+  const addAction = row => { ACTIONS.unshift(row); journal.actionIds.push(row.id); };
   if(p.entityType==='task'){
     const t = TASKS_BY_ID[p.entityId];
     if(t){
@@ -2194,8 +2239,8 @@ function withdrawProposal(id){
         t[j.field] = j.prevValue;
       }
     }
-    j.actions.forEach(row=>{ const i = ACTIONS.indexOf(row); if(i>=0) ACTIONS.splice(i,1); });
-    j.logs.forEach(entry=>{ const i = CHANGELOG.indexOf(entry); if(i>=0) CHANGELOG.splice(i,1); });
+    (j.actionIds||[]).forEach(id=>{ const i = ACTIONS.findIndex(a=>a.id===id); if(i>=0) ACTIONS.splice(i,1); });
+    (j.logIds||[]).forEach(id=>{ const i = CHANGELOG.findIndex(c=>c._id===id); if(i>=0) CHANGELOG.splice(i,1); });
     delete p._applied;
   }
   p.status = 'pending';
@@ -2344,6 +2389,18 @@ function removeAttachment(i){ pendingAttachments.splice(i,1); renderAttachPrevie
 
 const AI_EXTRACTOR_ENDPOINT = '';   // e.g. 'http://localhost:8787/extract' — see AI_EXTRACTOR_CONTRACT below
 
+/* ===================== LUNA HANDOFF =====================
+   Where approved changes go once a human has signed off on them here. Luna (the Teams delivery
+   bot) writes them into its own program data, re-runs blocker detection against the post-meeting
+   picture, and posts what it wants to chase into the Delivery Control Room channel for a second
+   review before anyone is actually pinged.
+
+   Two gates on purpose: this dashboard decides "what the meeting decided", Luna's Control Room
+   review decides "and this is what we chase someone about". Neither one alone reaches the
+   Project Delivery Group. Leave this blank and the button stays hidden — the dashboard is fully
+   usable on its own. */
+const LUNA_ENDPOINT = '';   // e.g. 'http://localhost:3978/api/apply-changes'
+
 /* AI_EXTRACTOR_CONTRACT — what a backend at AI_EXTRACTOR_ENDPOINT must speak.
    Request : POST JSON { text, meetingId, tasks:[{id,name,status,progress,next,due,ge,targetOriginal}] }
    Response: JSON { proposals:[ … ] } where each proposal is exactly the shape this page already
@@ -2478,6 +2535,9 @@ function _segments(text){
   return out;
 }
 
+/* Why did an import produce nothing? Almost always "no sentence named a task the page knows",
+   so record enough to say that out loud instead of leaving the user staring at an empty panel. */
+let LAST_EXTRACTION = null;
 function extractProposalsLocal(text, meetingId){
   const props = [];
   const claimed = new Set();   // one field per task per meeting — the first, most specific hit wins
@@ -2489,10 +2549,16 @@ function extractProposalsLocal(text, meetingId){
     props.push(Object.assign({id:`x${meetingId}-${++n}`, meetingId, status:'pending'}, p));
   };
 
-  _segments(text).forEach(seg=>{
+  const segs = _segments(text);
+  const diag = {segments: segs.length, matched: 0, unmatched: [], meetingId};
+  segs.forEach(seg=>{
     const unit = seg.unit, section = seg.section;
     const hit = _matchTask(unit);
-    if(!hit) return;                       // no task named → no proposal, rather than a guessed one
+    if(!hit){                              // no task named → no proposal, rather than a guessed one
+      if(diag.unmatched.length < 5) diag.unmatched.push(unit.slice(0,90));
+      return;
+    }
+    diag.matched++;
     const t = hit.task;
     const conf = _confidence(unit, hit.exact);
     const evidence = unit.length>300 ? unit.slice(0,297)+'…' : unit;
@@ -2574,6 +2640,8 @@ function extractProposalsLocal(text, meetingId){
     }
   });
 
+  diag.proposals = props.length;
+  LAST_EXTRACTION = diag;
   return props;
 }
 
@@ -2646,6 +2714,62 @@ async function importMeeting(){
   );
 }
 
+/* --- Push approved changes to Luna -------------------------------------------------------- */
+// Approved but not yet handed to Luna. Withdrawing before a push takes it back out of this set;
+// withdrawing after a push cannot un-send it, which is why the button reports what it sent.
+function pendingLunaPush(){ return PROPOSALS.filter(p=>p.status==='approved' && !p._pushed); }
+function updateLunaButton(){
+  const btn = document.getElementById('pushLunaBtn');
+  if(!btn) return;
+  const n = pendingLunaPush().length;
+  btn.style.display = (LUNA_ENDPOINT && n) ? 'inline-block' : 'none';
+  btn.textContent = `${tr('Push to Luna')} (${n})`;
+}
+// Luna stores dates as ISO; this page shows targets as MM/DD. Convert on the way out so the
+// bot's overdue maths works on real dates rather than a string it cannot parse.
+function _isoForLuna(field, value){
+  if(value===null || value===undefined) return value;
+  if(field==='due'){ const d=_parseDate(String(value)); return d ? d.iso : null; }
+  return value;
+}
+async function pushToLuna(){
+  const batch = pendingLunaPush();
+  if(!batch.length) return;
+  if(!LUNA_ENDPOINT){ showToast(tr('Luna is not connected'), tr('Set LUNA_ENDPOINT near the top of this file to your bot\'s /api/apply-changes URL')); return; }
+  const meeting = MEETINGS.find(m=>m.id===currentMeetingId) || {};
+  const payload = {
+    meetingId: meeting.id || currentMeetingId, meetingTitle: meeting.title || '', meetingDate: meeting.date || '',
+    changes: batch.filter(p=>p.entityType==='task').map(p=>({taskId:p.entityId, field:p.field, value:_isoForLuna(p.field, p.confidence==='unknown' ? null : p.newValue)})),
+    actions: batch.filter(p=>p.entityType==='action').map(p=>({title:p.newValue.title, owner:p.newValue.owner, due:_isoForLuna('due',p.newValue.due), relatedTask:p.entityId})),
+  };
+  showToast(tr('Pushing to Luna…'), `${batch.length} ${tr('approved updates')}`);
+  try{
+    const res = await fetch(LUNA_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    batch.forEach(p=>{ p._pushed = true; });
+    const skipped = (data.skipped||[]).length;
+    const drafted = data.drafted || 0;
+    CHANGELOG.unshift({date:nowLabel(), text:`Pushed <b>${payload.changes.length}</b> approved change(s) and <b>${payload.actions.length}</b> action(s) to Luna — ${drafted} ticket(s) drafted for Delivery Control Room review.`});
+    renderMeetingsPage(); updateLunaButton();
+    if(data.deliveryError){
+      // The data landed; only the Teams post failed — almost always an unregistered channel.
+      showToast(tr('Luna updated, but could not post to Teams'), data.deliveryError);
+    } else {
+      // "0 drafted" on its own reads like a failure, when it usually means every affected task
+      // already has an open ticket — so always say how many were deduped.
+      const deduped = data.deduped || 0;
+      const body = drafted
+        ? tr('Luna re-ran blocker detection and sent them to the Delivery Control Room for review')
+        : tr('Nothing new to chase — every affected task already has an open ticket in Luna');
+      const extra = (deduped ? ` · ${deduped} ${tr('already open (deduped)')}` : '') + (skipped ? ` · ${skipped} ${tr('change(s) skipped')}` : '');
+      showToast(`${drafted} ${tr('tickets drafted in Luna')}`, body + extra);
+    }
+  }catch(err){
+    showToast(tr('Could not reach Luna'), `${err.message} · ${tr('Check the bot is running and LUNA_ENDPOINT is correct')}`);
+  }
+}
+
 function selectMeeting(id){ currentMeetingId = id; renderMeetingsPage(); }
 function renderMeetList(){
   const el = document.getElementById('meetList');
@@ -2691,7 +2815,24 @@ function renderProposalList(){
       <div class="prop-reason">${p.reason}</div>
       ${actionsHtml}
     </div>`;
-  }).join('') || `<div style="color:var(--text-dimmer);font-size:12.5px;padding:20px 0;text-align:center;">${tr('No pending change proposals for this meeting')}</div>`;
+  }).join('') || emptyProposalState();
+}
+/* An empty panel after an import is a dead end unless it explains itself. When the last
+   extraction ran on this meeting and matched nothing, show what it scanned, what it could not
+   place, and the task names it actually recognises — enough to fix the minutes or the aliases. */
+function emptyProposalState(){
+  const d = LAST_EXTRACTION;
+  const plain = `<div style="color:var(--text-dimmer);font-size:12.5px;padding:20px 0;text-align:center;">${tr('No pending change proposals for this meeting')}</div>`;
+  if(!d || d.meetingId !== currentMeetingId || d.proposals > 0) return plain;
+  const names = TASKS.map(t=>`${t.id} ${taskName(t)}`).join(' · ');
+  const samples = d.unmatched.map(u=>`<div style="margin:3px 0;padding-left:10px;border-left:2px solid var(--border2);">${u.replace(/</g,'&lt;')}…</div>`).join('');
+  return `<div style="font-size:12px;color:var(--text-dim);padding:16px 2px;line-height:1.7;">
+    <div style="font-weight:800;color:var(--orange);margin-bottom:8px;">${tr('Nothing was extracted from these minutes')}</div>
+    <div>${tr('Scanned')} <b>${d.segments}</b> ${tr('sentences')}, ${tr('none of which named a task this page tracks.')}</div>
+    ${samples ? `<div style="margin:10px 0;"><b>${tr('Sentences it could not place:')}</b>${samples}</div>` : ''}
+    <div style="margin-top:10px;"><b>${tr('It looks for these task names (or their aliases):')}</b><div style="margin-top:4px;color:var(--text-dimmer);">${names}</div></div>
+    <div style="margin-top:10px;">${tr('If your minutes name these tasks differently, add the wording to TASK_ALIASES near the top of this file.')}</div>
+  </div>`;
 }
 function renderChangeLog(){
   const el = document.getElementById('changeLogTimeline');
@@ -2703,6 +2844,7 @@ function renderMeetingsPage(){
   renderProposalList();
   renderChangeLog();
   updatePendingBadge();
+  updateLunaButton();
 }
 function updatePendingBadge(){
   const pendingCount = PROPOSALS.filter(p=>p.status==='pending').length;
@@ -2721,6 +2863,216 @@ function showToast(title, body){
   toastTimer = setTimeout(()=>el.classList.remove('show'), 4000);
 }
 
+/* ===================== SCROLL TO THE NEXT VIEW =====================
+   Keep scrolling at the bottom of a view and it moves to the next one; keep scrolling up at the
+   top and it goes back. The six views then read as one long document instead of six places you
+   have to go and click.
+
+   Hijacking a scroll is easy to get wrong, so three rules keep it out of the way:
+     · it only ever acts at a real edge, and only after you push past it by EDGE_THRESHOLD more
+       pixels — an ordinary flick that merely reaches the bottom does nothing;
+     · scrolling inside something that can still scroll itself (the Gantt, a table, the meeting
+       list) is left alone entirely;
+     · a cooldown after each switch swallows trackpad momentum, so one gesture moves one view.
+   The hint pill shows what is about to happen, jumps straight there if clicked, and can be
+   switched off for good with its ✕. */
+const EDGE_THRESHOLD = 170;   // px of continued scrolling past an edge before the view flips
+const SNAP_COOLDOWN = 650;    // ms after a switch during which scrolling is ignored
+const EDGE_DECAY_MS = 900;    // stillness that lets a part-finished push fade back to nothing
+const RUBBER_MAX = 16;        // px the page gives way by, as resistance while you push
+let SNAP_ENABLED = true;
+try{ SNAP_ENABLED = localStorage.getItem('dc_snap') !== 'off'; }catch(e){}
+const EDGE_IDLE_RESET = 400;  // ms of stillness that ends a gesture, for momentum detection
+let _snapUntil = 0, _edgePush = 0, _edgeDir = 0, _edgeLast = 0, _awaitIdle = false;
+
+function pageOrder(){ return [...document.querySelectorAll('.tab[data-page]')].map(t=>t.dataset.page); }
+function activePageId(){ const el = document.querySelector('.page.active'); return el ? el.id.replace('page-','') : null; }
+function pageLabel(id){
+  const tab = document.querySelector(`.tab[data-page="${id}"]`);
+  const span = tab && tab.querySelector('[data-i18n-en]');
+  return span ? span.textContent.trim() : (tab ? tab.textContent.trim() : id);
+}
+function neighbourPage(dir){
+  const order = pageOrder(), i = order.indexOf(activePageId());
+  if(i < 0) return null;
+  const j = i + dir;
+  return (j >= 0 && j < order.length) ? order[j] : null;
+}
+const _docBottomGap = () => document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+const atBottom = () => _docBottomGap() <= 2;
+const atTop = () => window.scrollY <= 1;
+
+/* Walk up from whatever the pointer is over: if any ancestor can still scroll the way the user
+   is scrolling, this gesture belongs to that element, not to page navigation. */
+function nestedCanScroll(target, dy){
+  let el = target;
+  while(el && el !== document.body && el !== document.documentElement){
+    if(el.scrollHeight > el.clientHeight + 1){
+      const style = getComputedStyle(el).overflowY;
+      if(style === 'auto' || style === 'scroll'){
+        const room = dy > 0 ? (el.scrollHeight - el.clientHeight - el.scrollTop) : el.scrollTop;
+        if(room > 1) return true;
+      }
+    }
+    el = el.parentElement;
+  }
+  return false;
+}
+
+function showSnapHint(dir, target, progress){
+  const hint = document.getElementById('snapHint');
+  if(!hint) return;
+  if(!target){ hint.classList.remove('show'); return; }
+  hint.classList.toggle('at-top', dir < 0);
+  document.getElementById('snapHintText').innerHTML =
+    `${dir > 0 ? tr('Keep scrolling for') : tr('Keep scrolling back to')} <b>${pageLabel(target)}</b>`;
+  document.getElementById('snapHintFill').style.width = Math.min(100, progress * 100) + '%';
+  hint.classList.add('show');
+  hint.onclick = e => { if(e.target.id !== 'snapHintOff') snapTo(dir, target); };
+}
+function hideSnapHint(){ const h = document.getElementById('snapHint'); if(h) h.classList.remove('show'); }
+
+function snapTo(dir, target){
+  _snapUntil = Date.now() + SNAP_COOLDOWN;
+  _edgePush = 0; _edgeDir = 0; _awaitIdle = true;
+  setRubber(0, false);   // no easing here — the view is changing under it anyway
+  hideSnapHint();
+  goPage(target);
+  // Forward lands at the top of the next view; going back lands at the bottom of the previous
+  // one, which is where you were reading from.
+  window.scrollTo({top: dir > 0 ? 0 : document.documentElement.scrollHeight, behavior: 'auto'});
+}
+
+function handleEdgeScroll(dy, target){
+  if(!SNAP_ENABLED || !dy) return;
+  const now = Date.now();
+  const gap = now - _edgeLast;                      // both computed before _edgeLast is updated
+  const idle = gap > EDGE_IDLE_RESET;
+  _edgeLast = now;
+  // After a switch, swallow the rest of the gesture: only a scroll that begins after a pause may
+  // move again. Trackpad momentum can keep firing events for a second or more, and without this
+  // one hard flick skates through several views at once.
+  if(_awaitIdle){ if(!idle) return; _awaitIdle = false; }
+  if(now < _snapUntil) return;
+  if(nestedCanScroll(target, dy)){ if(_edgePush) releaseEdge(); return; }
+  const dir = dy > 0 ? 1 : -1;
+  const atEdge = dir > 0 ? atBottom() : atTop();
+  if(!atEdge){ if(_edgePush){ releaseEdge(); } return; }
+  const next = neighbourPage(dir);
+  if(!next){ hideSnapHint(); return; }
+  // The push fades rather than resetting outright. A hard reset made this unusable with a mouse
+  // wheel: each detent is one ~100px event, and scrolling at a normal pace left a gap long enough
+  // to zero the total between every click, so the threshold could never be reached. Fading keeps
+  // consecutive clicks building while genuinely separate nudges still come to nothing.
+  if(dir !== _edgeDir){ _edgeDir = dir; _edgePush = 0; }
+  else if(gap > 0) _edgePush = Math.max(0, _edgePush - (gap / EDGE_DECAY_MS) * EDGE_THRESHOLD);
+  _edgePush += Math.abs(dy);
+  if(_edgePush >= EDGE_THRESHOLD){ snapTo(dir, next); return; }
+  const progress = _edgePush / EDGE_THRESHOLD;
+  showSnapHint(dir, next, progress);
+  // Let the page give way a little as you push — the resistance makes the threshold something you
+  // can feel, instead of a hidden number you cross by surprise.
+  setRubber(-dir * RUBBER_MAX * (1 - Math.pow(1 - progress, 2)), false);
+}
+/* Let go: slide the page back and drop a half-finished push. */
+function releaseEdge(){ _edgePush = 0; setRubber(0, true); hideSnapHint(); }
+function setRubber(offset, animate){
+  const app = document.querySelector('.app');
+  if(!app) return;
+  app.style.transition = animate ? 'transform .22s cubic-bezier(.22,.61,.36,1)' : 'none';
+  app.style.transform = offset ? `translateY(${offset}px)` : '';
+}
+
+window.addEventListener('wheel', e => handleEdgeScroll(e.deltaY, e.target), {passive:true});
+window.addEventListener('scroll', () => {
+  // Leaving an edge should let go of the page even without further wheel events.
+  if(_edgePush && !atBottom() && !atTop()) releaseEdge();
+}, {passive:true});
+// Stop pushing and the page eases back rather than sitting held open.
+setInterval(() => {
+  if(_edgePush && Date.now() - _edgeLast > EDGE_IDLE_RESET) releaseEdge();
+}, 200);
+let _touchY = null;
+window.addEventListener('touchstart', e => { _touchY = e.touches[0].clientY; }, {passive:true});
+window.addEventListener('touchmove', e => {
+  if(_touchY === null) return;
+  const y = e.touches[0].clientY;
+  handleEdgeScroll(_touchY - y, e.target);   // finger up = scrolling down
+  _touchY = y;
+}, {passive:true});
+window.addEventListener('touchend', () => { _touchY = null; if(_edgePush) releaseEdge(); }, {passive:true});
+document.getElementById('snapHintOff').addEventListener('click', e => {
+  e.stopPropagation();
+  SNAP_ENABLED = false;
+  try{ localStorage.setItem('dc_snap','off'); }catch(err){}
+  hideSnapHint();
+  showToast(tr('Scroll navigation off'), tr('Use the tabs or the icon rail to switch views'));
+});
+
+/* ===================== SESSION PERSISTENCE =====================
+   Everything on this page lives in memory, so without this a browser refresh would throw away
+   imported meetings, extracted proposals and every Approve/Reject decision — which looks exactly
+   like "my approvals keep resetting".
+
+   What is saved: the task fields that approvals changed (as a diff against the values baked into
+   this file), the meetings list with their raw minutes, all proposals with their review status,
+   the action list and the change log. What is NOT saved: image attachments, whose data URLs would
+   blow the ~5MB localStorage quota — the text extracted from them is already in the minutes.
+
+   Storage is per-browser and per-file. Someone else opening the same file sees the original data,
+   which is the right default for a file that gets emailed around. */
+const STATE_KEY = 'dc_state_v1';
+const TASK_BASELINE = {}; TASKS.forEach(t=>{ TASK_BASELINE[t.id] = Object.assign({}, t); });
+let _stateWarned = false;
+
+function _taskOverrides(){
+  const out = {};
+  TASKS.forEach(t=>{
+    const base = TASK_BASELINE[t.id]; if(!base) return;
+    const diff = {};
+    Object.keys(t).forEach(k=>{ if(t[k] !== base[k]) diff[k] = t[k]; });
+    if(Object.keys(diff).length) out[t.id] = diff;
+  });
+  return out;
+}
+function saveState(){
+  try{
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      v:1, savedAt:new Date().toISOString(),
+      taskOverrides:_taskOverrides(),
+      meetings: MEETINGS.map(m=>{ const c = Object.assign({}, m); delete c.attachments; return c; }),
+      proposals: PROPOSALS, changelog: CHANGELOG, actions: ACTIONS,
+      actionSeq:_actionSeq, logSeq:_logSeq, currentMeetingId,
+    }));
+  }catch(e){
+    // Quota exceeded, or storage blocked (private window / browser setting). The page keeps
+    // working in memory; say so once rather than failing silently on every render.
+    if(!_stateWarned){ _stateWarned = true; console.warn('[state] could not save:', e.message); showToast(tr('Changes are not being saved'), tr('This browser is blocking local storage, so a refresh will reset the page')); }
+  }
+}
+function loadState(){
+  let s;
+  try{ s = JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); }catch(e){ return false; }
+  if(!s || s.v !== 1) return false;
+  Object.entries(s.taskOverrides||{}).forEach(([id,fields])=>{ if(TASKS_BY_ID[id]) Object.assign(TASKS_BY_ID[id], fields); });
+  const swap = (arr, next) => { arr.length = 0; (next||[]).forEach(x=>arr.push(x)); };
+  swap(MEETINGS, s.meetings); swap(PROPOSALS, s.proposals); swap(CHANGELOG, s.changelog); swap(ACTIONS, s.actions);
+  _actionSeq = s.actionSeq || 0; _logSeq = s.logSeq || 0;
+  currentMeetingId = (MEETINGS.find(m=>m.id===s.currentMeetingId) ? s.currentMeetingId : (MEETINGS[0]||{}).id);
+  return true;
+}
+/* Back to the data baked into this file. Two clicks, because it throws away real review work. */
+let _resetArmed = 0;
+function resetState(){
+  if(Date.now() - _resetArmed > 5000){
+    _resetArmed = Date.now();
+    showToast(tr('Reset everything?'), tr('Click Reset again within 5 seconds to discard all imported meetings and review decisions'));
+    return;
+  }
+  try{ localStorage.removeItem(STATE_KEY); }catch(e){}
+  location.reload();
+}
+
 /* ===================== MASTER RENDER ===================== */
 function render(){
   applyKPIs();
@@ -2734,8 +3086,15 @@ function render(){
   if(document.getElementById('page-dependency').classList.contains('active')) drawDepConnectors();
   updatePendingBadge();
   if(document.getElementById('page-meetings').classList.contains('active')) renderMeetingsPage();
+  saveState();
 }
+// Restore the previous session before the first paint, so a refresh keeps imported meetings and
+// review decisions instead of silently reverting to the file's built-in data.
+loadState();
 render();
+renderList();
+buildGantt();
+renderMeetingsPage();
 
 /* ===================== i18n: static HTML switch + language toggle ===================== */
 // Walks every element marked with data-i18n-en/zh (added by a build-time pass over the
