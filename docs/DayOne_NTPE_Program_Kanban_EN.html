@@ -451,6 +451,23 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .snap-hint .bar i{display:block;height:100%;width:0;background:var(--purple);}
 .snap-hint .x{opacity:.45;padding:0 6px;font-size:13px;line-height:1;}
 .snap-hint .x:hover{opacity:1;color:var(--text);}
+/* Meeting History: one card per meeting — what it decided, and the minutes it decided it from. */
+.hist-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:var(--panel3);}
+.hist-card.current{border-color:var(--purple);}
+.hist-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.hist-top b{font-size:13.5px;}
+.hist-date{font-size:11.5px;color:var(--text-dimmer);font-weight:700;}
+.hist-sum{font-size:12px;color:var(--text-dim);line-height:1.65;margin:8px 0 10px;}
+.hist-stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.hist-raw{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;}
+.hist-raw summary{cursor:pointer;font-size:11.5px;font-weight:700;color:var(--text-dim);list-style:none;}
+.hist-raw summary::-webkit-details-marker{display:none;}
+.hist-raw summary::before{content:'▸ ';}
+.hist-raw[open] summary::before{content:'▾ ';}
+.hist-raw pre{white-space:pre-wrap;word-break:break-word;font-size:11.5px;line-height:1.7;color:var(--text-dim);
+  background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px;margin:10px 0 0;max-height:340px;overflow:auto;font-family:inherit;}
+.hist-thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.hist-thumbs img{width:52px;height:38px;object-fit:cover;border-radius:5px;border:1px solid var(--border2);cursor:pointer;}
 .btn-withdraw{background:transparent;color:var(--text-dim);border:1px solid var(--border2);border-radius:7px;padding:5px 12px;font-size:11.5px;font-weight:700;cursor:pointer;}
 .btn-withdraw:hover{color:var(--text);border-color:var(--text-dimmer);}
 .prop-status-tag{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;}
@@ -1160,11 +1177,18 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- MEETINGS / CHANGE PROPOSALS -->
   <!-- ============================================================ -->
   <div class="page" id="page-meetings">
-    <div class="page-head">
-      <h1><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span></h1>
-      <p><span data-i18n-en="Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically" data-i18n-zh="会议纪要 → AI 提取变更 → 生成待处理更新 → 人工审核 → 写回项目数据,健康度／KPI／阻塞影响图／路线图自动重新计算">Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically</span></p>
+    <div class="page-head" style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <h1><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span></h1>
+        <p><span data-i18n-en="Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically" data-i18n-zh="会议纪要 → AI 提取变更 → 生成待处理更新 → 人工审核 → 写回项目数据,健康度／KPI／阻塞影响图／路线图自动重新计算">Meeting minutes → AI extracts changes → generates pending updates → human review → writes back to project data, Health / KPIs / Blocker Map / Roadmap recalculate automatically</span></p>
+      </div>
+      <div class="pillgroup" style="margin-top:2px;flex-shrink:0;">
+        <button class="pill active" data-sub="mt-proposals"><span data-i18n-en="Proposals" data-i18n-zh="建议">Proposals</span></button>
+        <button class="pill" data-sub="mt-history"><span data-i18n-en="Meeting History" data-i18n-zh="历史纪要">Meeting History</span></button>
+      </div>
     </div>
 
+    <div class="subview active" id="mt-proposals">
     <div class="meet-body">
       <div>
         <div class="panel">
@@ -1204,6 +1228,25 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           </div>
           <div class="summary-chips" id="propSummaryChips"></div>
           <div id="proposalList"></div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ---- MEETING HISTORY SUBVIEW ---- -->
+    <div class="subview" id="mt-history">
+      <div class="meet-body">
+        <div>
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:12px;"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span data-i18n-en="Activity / Change Log" data-i18n-zh="活动／变更日志">Activity / Change Log</span></div>
+            <div class="timeline" id="historyTimeline"></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg></div><span data-i18n-en="Meeting History" data-i18n-zh="历史纪要">Meeting History</span></div>
+            <div id="historyList"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1385,6 +1428,10 @@ const ZH_MAP = {
   'The full AI-generated brief is a preview feature — not wired up yet.':'完整 AI 简报是预览功能,尚未接入真实数据。',
   'Internal Delivery':'内部交付进度','View internal progress':'查看内部进度',
   'Full internal-progress drill-down is a preview feature — not wired up yet.':'内部进度详情是预览功能,尚未接入真实数据。',
+  // Meeting History subview
+  'Proposals':'建议','Meeting History':'历史纪要','No proposals':'无建议',
+  'Raw minutes':'纪要原文','characters':'字','No minutes text stored for this meeting':'该会议没有保存纪要原文',
+  'No meetings recorded yet':'暂无会议记录',
   // Scroll-to-next-view
   'Keep scrolling for':'继续滑动前往','Keep scrolling back to':'继续上滑返回',
   'Scroll navigation off':'已关闭滑动翻页','Use the tabs or the icon rail to switch views':'可以用顶部标签或左侧图标栏切换视图',
@@ -1833,12 +1880,17 @@ window.addEventListener('resize', ()=>{
   if(document.getElementById('page-dependency').classList.contains('active')) drawDepConnectors();
 });
 
+// Scoped to the pill's own group and page, so more than one page can carry subview pills without
+// them deactivating each other.
 document.querySelectorAll('.pillgroup .pill[data-sub]').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.pillgroup .pill[data-sub]').forEach(b=>b.classList.remove('active'));
+    const group = btn.closest('.pillgroup');
+    const page = btn.closest('.page');
+    group.querySelectorAll('.pill[data-sub]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    document.querySelectorAll('#page-roadmap .subview').forEach(s=>s.classList.remove('active'));
+    (page || document).querySelectorAll('.subview').forEach(s=>s.classList.remove('active'));
     document.getElementById(btn.dataset.sub).classList.add('active');
+    if(btn.dataset.sub === 'mt-history') renderHistory();
   });
 });
 document.querySelectorAll('.pill[data-depfilter]').forEach(btn=>{
@@ -2519,7 +2571,7 @@ function _cleanClause(unit){
    One line often carries several items: 'Weekly Progress — "A": Done; "B": In Progress'. */
 function _segments(text){
   const out = [];
-  let section = '';
+  let section = '', lineId = 0;
   (text||'').split(/\r?\n/).forEach(rawLine=>{
     const line = _mx(rawLine);
     if(!line) return;
@@ -2527,9 +2579,14 @@ function _segments(text){
     if(head){ section = head[1].toLowerCase(); if(!head[2]) return; }
     const body = head ? head[2] : line;
     // Lookahead-only split (no lookbehind — keeps older Safari able to parse this file at all).
+    // lineId groups the pieces one source line was split into. A table row or a multi-sentence
+    // bullet names its task once and then states the change ("… first usable batch. Expected
+    // Completion 2026/09/11. Justin"), so the later pieces must inherit that task or the date and
+    // status are simply lost.
+    lineId++;
     body.replace(/([.;])\s+(?=["“]?[A-Z0-9@])/g, '$1\u0000').split('\u0000').forEach(part=>{
       const unit = _mx(part).replace(/^[-•*•\d.)\s]+/,'');
-      if(unit.length>=8) out.push({unit, section});
+      if(unit.length>=8) out.push({unit, section, lineId});
     });
   });
   return out;
@@ -2551,9 +2608,16 @@ function extractProposalsLocal(text, meetingId){
 
   const segs = _segments(text);
   const diag = {segments: segs.length, matched: 0, unmatched: [], meetingId};
+  let carry = null;                        // task named earlier on the current source line
   segs.forEach(seg=>{
     const unit = seg.unit, section = seg.section;
-    const hit = _matchTask(unit);
+    if(!carry || carry.lineId !== seg.lineId) carry = null;
+    let hit = _matchTask(unit);
+    if(hit) carry = {lineId: seg.lineId, hit};
+    // A fragment that names no task but continues a line that did — "Expected Completion
+    // 2026/09/11", "Done", an owner cell — is about that same task. Inherited context is never
+    // treated as an exact name match, so anything it produces is marked inferred, not confirmed.
+    else if(carry) hit = {task: carry.hit.task, score: carry.hit.score, exact: false};
     if(!hit){                              // no task named → no proposal, rather than a guessed one
       if(diag.unmatched.length < 5) diag.unmatched.push(unit.slice(0,90));
       return;
@@ -2839,12 +2903,46 @@ function renderChangeLog(){
   if(!el) return;
   el.innerHTML = CHANGELOG.map(c=>`<div class="timeline-item"><div class="tl-date">${c.date}</div><div class="tl-text">${c.text}</div></div>`).join('') || `<div style="color:var(--text-dimmer);font-size:12px;">${tr('No change history yet')}</div>`;
 }
+/* Meeting History: the archive half of this page. The Proposals view is about deciding; this one
+   is about what was already decided, and lets you read the minutes each decision came from —
+   which is the thing you actually want when someone asks "where did this date come from?". */
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  const tl = document.getElementById('historyTimeline');
+  if(tl) tl.innerHTML = CHANGELOG.map(c=>`<div class="timeline-item"><div class="tl-date">${c.date}</div><div class="tl-text">${c.text}</div></div>`).join('')
+    || `<div style="color:var(--text-dimmer);font-size:12px;">${tr('No change history yet')}</div>`;
+  if(!list) return;
+  list.innerHTML = MEETINGS.map(m=>{
+    const props = PROPOSALS.filter(p=>p.meetingId===m.id);
+    const n = s => props.filter(p=>p.status===s).length;
+    const chips = [
+      n('approved') ? `<span class="badge green">${n('approved')} ${tr('Approved')}</span>` : '',
+      n('rejected') ? `<span class="badge red">${n('rejected')} ${tr('Rejected')}</span>` : '',
+      n('pending')  ? `<span class="badge violet">${n('pending')} ${tr('Pending Review')}</span>` : '',
+      props.length===0 ? `<span class="badge gray">${tr('No proposals')}</span>` : '',
+    ].join('');
+    const thumbs = (m.attachments && m.attachments.length)
+      ? `<div class="hist-thumbs">${m.attachments.map(a=>`<img src="${a.dataUrl}" title="${a.name}" onclick="window.open('${a.dataUrl}','_blank')">`).join('')}</div>` : '';
+    // The raw minutes are the evidence behind every proposal, so they belong here, collapsed.
+    const raw = m.raw
+      ? `<details class="hist-raw"><summary>${tr('Raw minutes')} · ${m.raw.length.toLocaleString()} ${tr('characters')}</summary><pre>${m.raw.replace(/[<&]/g, c=>({'<':'&lt;','&':'&amp;'}[c]))}</pre></details>`
+      : `<div class="hist-raw" style="font-size:11.5px;color:var(--text-dimmer);">${tr('No minutes text stored for this meeting')}</div>`;
+    return `<div class="hist-card ${m.id===currentMeetingId?'current':''}">
+      <div class="hist-top"><b>${m.title}</b><span class="hist-date">${m.date}</span></div>
+      <div class="hist-stats">${chips}</div>
+      <div class="hist-sum">${m.summary||''}</div>
+      ${thumbs}${raw}
+    </div>`;
+  }).join('') || `<div style="color:var(--text-dimmer);font-size:12.5px;padding:20px 0;text-align:center;">${tr('No meetings recorded yet')}</div>`;
+}
+
 function renderMeetingsPage(){
   renderMeetList();
   renderProposalList();
   renderChangeLog();
   updatePendingBadge();
   updateLunaButton();
+  if(document.getElementById('mt-history').classList.contains('active')) renderHistory();
 }
 function updatePendingBadge(){
   const pendingCount = PROPOSALS.filter(p=>p.status==='pending').length;
