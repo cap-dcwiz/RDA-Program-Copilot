@@ -1226,6 +1226,16 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
               <button class="btn-ghost" onclick="reparseMeeting(currentMeetingId)" title="Re-run extraction on this meeting's stored minutes"><span data-i18n-en="Re-parse minutes" data-i18n-zh="重新解析纪要">Re-parse minutes</span></button><button class="btn-ghost" onclick="approveAllConfirmed()"><span data-i18n-en="Approve All Confirmed" data-i18n-zh="批准全部已确认项">Approve All Confirmed</span></button><button class="btn-primary" id="pushLunaBtn" style="display:none;" onclick="pushToLuna()" title="Send approved changes to Luna so it can chase the owners in Teams"></button><button class="btn-withdraw" onclick="resetState()" title="Discard imported meetings and review decisions, back to this file's built-in data"><span data-i18n-en="Reset" data-i18n-zh="重置">Reset</span></button>
             </div>
           </div>
+          <div id="lunaConfigRow" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 4px;padding:12px;border:1px solid var(--border2);border-radius:10px;background:var(--panel3);">
+            <span style="font-size:12px;font-weight:700;color:var(--text-dim);white-space:nowrap;"><span data-i18n-en="Luna bot address" data-i18n-zh="Luna 机器人地址">Luna bot address</span></span>
+            <input id="lunaEndpointInput" type="text" placeholder="http://localhost:3978/api/apply-changes"
+              style="flex:1;min-width:280px;background:var(--panel2);border:1px solid var(--border2);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;font-family:inherit;">
+            <button class="btn-ghost" onclick="testLunaEndpoint()"><span data-i18n-en="Test" data-i18n-zh="测试连接">Test</span></button>
+            <button class="btn-primary" onclick="saveLunaEndpoint()"><span data-i18n-en="Save" data-i18n-zh="保存">Save</span></button>
+            <div style="flex-basis:100%;font-size:11px;color:var(--text-dimmer);line-height:1.6;">
+              <span data-i18n-en="Approved changes are POSTed here. Luna updates its program data, re-runs blocker detection, and posts Ticket review cards to the Delivery Control Room channel — not straight to the project group." data-i18n-zh="已批准的变更会 POST 到这个地址。Luna 会更新项目数据、重跑阻塞检测,并把 Ticket 审核卡片发到 Delivery Control Room 频道 —— 不是直接发到项目群。">Approved changes are POSTed here. Luna updates its program data, re-runs blocker detection, and posts Ticket review cards to the Delivery Control Room channel — not straight to the project group.</span>
+            </div>
+          </div>
           <div class="summary-chips" id="propSummaryChips"></div>
           <div id="proposalList"></div>
         </div>
@@ -1454,7 +1464,12 @@ const ZH_MAP = {
   'Luna updated, but could not post to Teams':'Luna 数据已更新,但无法发送到 Teams',
   'Could not reach Luna':'无法连接 Luna','Check the bot is running and LUNA_ENDPOINT is correct':'请确认机器人已启动且 LUNA_ENDPOINT 配置正确',
   'Luna is not connected':'尚未连接 Luna',
-  "Set LUNA_ENDPOINT near the top of this file to your bot's /api/apply-changes URL":'请在本文件顶部把 LUNA_ENDPOINT 设为机器人的 /api/apply-changes 地址',
+  'Connect Luna':'连接 Luna',"Not connected yet — click to enter your bot's address":'尚未连接 —— 点击填入机器人地址',
+  'Luna connected':'已连接 Luna','Luna disconnected':'已断开 Luna',
+  'The Push to Luna button will ask for an address again':'下次点「推送到 Luna」会重新询问地址',
+  'Enter an address first':'请先填入地址','Testing…':'正在测试…',
+  'Luna is reachable':'Luna 可以连通','Luna answered':'Luna 返回',
+  'Is the bot running, and is the address right?':'机器人启动了吗?地址填对了吗?',
   // Withdrawing an approval / rejection
   'Withdraw':'撤回','Update withdrawn':'已撤回',
   'The change was reversed — Approve / Reject are available again':'变更已回退 — 可以重新批准或拒绝',
@@ -2451,7 +2466,11 @@ const AI_EXTRACTOR_ENDPOINT = '';   // e.g. 'http://localhost:8787/extract' — 
    review decides "and this is what we chase someone about". Neither one alone reaches the
    Project Delivery Group. Leave this blank and the button stays hidden — the dashboard is fully
    usable on its own. */
-const LUNA_ENDPOINT = '';   // e.g. 'http://localhost:3978/api/apply-changes'
+/* Set here to ship a default, or leave blank and paste the URL into the Luna button in the
+   Meetings page — that is stored per browser, so the file itself stays environment-agnostic. */
+const LUNA_ENDPOINT_DEFAULT = '';   // e.g. 'http://localhost:3978/api/apply-changes'
+let LUNA_ENDPOINT = LUNA_ENDPOINT_DEFAULT;
+try{ LUNA_ENDPOINT = localStorage.getItem('dc_luna_endpoint') || LUNA_ENDPOINT_DEFAULT; }catch(e){}
 
 /* AI_EXTRACTOR_CONTRACT — what a backend at AI_EXTRACTOR_ENDPOINT must speak.
    Request : POST JSON { text, meetingId, tasks:[{id,name,status,progress,next,due,ge,targetOriginal}] }
@@ -2782,12 +2801,48 @@ async function importMeeting(){
 // Approved but not yet handed to Luna. Withdrawing before a push takes it back out of this set;
 // withdrawing after a push cannot un-send it, which is why the button reports what it sent.
 function pendingLunaPush(){ return PROPOSALS.filter(p=>p.status==='approved' && !p._pushed); }
+/* Show the button whenever there is something to push, configured or not. Hiding it until an
+   endpoint was set meant nobody could discover that an endpoint was the missing piece — the
+   feature was invisible rather than merely unconfigured. */
 function updateLunaButton(){
   const btn = document.getElementById('pushLunaBtn');
   if(!btn) return;
   const n = pendingLunaPush().length;
-  btn.style.display = (LUNA_ENDPOINT && n) ? 'inline-block' : 'none';
-  btn.textContent = `${tr('Push to Luna')} (${n})`;
+  btn.style.display = n ? 'inline-block' : 'none';
+  btn.textContent = LUNA_ENDPOINT ? `${tr('Push to Luna')} (${n})` : `${tr('Connect Luna')} …`;
+  btn.title = LUNA_ENDPOINT ? `POST → ${LUNA_ENDPOINT}` : tr('Not connected yet — click to enter your bot\'s address');
+  const row = document.getElementById('lunaConfigRow');
+  if(row) document.getElementById('lunaEndpointInput').value = LUNA_ENDPOINT;
+}
+function toggleLunaConfig(force){
+  const row = document.getElementById('lunaConfigRow');
+  if(!row) return;
+  const show = force !== undefined ? force : row.style.display === 'none' || !row.style.display;
+  row.style.display = show ? 'flex' : 'none';
+  if(show){ const i = document.getElementById('lunaEndpointInput'); i.value = LUNA_ENDPOINT; i.focus(); }
+}
+function saveLunaEndpoint(){
+  const v = document.getElementById('lunaEndpointInput').value.trim();
+  LUNA_ENDPOINT = v;
+  try{ v ? localStorage.setItem('dc_luna_endpoint', v) : localStorage.removeItem('dc_luna_endpoint'); }catch(e){}
+  updateLunaButton();
+  toggleLunaConfig(false);
+  showToast(v ? tr('Luna connected') : tr('Luna disconnected'), v || tr('The Push to Luna button will ask for an address again'));
+}
+/* Check the address before a real push, so a typo or a stopped bot is obvious here rather than
+   showing up as "nothing happened in Teams" later. */
+async function testLunaEndpoint(){
+  const v = document.getElementById('lunaEndpointInput').value.trim();
+  if(!v){ showToast(tr('Enter an address first'), 'e.g. http://localhost:3978/api/apply-changes'); return; }
+  const health = v.replace(/\/api\/.*$/, '/healthz');
+  showToast(tr('Testing…'), health);
+  try{
+    const res = await fetch(health, {method:'GET'});
+    const body = await res.text();
+    showToast(res.ok ? tr('Luna is reachable') : `${tr('Luna answered')} HTTP ${res.status}`, body.slice(0,120));
+  }catch(err){
+    showToast(tr('Could not reach Luna'), `${err.message} · ${tr('Is the bot running, and is the address right?')}`);
+  }
 }
 // Luna stores dates as ISO; this page shows targets as MM/DD. Convert on the way out so the
 // bot's overdue maths works on real dates rather than a string it cannot parse.
@@ -2799,7 +2854,7 @@ function _isoForLuna(field, value){
 async function pushToLuna(){
   const batch = pendingLunaPush();
   if(!batch.length) return;
-  if(!LUNA_ENDPOINT){ showToast(tr('Luna is not connected'), tr('Set LUNA_ENDPOINT near the top of this file to your bot\'s /api/apply-changes URL')); return; }
+  if(!LUNA_ENDPOINT){ toggleLunaConfig(true); return; }   // ask for the address rather than refusing
   const meeting = MEETINGS.find(m=>m.id===currentMeetingId) || {};
   const payload = {
     meetingId: meeting.id || currentMeetingId, meetingTitle: meeting.title || '', meetingDate: meeting.date || '',
