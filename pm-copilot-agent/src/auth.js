@@ -58,9 +58,11 @@ function saveRoles(next) {
 /* ---------- users ---------- */
 const users = () => read(F.users, []);
 const publicUser = (u, rs = roles()) => ({ id: u.id, username: u.username, displayName: u.displayName || u.username, email: u.email || null,
-  roles: u.roles || [], disabled: !!u.disabled, createdAt: u.createdAt, lastLoginAt: u.lastLoginAt || null, perms: P.effective(rs, u.roles) });
+  roles: u.roles || [], disabled: !!u.disabled, mustChangePassword: !!u.mustChangePassword, createdAt: u.createdAt, lastLoginAt: u.lastLoginAt || null,
+  perms: P.effective(rs, u.roles) });
 
-function createUser({ username, password, displayName, email, roles: r }) {
+/* Accounts created by an admin start with a temporary password the person must change at first sign-in. */
+function createUser({ username, password, displayName, email, roles: r, mustChangePassword = true }) {
   username = String(username || '').trim().toLowerCase();
   if (!/^[a-z0-9._@-]{2,64}$/.test(username)) throw err(400, 'Username: 2–64 characters, letters, digits, . _ @ -');
   if (!validPassword(password)) throw err(400, 'Password must be at least 8 characters');
@@ -68,7 +70,7 @@ function createUser({ username, password, displayName, email, roles: r }) {
   if (list.find(u => u.username === username)) throw err(409, `User ${username} already exists`);
   const ids = new Set(roles().map(x => x.id));
   const u = { id: 'usr_' + crypto.randomBytes(5).toString('hex'), username, displayName: (displayName || '').trim() || username, email: (email || '').trim() || null,
-    roles: (r || []).filter(x => ids.has(x)), passwordHash: hashPassword(password), createdAt: new Date().toISOString() };
+    roles: (r || []).filter(x => ids.has(x)), passwordHash: hashPassword(password), mustChangePassword: !!mustChangePassword, createdAt: new Date().toISOString() };
   list.push(u); write(F.users, list);
   return publicUser(u);
 }
@@ -91,8 +93,18 @@ function updateUser(id, patch, actorId) {
 function setPassword(id, password) {
   if (!validPassword(password)) throw err(400, 'Password must be at least 8 characters');
   const list = users(); const u = list.find(x => x.id === id); if (!u) throw err(404, 'User not found');
-  u.passwordHash = hashPassword(password); u.passwordChangedAt = new Date().toISOString();
+  u.passwordHash = hashPassword(password); u.passwordChangedAt = new Date().toISOString(); u.mustChangePassword = true;
   write(F.users, list); revokeSessions(u.id);
+}
+/* The signed-in person changes their own password: needs the current one; signs out every other session. */
+function changeOwnPassword(id, current, password) {
+  const list = users(); const u = list.find(x => x.id === id); if (!u) throw err(404, 'User not found');
+  if (!checkPassword(String(current || ''), u.passwordHash)) throw err(400, 'Current password is not right');
+  if (!validPassword(password)) throw err(400, 'Password must be at least 8 characters');
+  if (checkPassword(password, u.passwordHash)) throw err(400, 'Choose a password different from the current one');
+  u.passwordHash = hashPassword(password); u.passwordChangedAt = new Date().toISOString(); u.mustChangePassword = false;
+  write(F.users, list); revokeSessions(u.id);
+  return issueSession(u);
 }
 function deleteUser(id, actorId) {
   if (id === actorId) throw err(400, 'You cannot delete yourself');
@@ -109,11 +121,14 @@ function login(username, password) {
   const list = users();
   const u = list.find(x => x.username === String(username || '').trim().toLowerCase());
   if (!u || u.disabled || !checkPassword(String(password || ''), u.passwordHash)) throw err(401, 'Wrong username or password');
+  u.lastLoginAt = new Date().toISOString(); write(F.users, list);
+  return issueSession(u);
+}
+function issueSession(u) {
   const token = 'pmc_' + crypto.randomBytes(24).toString('base64url');
   const s = read(F.sessions, []).filter(x => new Date(x.expiresAt) > new Date());
   s.push({ hash: sha(token), userId: u.id, createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + SESSION_DAYS * 86400000).toISOString() });
   write(F.sessions, s);
-  u.lastLoginAt = new Date().toISOString(); write(F.users, list);
   return { token, user: publicUser(u) };
 }
 function logout(token) { if (token) write(F.sessions, read(F.sessions, []).filter(x => x.hash !== sha(token))); }
@@ -131,13 +146,32 @@ function whoIs(req) {
   return { ...pu, name: pu.displayName, token: m[1].trim() };
 }
 
-/* First start: no users yet → create "admin" with ADMIN_PASSWORD (or a random one, printed once). */
+/* First start (no users yet). Admin rights go to named personal accounts, not a shared login:
+   SEED_ADMINS=selena.zhang@rda.ai,wenqian.yuan@rda.ai creates one Super Admin per address with a
+   random temporary password (changed at first sign-in). Without SEED_ADMINS a single "admin"
+   account is created instead, for setting up the named accounts and then disabling. */
 function bootstrap() {
   roles();
   if (users().length) return null;
-  const pw = process.env.ADMIN_PASSWORD && validPassword(process.env.ADMIN_PASSWORD) ? process.env.ADMIN_PASSWORD : crypto.randomBytes(9).toString('base64url');
-  createUser({ username: 'admin', password: pw, displayName: 'Admin', roles: ['admin'] });
-  return process.env.ADMIN_PASSWORD ? '(ADMIN_PASSWORD from .env)' : pw;
+  const seeds = String(process.env.SEED_ADMINS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+  const created = [];
+  if (seeds.length) {
+    for (const email of seeds) {
+      const pw = crypto.randomBytes(9).toString('base64url');
+      const name = email.split('@')[0].split(/[._-]/).map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+      createUser({ username: email, password: pw, displayName: name, email, roles: ['admin'] });
+      created.push([email, pw]);
+    }
+  } else {
+    const fixed = process.env.ADMIN_PASSWORD && validPassword(process.env.ADMIN_PASSWORD);
+    const pw = fixed ? process.env.ADMIN_PASSWORD : crypto.randomBytes(9).toString('base64url');
+    createUser({ username: 'admin', password: pw, displayName: 'Admin', roles: ['admin'] });
+    created.push(['admin', fixed ? '(ADMIN_PASSWORD from .env)' : pw]);
+  }
+  const file = path.join(DATA_DIR, 'initial-passwords.txt');
+  fs.writeFileSync(file, `Temporary passwords, created ${new Date().toISOString()}.\nEach person must change theirs at first sign-in. Hand them out privately, then delete this file.\n\n` +
+    created.map(([u, p]) => `${u}\t${p}`).join('\n') + '\n', { mode: 0o600 });
+  return { created, file };
 }
 
-module.exports = { whoIs, login, logout, roles, saveRoles, users: () => users().map(u => publicUser(u)), createUser, updateUser, setPassword, deleteUser, bootstrap };
+module.exports = { whoIs, login, logout, changeOwnPassword, roles, saveRoles, users: () => users().map(u => publicUser(u)), createUser, updateUser, setPassword, deleteUser, bootstrap };

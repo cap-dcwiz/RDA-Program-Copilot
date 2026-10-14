@@ -27,12 +27,14 @@ Granola notes ──► PM Copilot agent ──► Claude (summary + suggestions
 
 ```bash
 cd pm-copilot-agent
-cp .env.example .env        # fill in the keys below; set ADMIN_PASSWORD for the first sign-in
+cp .env.example .env        # fill in the keys below, incl. SEED_ADMINS
 npm start                   # dashboard + API on http://<host>:8790
 ```
 
-Node 18+, no npm dependencies. Open `http://<host>:8790/`, sign in as `admin`, then add people on
-**Users & Roles**. (If the dashboard is still served from another port, put the agent address
+Node 18+, no npm dependencies. On first start each address in `SEED_ADMINS` gets its own Super
+Admin account; temporary passwords are written to `data/initial-passwords.txt` (hand them out,
+then delete the file). Everyone sets a new password at first sign-in. Super Admins add everyone
+else on **Users & Roles**. (If the dashboard is still served from another port, put the agent address
 under **Server address** on the sign-in screen and add that origin to `ALLOWED_ORIGINS`.)
 
 | `.env` | Where to get it |
@@ -41,7 +43,8 @@ under **Server address** on the sign-in screen and add that origin to `ALLOWED_O
 | `GRANOLA_API_KEY` | Granola desktop → Settings → Connectors → API keys (Business/Enterprise plan). Optional `GRANOLA_FOLDER_ID` limits it to one folder. |
 | `JIRA_EMAIL`, `JIRA_API_TOKEN` | A Jira service account and an API token from id.atlassian.com → Security → API tokens. Needs browse, comment, edit and create in `BA`. |
 | `JIRA_DRY_RUN` | Starts as `true`: approvals are recorded and the exact Jira request is shown, but nothing is sent. Set `false` once you have checked a few. |
-| `ADMIN_PASSWORD` | Password for the `admin` user created on first start (only when no users exist). |
+| `SEED_ADMINS` | Emails that become Super Admins on first start, e.g. `selena.zhang@rda.ai,wenqian.yuan@rda.ai,zhaomeng.zhu@rda.ai`. Give admin rights to named people rather than sharing one login, so the decision log shows who did what. |
+| `ADMIN_PASSWORD` | Only if `SEED_ADMINS` is empty: password for a single `admin` account. |
 | `ALLOWED_ORIGINS` | Other origins allowed to call the API, if the dashboard is not served by the agent. |
 
 ## Users, roles and permissions
@@ -54,7 +57,16 @@ Everything sits behind sign-in. A role grants three things; a user with several 
 | **Can do** | `approve` — approve, edit, reject to-dos (writes to Jira) · `ingest` — sync Granola, import, re-analyse | every write route |
 | **Projects** | Whose data the role sees, or all projects | suggestions, meetings and the decision log are filtered per project; full meeting notes only for all-projects roles |
 
-Starting roles: **Admin** (locked, everything), **PM**, **Leadership**, **Engineering**, **Customer · DayOne**.
+Starting roles:
+
+| Role | Sees | Approves to Jira | Users & Roles |
+|---|---|---|---|
+| **Super Admin** (locked) | everything | yes | yes |
+| **RDA Manager** | every page and project | yes | no |
+| **RDA Member** | every page and project; can import meetings | no | no |
+| **Customer · DayOne** | DayOne overview and roadmap only | no | no |
+
+Add a `Customer · <client>` role per client as their project views are built.
 Edit them on Users & Roles → *Role → what it can see and do* and click **Save**.
 
 Passwords are scrypt-hashed; sessions are random tokens stored as hashes and last 7 days.
@@ -66,9 +78,14 @@ remove the last person who can manage users. Files: `data/users.json`, `data/rol
 `npm run add-user -- <username> <password> [role,role] ["Display name"] [email]` adds a user from
 the command line (for scripts or recovery).
 
-**Limit:** the Portfolio and DayOne figures are still baked into the HTML file. The page hides what
-a role does not grant, but a signed-in person could read them from the page source. Move that data
-behind the agent's API before giving customers access to anything but their own project.
+Portfolio data (`data/portfolio.json`) is served by `/api/portfolio` and filtered per role, so it
+is not in the HTML at all. **Remaining limit:** the DayOne project view's own data is still baked
+into the HTML file, so anyone who can load the page can read DayOne's program data from its
+source. Move it behind the API before giving accounts to clients other than DayOne, or to anyone
+who should not see DayOne.
+
+Accounts an admin creates, or whose password an admin resets, must set a new password at next
+sign-in. People change their own password from the header.
 
 ## API
 

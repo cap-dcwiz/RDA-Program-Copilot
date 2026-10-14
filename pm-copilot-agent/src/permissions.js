@@ -25,11 +25,15 @@ const PROJECTS = [
 const ALL = { pages: PAGES.map(p => p.id), actions: ACTIONS.map(a => a.id), projects: ['*'] };
 
 /* First-run roles. Admin is locked: it always keeps every permission and cannot be deleted. */
+const RDA_PAGES = PAGES.map(p => p.id).filter(p => p !== 'users');
 const DEFAULT_ROLES = [
-  { id: 'admin', name: 'Admin', locked: true, ...ALL },
-  { id: 'pm', name: 'PM', pages: ['portfolio', 'todo', 'history', 'overview', 'blocker', 'dependency', 'roadmap', 'meetings', 'luna'], actions: ['approve', 'ingest'], projects: ['*'] },
-  { id: 'leadership', name: 'Leadership', pages: ['portfolio', 'todo', 'history', 'overview', 'roadmap'], actions: [], projects: ['*'] },
-  { id: 'engineering', name: 'Engineering', pages: ['todo', 'history', 'overview', 'blocker', 'dependency', 'roadmap', 'meetings'], actions: ['ingest'], projects: ['*'] },
+  // Opens accounts and edits roles. Locked: always every permission, cannot be deleted.
+  { id: 'admin', name: 'Super Admin', locked: true, ...ALL },
+  // RDA managers: see everything, may approve to-dos into Jira.
+  { id: 'rda-manager', name: 'RDA Manager', pages: RDA_PAGES, actions: ['approve', 'ingest'], projects: ['*'] },
+  // RDA staff: see everything, can bring meetings in, cannot approve.
+  { id: 'rda-member', name: 'RDA Member', pages: RDA_PAGES, actions: ['ingest'], projects: ['*'] },
+  // Customers: only their own project, read-only.
   { id: 'customer-dayone', name: 'Customer · DayOne', pages: ['overview', 'roadmap'], actions: [], projects: ['dayone'] },
 ];
 

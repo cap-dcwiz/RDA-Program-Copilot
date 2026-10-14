@@ -7,6 +7,8 @@
    Signed in
    POST /api/logout
    GET  /api/me                             user + effective permissions
+   POST /api/me/password {current,password} change your own password (required after an admin sets one)
+   GET  /api/portfolio                      portfolio data, filtered to the role's projects
    GET  /api/suggestions?status=            page: todo      (only projects the user may see)
    GET  /api/meetings, /api/meetings/:id    page: history
    GET  /api/audit                          page: history
@@ -92,6 +94,28 @@ async function route(req, res, user) {
   const db = store.load();
   if (req.method === 'POST' && p === '/api/logout') { auth.logout(user.token); return send(res, 200, { ok: true }); }
   if (req.method === 'GET' && p === '/api/me') { const { token, ...u } = user; return send(res, 200, u); }
+  if (req.method === 'POST' && p === '/api/me/password') {
+    const body = await readBody(req);
+    const r = auth.changeOwnPassword(user.id, body.current, body.password);
+    store.audit(user.name, 'password-change', user.id); store.save();
+    return send(res, 200, r);
+  }
+  if (user.mustChangePassword) throw err(403, 'Set a new password first');
+
+  if (req.method === 'GET' && p === '/api/portfolio') {
+    // Each role receives only its projects. Without the Portfolio page you get the project list
+    // (for the project switcher) and nothing else; portfolio-wide narrative needs every project.
+    const all = JSON.parse(fs.readFileSync(path.join(cfg.DATA_DIR, 'portfolio.json'), 'utf8'));
+    const sees = (id) => P.canSeeProject(user.perms, id);
+    const projects = all.projects.filter(x => sees(x.id));
+    if (!user.perms.pages.includes('portfolio')) {
+      return send(res, 200, { asOf: all.asOf, projects: projects.map(x => ({ id: x.id, name: x.name, client: x.client, kind: x.kind, health: x.health, drill: x.drill,
+        phase: x.phase, headline: x.headline, stages: x.stages, tickets: [], risks: [], next: [] })), tickets: [], asks: [], events: [], text: {} });
+    }
+    const wide = user.perms.projects.includes('*');
+    return send(res, 200, { asOf: all.asOf, projects, tickets: all.tickets.filter(t => sees(t.proj)),
+      asks: all.asks.filter(a => wide || sees(a.proj)), events: all.events.filter(e => wide || sees(e.proj)), text: wide ? all.text : {} });
+  }
 
   if (req.method === 'GET' && p === '/api/suggestions') {
     page(user, 'todo');
@@ -171,7 +195,7 @@ if (require.main === module) {
   const first = auth.bootstrap();
   server.listen(cfg.port, () => {
     console.log(`PM Copilot agent on :${cfg.port} · dashboard at / · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
-    if (first) console.log(`\nFirst start: created user "admin" with password ${first}\nSign in, then change it on Users & Roles.\n`);
+    if (first) console.log(`\nFirst start: created ${first.created.map(c => c[0]).join(', ')}.\nTemporary passwords are in ${first.file} — hand them out privately, then delete the file.\n`);
     if (granola.configured() && cfg.granola.syncMinutes > 0) {
       const tick = () => agent.syncGranola('scheduler').then(r => r.notes && console.log('[sync]', r)).catch(e => console.warn('[sync]', e.message));
       setTimeout(tick, 3000); setInterval(tick, cfg.granola.syncMinutes * 60000);

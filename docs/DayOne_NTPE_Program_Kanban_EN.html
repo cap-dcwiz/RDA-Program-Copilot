@@ -677,6 +677,9 @@ body.gated{padding-left:0;}
 .ag-err{font-size:12px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:8px 10px;}
 .ag-adv summary{cursor:pointer;font-size:11.5px;color:var(--text-dimmer);margin-bottom:6px;} .ag-adv input{width:100%;}
 .user-chip{display:flex;align-items:center;gap:8px;font-size:12px;}
+.user-chip .sp-in{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:6px 9px;font-size:12px;width:140px;font-family:inherit;}
+.ag-pw{display:flex;flex-direction:column;gap:12px;}
+.ag-card [hidden]{display:none!important;}
 .user-chip .uc-name{font-weight:700;color:var(--text);} .user-chip .uc-role{color:var(--text-dimmer);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ua-sub{font-size:12.5px;color:var(--text-dim);margin:-6px 0 12px;}
 .ua-table td{vertical-align:middle;} .ua-table td b{font-size:13px;}
@@ -801,6 +804,12 @@ body.gated{padding-left:0;}
     <label><span data-i18n-en="Password" data-i18n-zh="密码">Password</span><input id="agPass" name="password" type="password" autocomplete="current-password" required></label>
     <div class="ag-err" id="agErr" role="alert" hidden></div>
     <button class="btn-primary" id="agBtn" type="submit"><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></button>
+    <div class="ag-pw" id="agPwBox" hidden>
+      <p><span data-i18n-en="Set a new password before you continue (at least 8 characters)." data-i18n-zh="继续前请设置新密码(至少 8 位)。">Set a new password before you continue (at least 8 characters).</span></p>
+      <label><span data-i18n-en="New password" data-i18n-zh="新密码">New password</span><input id="agNew1" type="password" autocomplete="new-password"></label>
+      <label><span data-i18n-en="Repeat new password" data-i18n-zh="再次输入新密码">Repeat new password</span><input id="agNew2" type="password" autocomplete="new-password"></label>
+      <button class="btn-primary" type="button" onclick="authChangePassword()"><span data-i18n-en="Save password" data-i18n-zh="保存密码">Save password</span></button>
+    </div>
     <details class="ag-adv"><summary><span data-i18n-en="Server address" data-i18n-zh="服务器地址">Server address</span></summary><input id="agUrl" placeholder="http://host:8790"></details>
   </form>
 </div>
@@ -3742,57 +3751,19 @@ const JIRA_BROWSE = 'https://projects-teams.atlassian.net/browse/';
 const PF_MEETING = { id:'MTG', title:'PM weekly sync · 12 Oct 2026', titleZh:'项目周会 · 2026-10-12', file:'智能纪要：1012project meeting' };
 
 // inQuery:false = parent/master ticket outside the JQL (status Backlog), shown for context only.
-const PF_TICKETS = [
-  {key:'BA-2380', proj:'dayone', summary:'[DayOne-NTPE] Master Ticket', type:'epic', status:'inprogress', assignee:'Xu Mingchen', created:'2026-07-17', updated:'2026-09-28', due:null,
-   signal:'28 Sep: GA calibration complete but Month 3 behind. GB data missing exports, 2 sensors with wrong start dates; only half of GC/GD received. IPMVP validation must come before AI policy training.'},
-  {key:'BA-2384', proj:'dayone', summary:'[DayOne-NTPE][3.1] Historical Data Export', status:'inprogress', assignee:'Sherry', created:'2026-07-17', updated:'2026-09-02', due:null,
-   signal:'1 data hall connected, 13 to go (Justin). System A chiller plant first. PUE formula confirmed.'},
-  {key:'BA-2386', proj:'dayone', summary:'[DayOne-NTPE][2.3] Historical data analysis and twin calibration', status:'inprogress', assignee:'Xu Mingchen', created:'2026-07-20', updated:'2026-09-28', due:'2026-07-23',
-   signal:'Moved to Month 3 on 28 Sep. Tied to the IPMVP engine (BA-2118).'},
-  {key:'BA-2387', proj:'dayone', summary:'[DayOne-NTPE][1.2] Chiller Plant Modelling + Cooling system topology mapping', status:'inprogress', assignee:'Valdy Lionel Christian', created:'2026-07-21', updated:'2026-09-10', due:null,
-   signal:'Chiller plant modelled as four systems (A–D). CRAH-to-hall mapping inferred from naming, still to validate against site drawings.'},
-  {key:'BA-2447', proj:'dayone', summary:'[DayOne-NTPE][2.1] Discretised data hall simulation model', status:'inprogress', assignee:'Xu Mingchen', created:'2026-08-25', updated:'2026-09-02', due:null,
-   signal:'Per-hall model (E-GA first) at row/rack level, beyond what dctwin resolves. Dummy simulation ran 25 Aug.'},
-
-  {key:'BA-1864', proj:'bdc', summary:'[P2-01] BDC data integration', status:'inprogress', assignee:'Xu Mingchen', created:'2026-03-09', updated:'2026-10-12', due:'2026-09-10',
-   signal:'9 Oct: client asked for the platform, so build it first and wait for data. Missing ~30 CRAH points and all IT load. E+ model complete but uncalibrated; AI policy pre-trained; ingestion mappings deployed.'},
-  {key:'BA-1774', proj:'bdc', summary:'[P0-03] [BDC-MY02] Cookbook', status:'todo', assignee:'Valdy Lionel Christian', created:'2026-01-30', updated:'2026-09-25', due:null,
-   signal:'Not started.'},
-  {key:'BA-2554', proj:'bdc', inQuery:false, summary:'[BDC-MY2] Master Ticket', type:'epic', status:'backlog', assignee:'—', created:'2026-09-25', updated:'2026-09-28', due:null,
-   signal:'Phase 1 done (10 tickets). Phase 2 data integration in progress; ingestion layer not built yet; a new engineer is joining.'},
-
-  {key:'BA-1098', proj:'bdx', summary:'[BDX-SIN1] Integrate new points', status:'blocked', assignee:'Lin Liangtao', created:'2025-07-14', updated:'2026-09-14', due:null,
-   signal:'Open since Jul 2025. Jan 2026: "escalate to upper management if still stalled". 72 existing points return data (3 Jun); new points, remote access and VPN bandwidth still open. No maintenance contract with BDx-SIN1.'},
-  {key:'BA-1897', proj:'bdx', summary:'[BDX-SIN1] Result analysis', status:'review', assignee:'Xu Mingchen', created:'2026-03-18', updated:'2026-09-14', due:null,
-   signal:'Mar: AI and baseline looked equal because the baseline setpoint was hard-coded at 14 °C. Scripts updated.'},
-  {key:'BA-2027', proj:'bdx', summary:'[BDX-SIN1] Test new data points', status:'inprogress', assignee:'Valdy Lionel Christian', created:'2026-05-04', updated:'2026-09-28', due:null,
-   signal:'50 of 60 new points OK, 10 return no value. Broken-point list exported to Sherry for an online review meeting.'},
-  {key:'BA-2429', proj:'bdx', summary:'[BDX-SIN1] Update the Chiller Plant & E+ model', status:'review', assignee:'Xu Mingchen', created:'2026-08-17', updated:'2026-09-14', due:'2026-09-11',
-   signal:'Scenario and cookbook updated (L7 roof loop, chiller swap). E+ model with Dr. Xu for check.'},
-  {key:'BA-2498', proj:'bdx', summary:'[BDX-SIN1] Local Deployment', status:'review', assignee:'Lin Liangtao', created:'2026-09-14', updated:'2026-10-05', due:null,
-   signal:'Deployed to GCP VM; InfluxDB and cookbook tested. Pending check with Dr. Xu.'},
-  {key:'BA-2499', proj:'bdx', inQuery:false, summary:'[BDX-SIN1] Master Ticket', type:'epic', status:'backlog', assignee:'—', created:'2026-09-14', updated:'2026-09-28', due:null,
-   signal:'28 Sep: E+ model updated; the data dependency that blocked progress is cleared. Data-problem list to go to Liangtao and BDx.'},
-
-  {key:'BA-1885', proj:'cmide', summary:'[CMI-DE1] Prepare deployment — data, frontend & AI integration', status:'review', assignee:'Xu Mingchen', created:'2026-03-16', updated:'2026-06-17', due:'2026-04-24',
-   signal:'17 Apr: AI engine integration ~80%; baseline and recommendation run without mocks. No update since June.'},
-  {key:'BA-2010', proj:'cmide', summary:'[CMI-G] Review and help task implementation', status:'blocked', assignee:'Ng Jia Hua', created:'2026-04-20', updated:'2026-07-12', due:null,
-   signal:'Platform layer deployed 5 May; application layer on hold because client data points have degraded since March. Handover note 12 Jul; patched code not yet merged into dcwiz-task-library.'},
-  {key:'BA-2034', proj:'cmide', summary:'CMI-DE deployment & monitoring/calibration', status:'inprogress', assignee:'Xu Mingchen', created:'2026-05-05', updated:'2026-08-03', due:null,
-   signal:'Jun–Aug: chiller and IT power readings flat; client still fixing data. Last note: "to review the data again".'},
-
-  {key:'BA-2566', proj:'cmisg', summary:'[CMI-SG] Chiller Leak Analysis', status:'inprogress', assignee:'Valdy Lionel Christian', created:'2026-09-28', updated:'2026-10-01', due:null,
-   signal:'CH-1 water-side COP 1.836 / 1.838 / 1.829 (Jul / Aug / Sep): no leak detectable; an early leak is not ruled out. Report handed to Mingchen for 2 Oct.'},
-  {key:'BA-2567', proj:'cmisg', summary:'[CMI-SG] Report Creation', status:'inprogress', assignee:'Xu Mingchen', created:'2026-09-28', updated:'2026-09-28', due:null,
-   signal:'Outline: savings on DH-3-01 and DH-3-03, overall chiller savings, CH02 leak status, CH01 recovery.'},
-
-  {key:'BA-2572', proj:'imdc', summary:'Q3 Report', status:'inprogress', assignee:'Xu Mingchen', created:'2026-10-05', updated:'2026-10-05', due:null,
-   signal:'Created 5 Oct. No description yet.'},
-  {key:'BA-1857', proj:'imdc', summary:'[IMDC] Upgrade project deployment (frontend integration)', status:'todo', priority:'High', assignee:'Valdy Lionel Christian', created:'2026-03-06', updated:'2026-05-22', due:null,
-   signal:'Waiting on the data-integration upgrade (BA-1846). Untouched since May.'},
-];
-const PF_TK = {}; PF_TICKETS.forEach(t=>{ PF_TK[t.key] = t; });
-const PF_Q = PF_TICKETS.filter(t=>t.inQuery!==false);   // exactly the JQL result set
+const PF_TICKETS = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
+const PF_TEXT = {};   // portfolio-wide narrative, only sent to roles that see every project
+const PF_TK = {};
+const PF_Q = [];   // exactly the JQL result set
+/* Portfolio data lives in the agent, not in this file, so a role only ever receives its own
+   projects. Called once after sign-in. */
+function pfLoad(data){
+  const fill = (arr, rows) => { arr.length = 0; (rows||[]).forEach(r=>arr.push(r)); };
+  fill(PF_TICKETS, data.tickets); fill(PF_PROJECTS, data.projects); fill(PF_ASKS, data.asks); fill(PF_EVENTS_EXTRA, data.events);
+  Object.keys(PF_TK).forEach(k=>delete PF_TK[k]); PF_TICKETS.forEach(t=>{ PF_TK[t.key] = t; });
+  fill(PF_Q, PF_TICKETS.filter(t=>t.inQuery!==false));
+  Object.keys(PF_TEXT).forEach(k=>delete PF_TEXT[k]); Object.assign(PF_TEXT, data.text || {});
+}
 
 /* Lifecycle stages every RDA deployment passes through, left to right. */
 const PF_STAGES = [
@@ -3816,174 +3787,10 @@ const PF_HEALTH = {
   green:{en:'On track', zh:'正常',   badge:'green',  rank:2},
 };
 
-const PF_PROJECTS = [
-  { id:'dayone', name:'DayOne NTP-E', client:{en:'DayOne · Johor, MY', zh:'DayOne · 马来西亚柔佛'}, kind:'delivery', health:'amber', gate:'client', drill:true,
-    phase:{en:'Month 3 of 9 · AI optimisation training', zh:'第 3/9 月 · AI 优化训练'},
-    headline:{en:'Twin is calibrated for hall GA only. GB, GC and GD data are still incomplete, so Month 3 is running behind plan.',
-              zh:'数字孪生仅完成 GA 机房标定,GB/GC/GD 数据仍不完整,第 3 月进度落后于计划。'},
-    owners:'Xu Mingchen · Valdy · Sherry',
-    tickets:['BA-2380','BA-2384','BA-2386','BA-2387','BA-2447'],
-    stages:{
-      data:  {s:'risk',    en:'GA complete; GB/GC/GD partial; live BMS at 1 of 14 halls', zh:'GA 完成;GB/GC/GD 部分到位;实时 BMS 仅 1/14 个机房', src:['BA-2380','BA-2384']},
-      model: {s:'wip',     en:'GA calibrated; per-hall rack-level model in build', zh:'GA 已标定;机房级(机柜粒度)模型构建中', src:['BA-2386','BA-2447','BA-2387']},
-      ai:    {s:'wip',     en:'Single-zone RL agreed as default; IPMVP gate before savings claims', zh:'已确定单区 RL 为默认版本;节能结论须先过 IPMVP 验证', src:['MTG','BA-2380']},
-      deploy:{s:'todo',    en:'Control-parameter scope to confirm on site', zh:'控制参数范围待现场确认', src:['MTG']},
-      ops:   {s:'todo',    en:'—', zh:'—', src:[]},
-    },
-    risks:[
-      {en:'GB is missing exports and has 2 sensors with wrong start dates; only half of GC/GD has arrived.', zh:'GB 缺少导出数据且有 2 个传感器起始日期错误;GC/GD 仅到位一半。', src:['BA-2380']},
-      {en:'Live BMS connectivity covers 1 of 14 data halls.', zh:'实时 BMS 连接仅覆盖 14 个机房中的 1 个。', src:['BA-2384']},
-      {en:'ECU status data reports repair state instead of on/off, likely a client data-entry error. Justin asked to verify.', zh:'ECU 状态数据给的是维修状态而非开关状态,疑似客户录入错误,已请 Justin 核实。', src:['MTG']},
-      {en:'Single-zone simulation shows a 6 °C deviation; root cause due within 1–2 days of 12 Oct.', zh:'单区仿真出现 6°C 偏差,10 月 12 日起 1–2 天内给出原因。', src:['MTG']},
-      {en:'Calibration ticket is 83 days past its 23 Jul due date.', zh:'标定任务已超过 7 月 23 日截止日 83 天。', src:['BA-2386']},
-    ],
-    next:[
-      {date:'2026-10-23', en:'Face-to-face with Zach (content pre-brief 19 Oct)', zh:'与 Zach 面对面会议(10 月 19 日预演内容)', src:['MTG']},
-      {date:'2026-10-28', tentative:true, en:'JB site visit: confirm controllable equipment and ranges', zh:'JB 现场考察:确认可控设备与参数范围', src:['MTG']},
-    ]},
-
-  { id:'bdc', name:'BDC MY2', client:{en:'Bridge Data Centres · Malaysia', zh:'Bridge Data Centres · 马来西亚'}, kind:'delivery', health:'amber', gate:'client',
-    phase:{en:'Phase 2 · Platform build ahead of data', zh:'第 2 阶段 · 先建平台、后补数据'},
-    headline:{en:'Committed to show the full platform by 31 Oct, but ~30 CRAH points and all IT load are still missing, so recommendations will come from a pre-trained policy.',
-              zh:'已承诺 10 月 31 日前交付完整平台,但仍缺约 30 个 CRAH 点位及全部 IT 负载数据,控制建议只能基于预训练策略。'},
-    owners:'Xu Mingchen · Valdy',
-    tickets:['BA-1864','BA-1774','BA-2554'],
-    stages:{
-      data:  {s:'blocked', en:'Chiller side mostly in; ~30 CRAH and all IT load missing', zh:'冷站侧基本到位;约 30 个 CRAH 及全部 IT 负载缺失', src:['BA-1864','MTG']},
-      model: {s:'risk',    en:'E+ model complete, uncalibrated until data lands', zh:'E+ 模型已完成,数据到位前无法标定', src:['BA-1864']},
-      ai:    {s:'risk',    en:'Policy pre-trained to prove the pipeline, not savings', zh:'策略已预训练,用于证明链路可用,不代表节能效果', src:['BA-1864']},
-      deploy:{s:'wip',     en:'Mappings, E+ and AI deployed; app and live ingestion due 31 Oct', zh:'映射、E+、AI 已部署;应用与实时接入 10 月 31 日交付', src:['BA-1864','MTG']},
-      ops:   {s:'todo',    en:'—', zh:'—', src:[]},
-    },
-    risks:[
-      {en:'Only 10–30% of total data points are usable; no IT load at all.', zh:'可用数据点仅占总量 10–30%,IT 负载完全缺失。', src:['MTG','BA-1864']},
-      {en:'Data-integration ticket is 34 days past its 10 Sep due date.', zh:'数据集成任务已超过 9 月 10 日截止日 34 天。', src:['BA-1864']},
-      {en:'Delivery lead hands over after 31 Oct; a new engineer is joining ingestion.', zh:'交付负责人 10 月 31 日后交接,新工程师加入数据接入。', src:['MTG','BA-2554']},
-      {en:'Without a written data-gap notice, a demo on missing data invites a dispute about what was delivered.', zh:'若无书面数据缺口通知,基于缺失数据的演示容易引发交付争议。', src:['MTG']},
-    ],
-    next:[
-      {date:'2026-10-16', en:'Send missing-data list and formal data-gap email (call first)', zh:'发送缺失数据清单与正式数据缺口邮件(先电话沟通)', src:['MTG']},
-      {date:'2026-10-31', en:'Full platform walkthrough: 3D data hall, preliminary control recommendations', zh:'完整平台演示:3D 机房视图、初步控制建议', src:['MTG','BA-1864']},
-    ]},
-
-  { id:'bdx', name:'BDx SIN1', client:{en:'BDx · Singapore (chiller plant)', zh:'BDx · 新加坡(冷站)'}, kind:'delivery', health:'red', gate:'client',
-    phase:{en:'Digital-twin migration · local deployment in review', zh:'数字孪生迁移 · 本地部署审查中'},
-    headline:{en:'Model and local deployment are ready, but the data-point ticket opened in July 2025 is still blocked and the client contact has gone quiet while on leave.',
-              zh:'模型与本地部署已就绪,但 2025 年 7 月开的数据点工单至今仍为阻塞,客户对接人休假期间失联。'},
-    owners:'Lin Liangtao · Valdy · Xu Mingchen',
-    tickets:['BA-1098','BA-2027','BA-2429','BA-2498','BA-1897','BA-2499'],
-    stages:{
-      data:  {s:'blocked', en:'10 of 60 new points empty; abnormal points awaiting client review', zh:'60 个新点位中 10 个无值;异常点位待客户核对', src:['BA-2027','BA-1098','MTG']},
-      model: {s:'done',    en:'Chiller plant and E+ model updated', zh:'冷站与 E+ 模型已更新', src:['BA-2429','BA-2499']},
-      ai:    {s:'risk',    en:'Result analysis in review since March', zh:'结果分析自 3 月起处于审查中', src:['BA-1897']},
-      deploy:{s:'wip',     en:'On GCP VM; InfluxDB and cookbook tested; awaiting Dr. Xu', zh:'已部署至 GCP VM;InfluxDB 与 cookbook 已测;待 Dr. Xu 确认', src:['BA-2498']},
-      ops:   {s:'na',      en:'Legacy system on site; no maintenance contract', zh:'现场旧系统运行中;无维保合同', src:['BA-1098']},
-    },
-    risks:[
-      {en:'The data-point ticket has been open 15 months and is Blocked. Escalation to management was already flagged in January.', zh:'数据点工单已开 15 个月且为阻塞状态,1 月已提出需向管理层升级。', src:['BA-1098']},
-      {en:'Client lead was on leave without notice; WhatsApp sent 12 Oct, call if no reply.', zh:'客户负责人未告知即休假;10 月 12 日已发 WhatsApp,无回复则电话联系。', src:['MTG']},
-      {en:'There is no maintenance contract, so support beyond scope has to be quoted.', zh:'无维保合同,超出范围的支持需另行报价。', src:['BA-1098']},
-      {en:'Model update ticket is 33 days past its 11 Sep due date (in review).', zh:'模型更新任务已超过 9 月 11 日截止日 33 天(审查中)。', src:['BA-2429']},
-    ],
-    next:[
-      {date:'2026-10-16', en:'Book data-review meeting with the BDx 360 team', zh:'与 BDx 360 团队约数据核对会议', src:['MTG']},
-      {date:null, en:'Dr. Xu sign-off on the GCP deployment', zh:'Dr. Xu 确认 GCP 部署', src:['BA-2498']},
-    ]},
-
-  { id:'cmide', name:'CMI-DE1', client:{en:'CMI · Germany', zh:'CMI · 德国'}, kind:'delivery', health:'red', gate:'client',
-    phase:{en:'Deployment on hold · waiting for client data', zh:'部署暂停 · 等待客户数据'},
-    headline:{en:'Platform layer went live on 5 May. The application layer has been on hold for 162 days because only about 20% of client data is accurate.',
-              zh:'平台层已于 5 月 5 日上线,但仅约 20% 的客户数据准确,应用层已暂停 162 天。'},
-    owners:'Xu Mingchen · Ng Jia Hua (handed over)',
-    tickets:['BA-1885','BA-2010','BA-2034'],
-    stages:{
-      data:  {s:'blocked', en:'~20% accurate; points degrading since March', zh:'准确率约 20%;点位自 3 月起持续劣化', src:['MTG','BA-2010']},
-      model: {s:'done',    en:'Physical models integrated', zh:'物理模型已集成', src:['BA-1885']},
-      ai:    {s:'done',    en:'Baseline, recommendation and partial deployment work end to end', zh:'基线、推荐、局部部署流程已跑通', src:['BA-2010','BA-1885']},
-      deploy:{s:'blocked', en:'Platform live 5 May; application layer on hold', zh:'平台层 5 月 5 日上线;应用层暂停', src:['BA-2010','BA-2034']},
-      ops:   {s:'todo',    en:'—', zh:'—', src:[]},
-    },
-    risks:[
-      {en:'About 20% of received data is accurate, with widespread gaps and connection issues.', zh:'收到的数据仅约 20% 准确,大面积缺失且存在连接问题。', src:['MTG']},
-      {en:'The team has stopped internal data checks, so progress now depends entirely on the client.', zh:'团队已停止内部数据核查,进展完全取决于客户。', src:['MTG']},
-      {en:'Deployment ticket is 173 days past its 24 Apr due date, with no update since June.', zh:'部署任务已超过 4 月 24 日截止日 173 天,6 月后无更新。', src:['BA-1885']},
-      {en:'Patched code is not yet merged into dcwiz-task-library; the original engineer has handed over.', zh:'临时补丁代码尚未合入 dcwiz-task-library;原负责工程师已交接。', src:['BA-2010']},
-    ],
-    next:[
-      {date:'2026-10-16', en:'Meeting with CMI Germany to push their data integration', zh:'与 CMI 德国开会,推动其完成数据集成', src:['MTG']},
-    ]},
-
-  { id:'cmisg', name:'CMI-SG', client:{en:'CMI · Singapore', zh:'CMI · 新加坡'}, kind:'ops', health:'green', gate:'none',
-    phase:{en:'In operation · reporting and renewal', zh:'运营中 · 报告与续约'},
-    headline:{en:'Chiller 1 leak check found nothing detectable (COP steady at 1.83–1.84). Next week’s on-site with the new client PM is the renewal moment.',
-              zh:'1 号冷机泄漏排查未发现异常(COP 稳定在 1.83–1.84)。下周与客户新任 PM 的现场会议是续约窗口。'},
-    owners:'Valdy · Xu Mingchen',
-    tickets:['BA-2566','BA-2567'],
-    stages:{
-      data:  {s:'done', en:'Live', zh:'已接入', src:[]},
-      model: {s:'done', en:'Live', zh:'已上线', src:[]},
-      ai:    {s:'done', en:'Live', zh:'已上线', src:[]},
-      deploy:{s:'done', en:'Live', zh:'已上线', src:[]},
-      ops:   {s:'wip',  en:'Leak analysis done; report in progress; quote next week', zh:'泄漏分析完成;报告编写中;下周报价', src:['BA-2566','BA-2567','MTG']},
-    },
-    risks:[
-      {en:'Report was due 2 Oct and is still in progress.', zh:'报告原定 10 月 2 日完成,目前仍在编写。', src:['BA-2566','BA-2567']},
-      {en:'Client PM changed: Wayne resigned and Yang Shuo takes over, so the relationship restarts.', zh:'客户 PM 更换:Wayne 离职,由 Yang Shuo 接任,关系需重新建立。', src:['MTG']},
-      {en:'Current data cannot rule out an early-stage leak on CH-1.', zh:'现有数据无法排除 CH-1 早期泄漏。', src:['BA-2566']},
-    ],
-    next:[
-      {date:'2026-10-22', tentative:true, en:'On-site with Terry and Yang Shuo: last report, new-feature demo, next year’s maintenance quote', zh:'与 Terry、Yang Shuo 现场会议:上期报告、新功能演示、明年维保报价', src:['MTG']},
-    ]},
-
-  { id:'imdc', name:'Iron Mountain SIN1', client:{en:'Iron Mountain · Singapore', zh:'Iron Mountain · 新加坡'}, kind:'ops', health:'green', gate:'none',
-    phase:{en:'In operation · quarterly reporting', zh:'运营中 · 季度报告'},
-    headline:{en:'Q3 report is in progress. The frontend upgrade has not moved since May and is waiting on the data-integration upgrade.',
-              zh:'Q3 报告编写中。前端升级自 5 月起未推进,等待数据集成升级完成。'},
-    owners:'Xu Mingchen · Valdy',
-    tickets:['BA-2572','BA-1857'],
-    stages:{
-      data:  {s:'done', en:'Live', zh:'已接入', src:[]},
-      model: {s:'done', en:'Live', zh:'已上线', src:[]},
-      ai:    {s:'done', en:'Live', zh:'已上线', src:[]},
-      deploy:{s:'risk', en:'Upgrade to the latest release not started (High priority)', zh:'升级到最新版本尚未开始(高优先级)', src:['BA-1857']},
-      ops:   {s:'wip',  en:'Q3 report in progress', zh:'Q3 报告编写中', src:['BA-2572']},
-    },
-    risks:[
-      {en:'Frontend upgrade (High) untouched for 145 days, waiting on BA-1846.', zh:'前端升级(高优先级)已 145 天无更新,等待 BA-1846。', src:['BA-1857']},
-      {en:'The quarterly report depends on one person; Yu Hui is shadowing, with no handover yet.', zh:'季度报告依赖单人;Yu Hui 跟学中,尚未交接。', src:['MTG','BA-2572']},
-    ],
-    next:[
-      {date:null, en:'Deliver the Q3 report (no due date in Jira)', zh:'交付 Q3 报告(Jira 中无截止日期)', src:['BA-2572']},
-    ]},
-];
+const PF_PROJECTS = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
 
 /* Decisions that need someone above the project. Facts are sourced; the action is the PM's recommendation. */
-const PF_ASKS = [
-  {proj:'cmide', kind:'escalate', src:['MTG','BA-2010','BA-1885'],
-   t:{en:'CMI-DE1 has been stalled by client data for 5 months', zh:'CMI-DE1 因客户数据停滞已 5 个月'},
-   w:{en:'Platform is live and the AI workflow works end to end; only ~20% of their data is accurate.', zh:'平台已上线、AI 流程已跑通,但对方数据仅约 20% 准确。'},
-   a:{en:'Agree a data-readiness deadline at this week’s meeting, and decide internally what follows if it is missed (pause, re-scope or re-price).', zh:'在本周会议上约定数据就绪截止日,并在内部决定逾期后的处理(暂停、调整范围或重新定价)。'}},
-  {proj:'bdx', kind:'escalate', src:['BA-1098','BA-2027','MTG'],
-   t:{en:'BDx SIN1 needs sponsor-level contact', zh:'BDx SIN1 需要高层对接'},
-   w:{en:'The data-point ticket has been blocked for 15 months and the project lead is unreachable.', zh:'数据点工单阻塞 15 个月,客户项目负责人联系不上。'},
-   a:{en:'Approve outreach above the project lead and confirm the out-of-contract support boundary before more engineering time goes in.', zh:'批准越过项目负责人向上沟通,并在继续投入工程时间前明确合同外支持边界。'}},
-  {proj:'bdc', kind:'decide', src:['MTG','BA-1864'],
-   t:{en:'Sign off the BDC data-gap notice before 31 Oct', zh:'在 10 月 31 日前签发 BDC 数据缺口通知'},
-   w:{en:'We will demo a complete platform running on 10–30% of the data.', zh:'我们将用 10–30% 的数据演示完整平台。'},
-   a:{en:'Call first, then send a formal email listing the missing points, so delivery with data gaps is on record.', zh:'先电话沟通,再正式邮件列出缺失点位,把带数据缺口交付记录在案。'}},
-  {proj:'team', kind:'decide', src:['MTG'], srcTickets:'xu',
-   t:{en:'Reduce key-person dependency on Xu Mingchen', zh:'降低对 Xu Mingchen 的单点依赖'},
-   w:{en:'He holds 10 of 19 open tickets across all six projects, and the BDC lead hands over after 31 Oct.', zh:'他承担 19 个在途工单中的 10 个,覆盖全部 6 个项目;BDC 负责人 10 月 31 日后交接。'},
-   a:{en:'Name a backup for CMI-SG and Iron Mountain reporting now; Yu Hui is shadowing but cannot take it over yet.', zh:'现在就为 CMI-SG 与 Iron Mountain 报告指定备份;Yu Hui 正在跟学,尚不能接手。'}},
-  {proj:'dayone', kind:'align', src:['MTG','BA-2380'],
-   t:{en:'Agree the message for Zach on 23 Oct', zh:'对齐 10 月 23 日与 Zach 的沟通口径'},
-   w:{en:'Single-zone AI is the default path; multi-zone is still in development and IPMVP validation comes before any savings claim.', zh:'单区 AI 为默认路径;多区仍在开发,任何节能结论须先通过 IPMVP 验证。'},
-   a:{en:'Present multi-zone as the planned upgrade and avoid committing a savings date at this meeting.', zh:'将多区定位为后续升级版本,本次会议不承诺节能结论时间。'}},
-  {proj:'cmisg', kind:'opportunity', src:['MTG'],
-   t:{en:'Approve next year’s CMI-SG maintenance quote', zh:'审批 CMI-SG 明年维保报价'},
-   w:{en:'The quote goes out at the on-site meeting with the new client PM, tentatively 22 Oct.', zh:'报价将在与客户新任 PM 的现场会议上发出,暂定 10 月 22 日。'},
-   a:{en:'Price it before the visit and pair it with the leak-check result as evidence of value.', zh:'在会前定价,并以泄漏排查结论作为价值佐证。'}},
-];
+const PF_ASKS = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
 const PF_ASK_KIND = {
   escalate:   {en:'Escalate',    zh:'升级',   badge:'red'},
   decide:     {en:'Decide',      zh:'决策',   badge:'orange'},
@@ -3992,11 +3799,7 @@ const PF_ASK_KIND = {
 };
 
 /* Dated commitments from the 12 Oct sync and Jira. 'This week' items are pinned to Fri 16 Oct. */
-const PF_EVENTS_EXTRA = [
-  {date:'2026-10-19', proj:'internal', en:'Workshop slide draft due', zh:'Workshop 幻灯片初稿截止', src:['MTG']},
-  {date:'2026-10-20', proj:'internal', en:'Capella digital-team demo, 2:30 pm (online)', zh:'Capella 数字化团队演示,下午 2:30(线上)', src:['MTG']},
-  {date:'2026-10-21', proj:'dayone', en:'Single-zone AI training work targeted', zh:'单区 AI 训练工作目标完成日', src:['MTG']},
-];
+const PF_EVENTS_EXTRA = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
 
 /* ---------- helpers ---------- */
 const L = o => (o == null) ? '' : (typeof o === 'string' ? o : ((LANG==='zh' && o.zh) ? o.zh : o.en));
@@ -4049,7 +3852,7 @@ function pfMetrics(){
 
 /* ---------- render ---------- */
 function renderPortfolio(){
-  if(!document.getElementById('pfKpis')) return;
+  if(!document.getElementById('pfKpis') || !PF_PROJECTS.length || !PF_Q.length) return;
   const m = pfMetrics();
   const top = m.owners[0];
 
@@ -4088,10 +3891,8 @@ function renderPortfolio(){
         T(`${m.stale60.length} tickets untouched for 60+ days`, `${m.stale60.length} 个工单超过 60 天未更新`), m.fresh.map(t=>t.key).concat(m.stale60.map(t=>t.key))),
   ].join('');
 
-  const briefBanner = document.getElementById('pfBrief').closest('.banner'); if(briefBanner) briefBanner.hidden = PF_SCOPED;
-  document.getElementById('pfBrief').textContent = T(
-    `${m.gated.length} of ${m.delivery.length} delivery projects are waiting on client data, not on RDA engineering: models, AI and deployments are being built ahead of the data. Two need leadership now. CMI-DE1 has been on hold for five months with about 20% usable data, and BDx SIN1's data-point ticket has been blocked for 15 months. The next ten days hold two client moments, the CMI-SG renewal visit (around 22 Oct) and DayOne's meeting with Zach (23 Oct), plus one hard date: the BDC platform delivery on 31 Oct. ${top.name} carries ${top.n} of ${m.total} open tickets across all ${top.projects} projects.`,
-    `${m.delivery.length} 个交付项目中有 ${m.gated.length} 个在等客户数据,而不是卡在 RDA 工程上:模型、AI 和部署都在数据之前先行搭建。两个项目现在就需要管理层介入:CMI-DE1 因可用数据仅约 20% 已暂停五个月;BDx SIN1 的数据点工单已阻塞 15 个月。未来十天有两个客户关键节点(CMI-SG 续约现场会约 10 月 22 日、DayOne 与 Zach 会面 10 月 23 日),以及一个硬性日期:BDC 平台 10 月 31 日交付。${top.name} 一人承担 ${m.total} 个在途工单中的 ${top.n} 个,覆盖全部 ${top.projects} 个项目。`);
+  const briefBanner = document.getElementById('pfBrief').closest('.banner'); if(briefBanner) briefBanner.hidden = !PF_TEXT.brief;
+  document.getElementById('pfBrief').textContent = L(PF_TEXT.brief);
 
   /* project cards */
   const sorted = PF_PROJECTS.slice().sort((a,b)=>PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
@@ -4204,9 +4005,7 @@ function renderPortfolio(){
     m.buckets.map(b=>`<div class="hbar-row" data-src="${srcAttr(b.keys)}">
        <span class="nm">${esc(L(b))}</span><div class="hbar cy"><i style="width:${maxB? b.keys.length/maxB*100:0}%"></i></div>
        <span class="v"><b>${b.keys.length}</b> ${T('tickets','个')}</span></div>`).join('') +
-    `<div class="pf-note">${T(
-      `<b>Jira trails the weekly meeting.</b> ${mtgOnly} of ${PF_PROJECTS.length} projects have material updates in the 12 Oct sync (the CMI-DE1 accuracy figure, BDC's 31 Oct commitment, the CMI-SG renewal) that are not in Jira. Approving them through Meetings keeps this page honest.`,
-      `<b>Jira 落后于周会。</b>${PF_PROJECTS.length} 个项目中有 ${mtgOnly} 个在 10 月 12 日周会上有重要更新(CMI-DE1 数据准确率、BDC 10 月 31 日承诺、CMI-SG 续约)尚未写入 Jira。通过「会议」页审批后回写,才能让本页保持准确。`)}</div>`;
+    (PF_TEXT.freshness ? `<div class="pf-note">${L(PF_TEXT.freshness)}</div>` : '');
 }
 
 /* ---------- source tooltip ---------- */
@@ -4658,6 +4457,7 @@ function renderUserChip(){
   const av = document.getElementById('railAvatar'); if(av){ av.textContent = initials; av.title = `${u.displayName} · ${T('Sign out','退出')}`; }
   const chip = document.getElementById('userChip');
   if(chip) chip.innerHTML = `<span class="uc-name">${esc(u.displayName)}</span><span class="uc-role">${esc((u.perms.roles||[]).join(', ')||T('No role','无角色'))}</span>
+    <button class="btn-withdraw" onclick="uaSelfPassword()">${T('Password','密码')}</button>
     <button class="btn-withdraw" onclick="authSignOut()">${T('Sign out','退出')}</button>`;
   const live = document.getElementById('whoLive'); if(live) live.textContent = T(`Signed in as ${u.displayName}`, `已登录:${u.displayName}`);
 }
@@ -4676,7 +4476,7 @@ async function authLogin(ev){
   const btn = document.getElementById('agBtn'); btn.disabled = true;
   try{
     const r = await pmcApi('POST','/api/login', {username:document.getElementById('agUser').value, password:document.getElementById('agPass').value});
-    PMC.token = r.token; PMC.me = r.user;
+    PMC.token = r.token; PMC.me = r.user; _pwCurrent = document.getElementById('agPass').value;
     try{ localStorage.setItem('dc_pmc_url', PMC.url); localStorage.setItem('dc_pmc_token', PMC.token); }catch(e){}
     document.getElementById('agPass').value = '';
     onSignedIn();
@@ -4685,7 +4485,9 @@ async function authLogin(ev){
   }
   btn.disabled = false;
 }
-function onSignedIn(){
+async function onSignedIn(){
+  if(PMC.me.mustChangePassword) return showPwChange();
+  try{ pfLoad(await pmcApi('GET','/api/portfolio')); }catch(e){ showToast(T('Could not load the portfolio','无法加载项目组合'), e.message); }
   AUTH_READY = true;
   applyProjectScope(PMC.me.perms);
   applyPagePerms();
@@ -4698,6 +4500,26 @@ function onSignedIn(){
   const cur = activePageId();
   goPage(pageAllowed(cur) ? cur : first);
   pmcRefresh();
+}
+let _pwCurrent = '';
+function showPwChange(){
+  showGate();
+  document.getElementById('agPwBox').hidden = false;
+  ['agUser','agPass','agBtn'].forEach(id=>{ const el = document.getElementById(id); (el.closest('label')||el).hidden = true; });
+  setTimeout(()=>document.getElementById('agNew1').focus(), 50);
+}
+async function authChangePassword(){
+  const a = document.getElementById('agNew1').value, b = document.getElementById('agNew2').value;
+  const e = document.getElementById('agErr');
+  if(a !== b){ e.textContent = T('The two passwords do not match.','两次输入的密码不一致。'); e.hidden = false; return; }
+  try{
+    const r = await pmcApi('POST','/api/me/password', {current:_pwCurrent, password:a});
+    PMC.token = r.token; PMC.me = r.user; _pwCurrent = '';
+    try{ localStorage.setItem('dc_pmc_token', PMC.token); }catch(x){}
+    document.getElementById('agPwBox').hidden = true; e.hidden = true;
+    ['agUser','agPass','agBtn'].forEach(id=>{ const el = document.getElementById(id); (el.closest('label')||el).hidden = false; });
+    onSignedIn();
+  }catch(x){ e.textContent = x.message; e.hidden = false; }
 }
 async function authSignOut(expired){
   if(!expired){ try{ await pmcApi('POST','/api/logout'); }catch(e){} }
@@ -4712,6 +4534,21 @@ async function authBoot(){
     if(e.status===401){ try{ localStorage.removeItem('dc_pmc_token'); }catch(x){} PMC.token=''; return showGate(T('Your session has ended. Please sign in again.','登录已过期,请重新登录。')); }
     showGate(T(`Cannot reach the agent at ${PMC.url}.`, `无法连接 ${PMC.url}。`));
   }
+}
+
+/* Change your own password: the current one is asked for in the page, never via prompt(). */
+function uaSelfPassword(){
+  const chip = document.getElementById('userChip');
+  chip.innerHTML = `<input type="password" id="spCur" placeholder="${T('Current password','当前密码')}" class="sp-in"><input type="password" id="spNew" placeholder="${T('New password (8+)','新密码(8 位以上)')}" class="sp-in">
+    <button class="btn-primary" onclick="uaSelfPasswordSave()">${T('Save','保存')}</button><button class="btn-withdraw" onclick="renderUserChip()">${T('Cancel','取消')}</button>`;
+  document.getElementById('spCur').focus();
+}
+async function uaSelfPasswordSave(){
+  try{
+    const r = await pmcApi('POST','/api/me/password', {current:document.getElementById('spCur').value, password:document.getElementById('spNew').value});
+    PMC.token = r.token; try{ localStorage.setItem('dc_pmc_token', PMC.token); }catch(x){}
+    showToast(T('Password changed','密码已修改'), T('Other sessions were signed out.','其他会话已退出。')); renderUserChip();
+  }catch(e){ showToast(T('Could not change password','无法修改密码'), e.message); }
 }
 
 /* ---------- Users & Roles page ---------- */
