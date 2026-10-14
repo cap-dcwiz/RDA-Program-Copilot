@@ -516,8 +516,8 @@ button.project-select{font-family:inherit;}
 .pm-item.active .pm-go{color:var(--purple);}
 .pm-group{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);padding:8px 10px 4px;}
 .pm-sep{height:1px;background:var(--border);margin:6px 4px;}
-.tabs.mode-all{display:none;}
-.tabs .tab[data-page="portfolio"]{display:none;}
+.tabs.mode-all .tab[data-scope="project"],.tabs:not(.mode-all) .tab[data-scope="all"]{display:none;}
+.tab-count{margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;}
 .stats.n6{grid-template-columns:repeat(6,1fr);}
 .stat-card[data-src]{cursor:help;}
 .pf-asof{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--text-dimmer);}
@@ -656,6 +656,68 @@ button.project-select{font-family:inherit;}
 .dr-tk .st-l2 .badge{padding:1px 7px;font-size:9.5px;}
 .dr-tk .st-sig{font-size:11.5px;color:var(--text-dim);line-height:1.55;margin-top:6px;}
 
+
+/* ===== PM Copilot: Meeting To-dos + History ===== */
+.pmc-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:16px;border-radius:12px;
+  background:var(--panel3);border:1px solid var(--border);font-size:12.5px;color:var(--text-dim);}
+.pmc-bar .who{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:700;}
+.pmc-bar .sp{flex:1;}
+.pmc-bar .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg);}
+.pmc-bar .off-dot{width:7px;height:7px;border-radius:50%;background:var(--gray);}
+.pmc-bar input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12.5px;font-family:inherit;min-width:0;}
+.pmc-bar input#pmcUrl{width:240px;} .pmc-bar input#pmcToken{width:260px;}
+.pmc-connect{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.pmc-empty{padding:28px 24px;text-align:left;}
+.pmc-empty h3{margin:0 0 6px;font-size:15px;} .pmc-empty p{margin:0 0 10px;font-size:12.5px;color:var(--text-dim);line-height:1.6;max-width:70ch;}
+.pmc-empty ol{margin:0;padding-left:18px;font-size:12.5px;color:var(--text-dim);line-height:1.8;}
+.pmc-empty code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--text);}
+.pmc-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.pmc-group{margin-bottom:18px;}
+.pmc-group-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 8px;flex-wrap:wrap;}
+.pmc-group-h b{font-size:13.5px;} .pmc-group-h span{font-size:11.5px;color:var(--text-dimmer);}
+.pmc-group-h a{color:var(--cyan);font-size:11.5px;font-weight:700;text-decoration:none;}
+.sug{border:1px solid var(--border2);border-radius:12px;background:var(--panel3);padding:13px 16px;margin-bottom:10px;}
+.sug.approved{border-color:rgba(34,197,94,.4);} .sug.rejected{opacity:.6;}
+.sug-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.sug-kind{font-size:10.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--text-dimmer);}
+.sug-key{font-weight:800;font-size:11.5px;color:var(--cyan);text-decoration:none;cursor:help;}
+.sug-title{font-size:13.5px;font-weight:700;line-height:1.4;margin:0 0 4px;}
+.sug-detail{font-size:12.5px;color:#d6d9ee;line-height:1.6;margin:0;}
+.sug-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin-top:8px;}
+.sug-meta b{color:var(--text);font-weight:700;}
+.sug .prop-evidence{margin:8px 0 6px;}
+.sug-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.sug-actions .hint{font-size:11px;color:var(--text-dimmer);}
+.sug-actions button[disabled]{opacity:.45;cursor:not-allowed;}
+.sug-result{margin-top:10px;font-size:12px;color:var(--text-dim);background:var(--panel2);border-radius:8px;padding:8px 10px;}
+.sug-result b{color:var(--text);} .sug-result a{color:var(--cyan);font-weight:700;}
+.sug-result details summary{cursor:pointer;color:var(--text-dimmer);font-size:11px;margin-top:4px;}
+.sug-result pre{white-space:pre-wrap;word-break:break-word;font-size:10.5px;color:var(--text-dim);margin:6px 0 0;max-height:220px;overflow:auto;}
+.sug-edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.sug-edit label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:var(--text-dimmer);}
+.sug-edit label.full{grid-column:1/-1;}
+.sug-edit input,.sug-edit textarea,.pmc-form input,.pmc-form textarea,.sug-reject input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);
+  padding:7px 10px;font-size:12.5px;font-family:inherit;resize:vertical;}
+.sug-edit textarea{min-height:70px;}
+.sug-reject{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;} .sug-reject input{flex:1;min-width:200px;}
+.mh-card{border:1px solid var(--border);border-radius:12px;background:var(--panel);padding:14px 16px;margin-bottom:12px;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.mh-top b{font-size:14px;} .mh-date{font-size:11.5px;color:var(--text-dimmer);font-weight:700;font-variant-numeric:tabular-nums;}
+.mh-sub{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 8px;font-size:11.5px;color:var(--text-dimmer);}
+.mh-sub a{color:var(--cyan);font-weight:700;text-decoration:none;}
+.mh-sum{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#d6d9ee;line-height:1.55;}
+.mh-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.mh-err{font-size:12px;color:var(--red);margin-top:6px;}
+.pmc-form{display:flex;flex-direction:column;gap:8px;}
+.pmc-form textarea{min-height:140px;}
+.pmc-form .row{display:grid;grid-template-columns:1fr 150px;gap:8px;}
+.aud-row{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:12px;}
+.aud-row:last-child{border-bottom:none;}
+.aud-row .t{font-size:10.5px;color:var(--text-dimmer);font-variant-numeric:tabular-nums;grid-row:span 2;padding-top:2px;}
+.aud-row .a{color:var(--text);} .aud-row .d{color:var(--text-dim);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pmc-busy{opacity:.6;pointer-events:none;}
+@media (max-width:900px){ .sug-edit{grid-template-columns:1fr;} .pmc-bar input#pmcUrl,.pmc-bar input#pmcToken{width:100%;} }
 @media (max-width:1400px){
   .stats.n6{grid-template-columns:repeat(3,1fr);}
   .pf-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -680,6 +742,8 @@ button.project-select{font-family:inherit;}
 <div class="icon-rail">
   <div class="rail-logo">D</div>
   <div class="rail-icon active" data-page="portfolio" title="Portfolio" onclick="goPage('portfolio')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+  <div class="rail-icon" data-page="todo" title="Meeting To-dos" onclick="goPage('todo')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="rail-dot" id="railTodoDot" style="display:none"></span></div>
+  <div class="rail-icon" data-page="history" title="Meeting History" onclick="goPage('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
   <div class="rail-icon" data-page="overview" title="DayOne NTPE · Overview" onclick="goPage('overview')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
   <div class="rail-icon" data-page="blocker" title="Blocker Impact Map" onclick="goPage('blocker')"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5L15.5 10.5M8.5 16.5L15.5 13.5"/></svg></div>
   <div class="rail-icon" data-page="dependency" title="Dependency View" onclick="goPage('dependency')"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
@@ -738,13 +802,15 @@ button.project-select{font-family:inherit;}
         <div class="proj-menu" id="projMenu" role="listbox"></div>
       </div>
       <div class="tabs">
-        <button class="tab active" data-page="portfolio"><span data-i18n-en="Portfolio" data-i18n-zh="项目组合">Portfolio</span></button>
-        <button class="tab" data-page="overview"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
-        <button class="tab" data-page="blocker"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
-        <button class="tab" data-page="dependency"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
-        <button class="tab" data-page="roadmap"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
-        <button class="tab" data-page="meetings"><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span><span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
-        <button class="tab" data-page="luna"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
+        <button class="tab active" data-page="portfolio" data-scope="all"><span data-i18n-en="Portfolio" data-i18n-zh="项目组合">Portfolio</span></button>
+        <button class="tab" data-page="todo" data-scope="all"><span data-i18n-en="Meeting To-dos" data-i18n-zh="会议待办">Meeting To-dos</span><span id="pmcTodoBadge" class="tab-count" style="display:none"></span></button>
+        <button class="tab" data-page="history" data-scope="all"><span data-i18n-en="Meeting History" data-i18n-zh="会议记录">Meeting History</span></button>
+        <button class="tab" data-page="overview" data-scope="project"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
+        <button class="tab" data-page="blocker" data-scope="project"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
+        <button class="tab" data-page="dependency" data-scope="project"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
+        <button class="tab" data-page="roadmap" data-scope="project"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
+        <button class="tab" data-page="meetings" data-scope="project"><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span><span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
+        <button class="tab" data-page="luna" data-scope="project"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
       </div>
     </div>
   </div>
@@ -800,6 +866,33 @@ button.project-select{font-family:inherit;}
       <div class="panel" style="min-width:0;">
         <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span data-i18n-en="Team Load & Data Freshness" data-i18n-zh="团队负载与数据新鲜度">Team Load &amp; Data Freshness</span></div>
         <div id="pfTeam"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MEETING TO-DOS + MEETING HISTORY — served by pm-copilot-agent -->
+  <!-- ============================================================ -->
+  <div class="page" id="page-todo">
+    <div class="page-head">
+      <h1><span data-i18n-en="Meeting To-dos" data-i18n-zh="会议待办">Meeting To-dos</span></h1>
+      <p><span data-i18n-en="PM Copilot reads each meeting from Granola and drafts Jira updates. Nothing reaches Jira until an admin approves it here." data-i18n-zh="PM Copilot 从 Granola 读取每场会议并起草 Jira 更新。只有管理员在此审批后才会写入 Jira。">PM Copilot reads each meeting from Granola and drafts Jira updates. Nothing reaches Jira until an admin approves it here.</span></p>
+    </div>
+    <div class="pmc-bar" data-pmc-bar></div>
+    <div id="pmcTodo"></div>
+  </div>
+
+  <div class="page" id="page-history">
+    <div class="page-head">
+      <h1><span data-i18n-en="Meeting History" data-i18n-zh="会议记录">Meeting History</span></h1>
+      <p><span data-i18n-en="Every meeting PM Copilot has read, what it concluded, and what was approved from it." data-i18n-zh="PM Copilot 读过的每场会议、它的结论,以及从中审批了哪些事项。">Every meeting PM Copilot has read, what it concluded, and what was approved from it.</span></p>
+    </div>
+    <div class="pmc-bar" data-pmc-bar></div>
+    <div class="row2" style="grid-template-columns:1.7fr 1fr;">
+      <div id="pmcHistory" style="min-width:0;"></div>
+      <div style="min-width:0;display:flex;flex-direction:column;gap:16px;">
+        <div class="panel" id="pmcImport"></div>
+        <div class="panel" id="pmcAudit"></div>
       </div>
     </div>
   </div>
@@ -1975,14 +2068,16 @@ function goPage(id){
   if(id==='meetings') renderMeetingsPage();
   // The portfolio spans every client; the remaining tabs are the DayOne NTPE project view.
   const sel = document.getElementById('projSelLabel');
-  if(sel) sel.textContent = id==='portfolio'
+  const ALL_SCOPE = ['portfolio','todo','history'];
+  if(sel) sel.textContent = ALL_SCOPE.includes(id)
     ? (LANG==='zh' ? `全部项目(${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})` : `All projects (${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})`)
     : 'DayOne NTP-E';
   const upd = document.getElementById('updatedTime');
-  if(upd) upd.textContent = id==='portfolio' ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '') : '2026-08-21 09:15';
-  const tabsEl = document.querySelector('.tabs'); if(tabsEl) tabsEl.classList.toggle('mode-all', id==='portfolio');
+  if(upd) upd.textContent = ALL_SCOPE.includes(id) ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '') : '2026-08-21 09:15';
+  const tabsEl = document.querySelector('.tabs'); if(tabsEl) tabsEl.classList.toggle('mode-all', ALL_SCOPE.includes(id));
   if(typeof renderProjMenu==='function') renderProjMenu();
   if(id==='portfolio' && typeof renderPortfolio==='function') renderPortfolio();
+  if((id==='todo' || id==='history') && typeof pmcRefresh==='function') pmcRefresh();
   if(typeof hideSrcTip==='function') hideSrcTip(true);
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
@@ -4138,7 +4233,7 @@ document.getElementById('page-portfolio').addEventListener('keydown', e=>{
 const projMenu = document.getElementById('projMenu'), projBtn = document.getElementById('projectSelect');
 function renderProjMenu(){
   if(!projMenu) return;
-  const onAll = activePageId()==='portfolio';
+  const onAll = ['portfolio','todo','history'].includes(activePageId());
   const grid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
   const sorted = PF_PROJECTS.slice().sort((a,b)=>(b.drill?1:0)-(a.drill?1:0) || PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
   projMenu.innerHTML =
@@ -4180,6 +4275,280 @@ projMenu.addEventListener('keydown', e=>{
   if(e.key==='Escape'){ e.stopPropagation(); toggleProjMenu(false); projBtn.focus(); }
 });
 document.addEventListener('click', e=>{ if(projMenu.classList.contains('open') && !e.target.closest('#projDD')) toggleProjMenu(false); });
+
+/* ===================== PM COPILOT CLIENT (Meeting To-dos + Meeting History) =====================
+   Talks to pm-copilot-agent (repo: /pm-copilot-agent). The agent reads Granola, asks Claude for
+   Jira suggestions and only writes to Jira when an admin approves. This page never holds the
+   Claude, Granola or Jira credentials; it holds one per-person sign-in token, kept in this
+   browser only. Roles are enforced by the agent; the disabled buttons here are a courtesy. */
+const PMC = { url:'', token:'', me:null, health:null, suggestions:[], meetings:[], audit:[], error:null,
+  filter:{status:'pending', project:'all', meeting:null}, editing:null, rejecting:null, notes:{}, busy:false };
+try{
+  PMC.url = localStorage.getItem('dc_pmc_url') || (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:8790` : 'http://localhost:8790');
+  PMC.token = localStorage.getItem('dc_pmc_token') || '';
+}catch(e){ PMC.url = 'http://localhost:8790'; }
+
+async function pmcApi(method, path, body){
+  const res = await fetch(PMC.url.replace(/\/$/,'') + path, { method,
+    headers: Object.assign({'Content-Type':'application/json'}, PMC.token ? {Authorization:`Bearer ${PMC.token}`} : {}),
+    body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw Object.assign(new Error(data.error || `HTTP ${res.status}`), {status:res.status});
+  return data;
+}
+const isAdmin = () => PMC.me && PMC.me.role==='admin';
+function fmtDT(iso){
+  if(!iso) return '—';
+  const d = new Date(iso); if(isNaN(d)) return String(iso);
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Singapore',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).map(x=>[x.type,x.value]));
+  if(LANG==='zh'){ const z = new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Singapore',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).format(d); return z; }
+  return `${p.weekday} ${p.day} ${p.month}, ${p.hour}:${p.minute}`;
+}
+
+async function pmcRefresh(){
+  try{ PMC.health = await pmcApi('GET','/api/health'); PMC.error = null; }
+  catch(e){ PMC.health = null; PMC.error = T(`Cannot reach the PM Copilot agent at ${PMC.url}`, `无法连接 PM Copilot agent(${PMC.url})`); }
+  if(PMC.health && PMC.token){
+    try{
+      const [me, sg, mt, au] = await Promise.all([pmcApi('GET','/api/me'), pmcApi('GET','/api/suggestions'), pmcApi('GET','/api/meetings'), pmcApi('GET','/api/audit')]);
+      PMC.me = me; PMC.suggestions = sg.suggestions; PMC.meetings = mt.meetings; PMC.audit = au.audit;
+    }catch(e){
+      PMC.me = null;
+      PMC.error = e.status===401 ? T('That sign-in token was not accepted. Ask an admin for a new one.','登录令牌无效,请向管理员申请新的令牌。') : e.message;
+    }
+  }
+  pmcRender();
+}
+function pmcConnect(){
+  const u = document.getElementById('pmcUrl'), t = document.getElementById('pmcToken');
+  if(u && u.value.trim()) PMC.url = u.value.trim();
+  if(t && t.value.trim()) PMC.token = t.value.trim();
+  try{ localStorage.setItem('dc_pmc_url', PMC.url); localStorage.setItem('dc_pmc_token', PMC.token); }catch(e){}
+  pmcRefresh();
+}
+function pmcSignOut(){
+  PMC.token = ''; PMC.me = null; PMC.suggestions = []; PMC.meetings = []; PMC.audit = [];
+  try{ localStorage.removeItem('dc_pmc_token'); }catch(e){}
+  pmcRender();
+}
+async function pmcSync(){
+  PMC.busy = true; pmcRender();
+  try{ const r = await pmcApi('POST','/api/sync'); showToast(T('Granola synced','Granola 已同步'), T(`${r.notes} new or updated notes, ${r.analysed} analysed`,`${r.notes} 条新增/更新纪要,已分析 ${r.analysed} 条`)); }
+  catch(e){ showToast(T('Sync failed','同步失败'), e.message); }
+  PMC.busy = false; await pmcRefresh();
+}
+
+/* ---------- top bar (shared by both pages) ---------- */
+function pmcBarHTML(){
+  if(PMC.me){
+    const h = PMC.health || {};
+    return `<span class="who"><span class="live-dot"></span>${esc(PMC.me.name)} · ${PMC.me.role==='admin'?T('Admin','管理员'):T('Viewer','只读')}</span>
+      <span>· Jira: <b style="color:${h.jiraDryRun?'var(--orange)':'var(--green)'}">${h.jiraDryRun?T('dry run, nothing is written','演练模式,不写入'):T('live','实时写入')}</b></span>
+      <span>· Granola: ${h.granola ? (h.lastGranolaSync ? T(`last sync ${fmtDT(h.lastGranolaSync)}`,`上次同步 ${fmtDT(h.lastGranolaSync)}`) : T('not synced yet','尚未同步')) : T('no API key','未配置 API key')}</span>
+      <span class="sp"></span>
+      ${isAdmin() && h.granola ? `<button class="btn-ghost" onclick="pmcSync()">${T('Sync Granola now','立即同步 Granola')}</button>` : ''}
+      <button class="btn-ghost" onclick="pmcRefresh()">${T('Refresh','刷新')}</button>
+      <button class="btn-withdraw" onclick="pmcSignOut()">${T('Sign out','退出')}</button>`;
+  }
+  return `<span class="who"><span class="off-dot"></span>${T('Not signed in','未登录')}</span>
+    <input id="pmcUrl" value="${esc(PMC.url)}" placeholder="http://host:8790" aria-label="${T('Agent URL','Agent 地址')}">
+    <input id="pmcToken" type="password" value="" placeholder="${T('Sign-in token (pmc_…)','登录令牌(pmc_…)')}" aria-label="${T('Sign-in token','登录令牌')}">
+    <button class="btn-primary" onclick="pmcConnect()">${T('Sign in','登录')}</button>
+    ${PMC.error ? `<span style="color:var(--red)">${esc(PMC.error)}</span>` : ''}`;
+}
+function pmcSetupHTML(){
+  return `<div class="panel pmc-empty">
+    <h3>${T('Connect PM Copilot','连接 PM Copilot')}</h3>
+    <p>${T('Meeting to-dos come from the PM Copilot agent, a small service that reads Granola, drafts Jira updates with Claude, and writes them to Jira after an admin approves. Sign in above once it is running.',
+           '会议待办来自 PM Copilot agent:一个读取 Granola、用 Claude 起草 Jira 更新,并在管理员审批后写入 Jira 的小服务。服务启动后在上方登录即可。')}</p>
+    <ol>
+      <li>${T('On the server:','在服务器上:')} <code>cd pm-copilot-agent && cp .env.example .env</code> ${T('and fill in the Claude, Granola and Jira keys','并填入 Claude、Granola、Jira 的密钥')}</li>
+      <li>${T('Create sign-ins:','创建账号:')} <code>npm run add-user -- "Sherry Liu" admin</code> · <code>npm run add-user -- "Name" viewer</code></li>
+      <li><code>npm start</code> ${T('then paste the agent URL and your token above.','然后在上方粘贴 agent 地址和你的令牌。')}</li>
+    </ol></div>`;
+}
+
+/* ---------- Meeting To-dos ---------- */
+const PMC_KIND = {
+  comment:   {en:'Comment on', zh:'评论到'},
+  due_date:  {en:'Change due date', zh:'修改截止日'},
+  new_ticket:{en:'New ticket', zh:'新建工单'},
+};
+function sugHTML(s){
+  const k = PMC_KIND[s.kind] || {en:s.kind};
+  const keyHTML = s.jiraKey ? `<a class="sug-key" href="${JIRA_BROWSE}${esc(s.jiraKey)}" target="_blank" rel="noopener" ${PF_TK[s.jiraKey]?`data-src="${esc(s.jiraKey)}"`:''}>${esc(s.jiraKey)}</a>` : '';
+  const conf = s.confidence==='confirmed' ? `<span class="conf-badge confirmed">${T('Stated','明确提出')}</span>` : `<span class="conf-badge inferred">${T('Inferred','推断')}</span>`;
+  const meta = [
+    s.newDueDate ? `<span>${T('Due','截止')} <b>${esc(fmtD(s.newDueDate))}</b></span>` : '',
+    s.owner ? `<span>${T('Owner','负责人')} <b>${esc(s.owner)}</b></span>` : '',
+    s.editedBy ? `<span>${T('Edited by','编辑人')} ${esc(s.editedBy)}</span>` : '',
+  ].filter(Boolean).join('');
+  let actions = '';
+  if(s.status==='pending'){
+    if(PMC.editing===s.id){
+      actions = `<div class="sug-edit">
+        <label class="full">${T('Title','标题')}<input id="ed_title" value="${esc(s.title)}"></label>
+        <label class="full">${T('Text written to Jira','写入 Jira 的内容')}<textarea id="ed_detail">${esc(s.detail)}</textarea></label>
+        <label>${T('Jira key (blank = new ticket)','Jira 编号(留空 = 新建)')}<input id="ed_jiraKey" value="${esc(s.jiraKey||'')}"></label>
+        <label>${T('Due date','截止日')}<input id="ed_newDueDate" type="date" value="${esc(s.newDueDate||'')}"></label>
+        <label>${T('Owner','负责人')}<input id="ed_owner" value="${esc(s.owner||'')}"></label>
+      </div><div class="sug-actions"><button class="btn-primary" onclick="pmcSaveEdit('${s.id}')">${T('Save changes','保存修改')}</button><button class="btn-ghost" onclick="PMC.editing=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
+    } else if(PMC.rejecting===s.id){
+      actions = `<div class="sug-reject"><input id="rj_reason" placeholder="${T('Why? (optional, kept in the audit log)','原因(可选,记入审计日志)')}"><button class="btn-reject" onclick="pmcReject('${s.id}')">${T('Confirm reject','确认驳回')}</button><button class="btn-ghost" onclick="PMC.rejecting=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
+    } else {
+      const dis = isAdmin() ? '' : 'disabled';
+      actions = `<div class="sug-actions">
+        <button class="btn-approve" ${dis} onclick="pmcApprove('${s.id}')">${(PMC.health&&PMC.health.jiraDryRun)?T('Approve (dry run)','批准(演练)'):T('Approve to Jira','批准并写入 Jira')}</button>
+        <button class="btn-ghost" ${dis} onclick="PMC.editing='${s.id}';PMC.rejecting=null;pmcRender()">${T('Edit','编辑')}</button>
+        <button class="btn-reject" ${dis} onclick="PMC.rejecting='${s.id}';PMC.editing=null;pmcRender()">${T('Reject','驳回')}</button>
+        ${isAdmin() ? '' : `<span class="hint">${T('Only admins can approve. You can read and discuss.','仅管理员可审批,你可以查看。')}</span>`}
+      </div>`;
+    }
+  } else {
+    const j = s.jira || {};
+    const when = `${esc(s.decidedBy||'')} · ${esc(fmtDT(s.decidedAt))}`;
+    actions = s.status==='approved'
+      ? `<div class="sug-result"><b>${j.dryRun ? T('Approved · dry run, not written to Jira','已批准 · 演练模式,未写入 Jira') : T('Written to Jira','已写入 Jira')}</b> · ${when}
+          ${j.url ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.createdKey||s.jiraKey||T('Open','打开'))}</a>` : ''}
+          ${j.steps ? `<details><summary>${T('Jira request','Jira 请求')}</summary><pre>${esc(JSON.stringify(j.steps,null,2))}</pre></details>` : ''}</div>`
+      : `<div class="sug-result"><b>${T('Rejected','已驳回')}</b> · ${when}${s.rejectReason?` · ${esc(s.rejectReason)}`:''}</div>`;
+  }
+  return `<div class="sug ${s.status}">
+    <div class="sug-top"><span class="sug-kind">${esc(L(k))}</span>${keyHTML}<span class="proj-tag">${esc(projName(s.project))}</span>${conf}</div>
+    <div class="sug-title">${esc(s.title)}</div>
+    <p class="sug-detail">${esc(s.detail)}</p>
+    ${meta?`<div class="sug-meta">${meta}</div>`:''}
+    ${s.evidence?`<div class="prop-evidence"><b>${T('From the notes','纪要原文')}</b> “${esc(s.evidence)}”</div>`:''}
+    ${s.reason?`<div class="prop-reason">${esc(s.reason)}</div>`:''}
+    ${actions}
+  </div>`;
+}
+function renderTodo(){
+  const box = document.getElementById('pmcTodo'); if(!box) return;
+  if(!PMC.me){ box.innerHTML = pmcSetupHTML(); return; }
+  const f = PMC.filter;
+  const byStatus = st => PMC.suggestions.filter(s=>s.status===st).length;
+  const projects = [...new Set(PMC.suggestions.map(s=>s.project))];
+  let list = PMC.suggestions.filter(s=>s.status===f.status && (f.project==='all'||s.project===f.project) && (!f.meeting||s.meetingId===f.meeting));
+  const pill = (val, cur, label, on) => `<button class="pill ${val===cur?'active':''}" onclick="${on}">${label}</button>`;
+  const mtg = f.meeting && PMC.meetings.find(m=>m.id===f.meeting);
+  let html = `<div class="pmc-filters">
+    <div class="pillgroup">${['pending','approved','rejected'].map(st=>pill(st,f.status,`${{pending:T('Pending','待审批'),approved:T('Approved','已批准'),rejected:T('Rejected','已驳回')}[st]} (${byStatus(st)})`,`PMC.filter.status='${st}';pmcRender()`)).join('')}</div>
+    <div class="pillgroup">${pill('all',f.project,T('All projects','全部项目'),"PMC.filter.project='all';pmcRender()")}${projects.map(p=>pill(p,f.project,esc(projName(p)),`PMC.filter.project='${p}';pmcRender()`)).join('')}</div>
+    ${mtg?`<span class="pf-chip">${T('Meeting','会议')}: ${esc(mtg.title)} <a style="cursor:pointer;margin-left:4px" onclick="PMC.filter.meeting=null;pmcRender()">✕</a></span>`:''}
+  </div>`;
+  if(!list.length){
+    html += `<div class="panel pmc-empty"><h3>${f.status==='pending'?T('Nothing waiting for approval','没有待审批事项'):T('Nothing here yet','暂无记录')}</h3>
+      <p>${f.status==='pending'?T('New suggestions appear after the next meeting is synced from Granola.','下一场会议从 Granola 同步后会出现新建议。'):''}</p></div>`;
+    box.innerHTML = html; return;
+  }
+  const groups = {};
+  list.forEach(s=>{ (groups[s.meetingId] = groups[s.meetingId] || {m:s.meeting, items:[]}).items.push(s); });
+  html += Object.values(groups).sort((a,b)=>String(b.m.date).localeCompare(String(a.m.date))).map(g=>`
+    <div class="pmc-group"><div class="pmc-group-h"><div><b>${esc(g.m.title||T('Meeting','会议'))}</b> <span>· ${esc(fmtDT(g.m.date))} · ${g.items.length} ${T('items','项')}</span></div>
+      ${g.m.url?`<a href="${esc(g.m.url)}" target="_blank" rel="noopener">${T('Open in Granola','在 Granola 打开')}</a>`:''}</div>
+      ${g.items.map(sugHTML).join('')}</div>`).join('');
+  box.innerHTML = html;
+}
+async function pmcApprove(id){
+  PMC.busy = true;
+  try{
+    const s = await pmcApi('POST',`/api/suggestions/${id}/approve`);
+    const i = PMC.suggestions.findIndex(x=>x.id===id); if(i>=0) PMC.suggestions[i] = Object.assign(PMC.suggestions[i], s);
+    showToast(s.jira&&s.jira.dryRun ? T('Approved (dry run)','已批准(演练)') : T('Written to Jira','已写入 Jira'), s.title);
+  }catch(e){ showToast(T('Could not approve','审批失败'), e.message); }
+  PMC.busy = false; pmcRefresh();
+}
+async function pmcReject(id){
+  const r = (document.getElementById('rj_reason')||{}).value || '';
+  try{ await pmcApi('POST',`/api/suggestions/${id}/reject`, {reason:r}); PMC.rejecting = null; showToast(T('Rejected','已驳回'), r||''); }
+  catch(e){ showToast(T('Could not reject','驳回失败'), e.message); }
+  pmcRefresh();
+}
+async function pmcSaveEdit(id){
+  const v = k => (document.getElementById('ed_'+k)||{}).value;
+  const patch = { title:v('title'), detail:v('detail'), jiraKey:(v('jiraKey')||'').trim()||null, newDueDate:v('newDueDate')||null, owner:(v('owner')||'').trim()||null };
+  const cur = PMC.suggestions.find(x=>x.id===id);
+  if(cur && !patch.jiraKey) patch.kind = 'new_ticket';
+  else if(cur && cur.kind==='new_ticket' && patch.jiraKey) patch.kind = patch.newDueDate && patch.newDueDate!==cur.newDueDate ? 'due_date' : 'comment';
+  try{ await pmcApi('POST',`/api/suggestions/${id}/edit`, patch); PMC.editing = null; showToast(T('Saved','已保存'), patch.title); }
+  catch(e){ showToast(T('Could not save','保存失败'), e.message); }
+  pmcRefresh();
+}
+
+/* ---------- Meeting History ---------- */
+function renderHistory(){
+  const box = document.getElementById('pmcHistory'); if(!box) return;
+  const imp = document.getElementById('pmcImport'), aud = document.getElementById('pmcAudit');
+  if(!PMC.me){ box.innerHTML = pmcSetupHTML(); imp.style.display='none'; aud.style.display='none'; return; }
+  imp.style.display=''; aud.style.display='';
+  box.innerHTML = PMC.meetings.length ? PMC.meetings.map(m=>{
+    const notes = PMC.notes[m.id];
+    return `<div class="mh-card">
+      <div class="mh-top"><b>${esc(m.title)}</b><span class="mh-date">${esc(fmtDT(m.date))}</span></div>
+      <div class="mh-sub">${m.source==='granola'?`<span>Granola</span>${m.url?` · <a href="${esc(m.url)}" target="_blank" rel="noopener">${T('Open note','打开纪要')}</a>`:''}`:`<span>${T('Imported','手动导入')}</span>`}
+        ${m.attendees&&m.attendees.length?`<span>· ${m.attendees.length} ${T('attendees','人参会')}</span>`:''}
+        ${(m.projects||[]).map(p=>`<span class="proj-tag">${esc(projName(p))}</span>`).join('')}</div>
+      ${m.status==='failed'?`<div class="mh-err">${T('Analysis failed','分析失败')}: ${esc(m.error)}</div>`:''}
+      ${m.status==='analysing'?`<div class="mh-sub">${T('Claude is reading this meeting…','Claude 正在阅读这场会议…')}</div>`:''}
+      ${(m.summary||[]).length?`<ul class="mh-sum">${m.summary.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+      <div class="mh-foot">
+        <span class="pf-chip ${m.counts.pending?'warn':''}">${m.counts.pending} ${T('pending','待审批')}</span>
+        <span class="pf-chip">${m.counts.approved} ${T('approved','已批准')}</span>
+        <span class="pf-chip">${m.counts.rejected} ${T('rejected','已驳回')}</span>
+        <span class="sp" style="flex:1"></span>
+        <button class="btn-ghost" onclick="PMC.filter={status:'pending',project:'all',meeting:'${m.id}'};goPage('todo')">${T('View to-dos','查看待办')}</button>
+        <button class="btn-ghost" onclick="pmcToggleNotes('${m.id}')">${notes?T('Hide notes','收起纪要'):T('Show notes','查看纪要')}</button>
+        ${isAdmin()?`<button class="btn-withdraw" onclick="pmcReanalyse('${m.id}')">${T('Re-analyse','重新分析')}</button>`:''}
+      </div>
+      ${notes?`<details class="hist-raw" open><summary>${T('Meeting notes','会议纪要')}</summary><pre>${esc(notes)}</pre></details>`:''}
+    </div>`; }).join('')
+    : `<div class="panel pmc-empty"><h3>${T('No meetings yet','暂无会议')}</h3><p>${T('Sync Granola or import minutes on the right.','请同步 Granola 或在右侧导入纪要。')}</p></div>`;
+
+  imp.innerHTML = `<div class="panel-title">${T('Import minutes','导入纪要')}</div>` + (isAdmin() ? `
+    <div class="pmc-form">
+      <div class="row"><input id="imTitle" placeholder="${T('Meeting title','会议标题')}"><input id="imDate" type="date" value="${PF_TODAY}"></div>
+      <textarea id="imText" placeholder="${T('Paste minutes from a meeting Granola did not capture (Feishu, Teams, typed notes)…','粘贴 Granola 未记录的会议纪要(飞书、Teams、手写笔记等)…')}"></textarea>
+      <button class="btn-primary" onclick="pmcImport()">${T('Analyse with Claude','用 Claude 分析')}</button>
+    </div>` : `<p class="pf-note" style="margin:0">${T('Only admins can import meetings.','仅管理员可导入会议。')}</p>`);
+
+  aud.innerHTML = `<div class="panel-title">${T('Decision log','决策日志')}</div>` + (PMC.audit.filter(a=>['approve','reject','edit','sync','analyse'].includes(a.action)).slice(0,15).map(a=>`
+    <div class="aud-row"><span class="t">${esc(fmtDT(a.at))}</span><span class="a"><b>${esc(a.by)}</b> · ${esc({approve:T('approved','批准'),reject:T('rejected','驳回'),edit:T('edited','编辑'),sync:T('synced Granola','同步 Granola'),analyse:T('analysed','分析')}[a.action]||a.action)}</span>
+      <span class="d" title="${esc(a.detail||'')}">${esc(a.detail||'')}</span></div>`).join('') || `<p class="pf-note" style="margin:0">${T('No decisions yet.','暂无决策。')}</p>`);
+}
+async function pmcToggleNotes(id){
+  if(PMC.notes[id]){ delete PMC.notes[id]; return pmcRender(); }
+  try{ const m = await pmcApi('GET',`/api/meetings/${id}`); PMC.notes[id] = m.notesText || T('(no notes stored)','(未保存纪要)'); }
+  catch(e){ showToast(T('Could not load notes','无法加载纪要'), e.message); }
+  pmcRender();
+}
+async function pmcReanalyse(id){
+  showToast(T('Re-analysing','重新分析中'), T('Claude is reading the meeting again; pending items will be replaced.','Claude 正在重新阅读,待审批事项将被替换。'));
+  try{ await pmcApi('POST',`/api/meetings/${id}/reanalyse`); }catch(e){ showToast(T('Re-analyse failed','重新分析失败'), e.message); }
+  pmcRefresh();
+}
+async function pmcImport(){
+  const title = document.getElementById('imTitle').value.trim(), date = document.getElementById('imDate').value, text = document.getElementById('imText').value;
+  if(text.trim().length < 40) return showToast(T('Paste the minutes first','请先粘贴纪要'), '');
+  document.getElementById('pmcImport').classList.add('pmc-busy');
+  showToast(T('Analysing','分析中'), T('Claude usually takes 20–60 seconds.','通常需要 20–60 秒。'));
+  try{ const m = await pmcApi('POST','/api/meetings/import', {title:title||T('Imported meeting','导入的会议'), date: date ? `${date}T09:00:00+08:00` : undefined, text});
+       showToast(m.status==='failed'?T('Analysis failed','分析失败'):T('Meeting analysed','会议已分析'), m.status==='failed'?m.error:`${m.counts.pending} ${T('to-dos drafted','条待办已起草')}`); }
+  catch(e){ showToast(T('Import failed','导入失败'), e.message); }
+  document.getElementById('pmcImport').classList.remove('pmc-busy');
+  pmcRefresh();
+}
+
+function pmcRender(){
+  document.querySelectorAll('[data-pmc-bar]').forEach(el=>{ el.innerHTML = pmcBarHTML(); });
+  renderTodo(); renderHistory();
+  const n = PMC.suggestions.filter(s=>s.status==='pending').length;
+  const b = document.getElementById('pmcTodoBadge'); if(b){ b.textContent = n; b.style.display = n ? '' : 'none'; }
+  const d = document.getElementById('railTodoDot'); if(d) d.style.display = n ? '' : 'none';
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target && e.target.id==='pmcToken') pmcConnect(); });
+setInterval(()=>{ const a = activePageId(); if(PMC.token && (a==='todo'||a==='history') && !PMC.editing && !PMC.rejecting) pmcRefresh(); }, 60000);
+if(PMC.token) pmcRefresh(); else pmcRender();
 
 renderPortfolio();
 goPage('portfolio');

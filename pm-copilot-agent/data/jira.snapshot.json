@@ -1,0 +1,178 @@
+{
+  "takenAt": "2026-10-14",
+  "jql": "project = BA AND \"client[dropdown]\" != RDA AND status NOT IN (Done, Backlog)",
+  "note": "Used only when Jira credentials are not set.",
+  "tickets": [
+    {
+      "key": "BA-2380",
+      "summary": "[DayOne-NTPE] Master Ticket",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": null,
+      "client": "DayOne NTP-E",
+      "updated": "2026-09-28"
+    },
+    {
+      "key": "BA-2384",
+      "summary": "[DayOne-NTPE][3.1] Historical Data Export",
+      "status": "In Progress",
+      "assignee": "Sherry",
+      "due": null,
+      "client": "DayOne NTP-E",
+      "updated": "2026-09-02"
+    },
+    {
+      "key": "BA-2386",
+      "summary": "[DayOne-NTPE][2.3] Historical data analysis and twin calibration",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": "2026-07-23",
+      "client": "DayOne NTP-E",
+      "updated": "2026-09-28"
+    },
+    {
+      "key": "BA-2387",
+      "summary": "[DayOne-NTPE][1.2] Chiller Plant Modelling + Cooling system topology mapping",
+      "status": "In Progress",
+      "assignee": "Valdy Lionel Christian",
+      "due": null,
+      "client": "DayOne NTP-E",
+      "updated": "2026-09-10"
+    },
+    {
+      "key": "BA-2447",
+      "summary": "[DayOne-NTPE][2.1] Discretised data hall simulation model",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": null,
+      "client": "DayOne NTP-E",
+      "updated": "2026-09-02"
+    },
+    {
+      "key": "BA-1864",
+      "summary": "[P2-01] BDC data integration",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": "2026-09-10",
+      "client": "BDC MY2",
+      "updated": "2026-10-12"
+    },
+    {
+      "key": "BA-1774",
+      "summary": "[P0-03] [BDC-MY02] Cookbook",
+      "status": "To Do",
+      "assignee": "Valdy Lionel Christian",
+      "due": null,
+      "client": "BDC MY2",
+      "updated": "2026-09-25"
+    },
+    {
+      "key": "BA-1098",
+      "summary": "[BDX-SIN1] Integrate new points",
+      "status": "Blocked",
+      "assignee": "Lin Liangtao",
+      "due": null,
+      "client": "BDx SIN1",
+      "updated": "2026-09-14"
+    },
+    {
+      "key": "BA-1897",
+      "summary": "[BDX-SIN1] Result analysis",
+      "status": "In Review",
+      "assignee": "Xu Mingchen",
+      "due": null,
+      "client": "BDx SIN1",
+      "updated": "2026-09-14"
+    },
+    {
+      "key": "BA-2027",
+      "summary": "[BDX-SIN1] Test new data points",
+      "status": "In Progress",
+      "assignee": "Valdy Lionel Christian",
+      "due": null,
+      "client": "BDx SIN1",
+      "updated": "2026-09-28"
+    },
+    {
+      "key": "BA-2429",
+      "summary": "[BDX-SIN1] Update the Chiller Plant & E+ model",
+      "status": "In Review",
+      "assignee": "Xu Mingchen",
+      "due": "2026-09-11",
+      "client": "BDx SIN1",
+      "updated": "2026-09-14"
+    },
+    {
+      "key": "BA-2498",
+      "summary": "[BDX-SIN1] Local Deployment",
+      "status": "In Review",
+      "assignee": "Lin Liangtao",
+      "due": null,
+      "client": "BDx SIN1",
+      "updated": "2026-10-05"
+    },
+    {
+      "key": "BA-1885",
+      "summary": "[CMI-DE1] Prepare deployment — data, frontend & AI integration",
+      "status": "In Review",
+      "assignee": "Xu Mingchen",
+      "due": "2026-04-24",
+      "client": "CMI-DE1-Germany",
+      "updated": "2026-06-17"
+    },
+    {
+      "key": "BA-2010",
+      "summary": "[CMI-G] Review and help task implementation",
+      "status": "Blocked",
+      "assignee": "Ng Jia Hua",
+      "due": null,
+      "client": "CMI-DE1-Germany",
+      "updated": "2026-07-12"
+    },
+    {
+      "key": "BA-2034",
+      "summary": "CMI-DE deployment & monitoring/calibration",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": null,
+      "client": "CMI-DE1-Germany",
+      "updated": "2026-08-03"
+    },
+    {
+      "key": "BA-2566",
+      "summary": "[CMI-SG] Chiller Leak Analysis",
+      "status": "In Progress",
+      "assignee": "Valdy Lionel Christian",
+      "due": null,
+      "client": "CMI-SGDC",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "BA-2567",
+      "summary": "[CMI-SG] Report Creation",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": null,
+      "client": "CMI-SGDC",
+      "updated": "2026-09-28"
+    },
+    {
+      "key": "BA-2572",
+      "summary": "Q3 Report",
+      "status": "In Progress",
+      "assignee": "Xu Mingchen",
+      "due": null,
+      "client": "Iron Mountain SIN1",
+      "updated": "2026-10-05"
+    },
+    {
+      "key": "BA-1857",
+      "summary": "[IMDC] Upgrade project deployment (frontend integration)",
+      "status": "To Do",
+      "assignee": "Valdy Lionel Christian",
+      "due": null,
+      "client": "Iron Mountain SIN1",
+      "updated": "2026-05-22"
+    }
+  ]
+}
