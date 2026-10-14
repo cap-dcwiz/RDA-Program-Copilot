@@ -3,3 +3,5 @@ node_modules/
 data/store.json
 data/users.json
 data/*.tmp
+data/roles.json
+data/sessions.json

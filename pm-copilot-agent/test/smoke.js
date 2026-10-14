@@ -15,3 +15,11 @@ const mt = g.toMeeting({ id: 'not_1d3tmYTlCICgjy', title: ' Weekly ', owner: { n
   transcript: [{ speaker: { source: 'microphone' }, text: 'hello' }] });
 assert.equal(mt.title, 'Weekly'); assert.equal(mt.sourceId, 'not_1d3tmYTlCICgjy'); assert.match(mt.notesText, /Granola summary/); assert.match(mt.notesText, /microphone: hello/);
 console.log('granola mapping ok');
+const P = require('../src/permissions');
+const roles = P.DEFAULT_ROLES;
+let e = P.effective(roles, ['customer-dayone']);
+assert.deepEqual(e.projects, ['dayone']); assert.ok(!e.actions.includes('approve')); assert.ok(!e.pages.includes('portfolio'));
+e = P.effective(roles, ['leadership', 'engineering']);
+assert.ok(e.pages.includes('portfolio') && e.pages.includes('blocker') && e.actions.includes('ingest') && !e.actions.includes('approve'));
+e = P.effective(roles, ['admin']); assert.ok(e.pages.includes('users') && e.actions.includes('approve'));
+console.log('permissions ok');

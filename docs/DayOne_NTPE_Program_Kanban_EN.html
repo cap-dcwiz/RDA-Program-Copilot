@@ -657,6 +657,59 @@ button.project-select{font-family:inherit;}
 .dr-tk .st-sig{font-size:11.5px;color:var(--text-dim);line-height:1.55;margin-top:6px;}
 
 
+/* ===== Sign-in gate + Users & Roles ===== */
+body.gated .app, body.gated .icon-rail{visibility:hidden;}
+body.gated{padding-left:0;}
+.perm-hidden{display:none!important;}
+.auth-gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+.auth-gate[hidden]{display:none;}
+.ag-card{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;padding:28px 26px;border-radius:16px;background:var(--panel);
+  border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.5);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.ag-brand{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.ag-brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple2),var(--cyan));display:flex;align-items:center;justify-content:center;color:#0a0e1c;font-weight:900;}
+.ag-brand b{display:block;font-size:15px;} .ag-brand span{font-size:11px;color:var(--text-dimmer);}
+.ag-card h1{margin:0;font-size:22px;font-weight:800;} .ag-card p{margin:0 0 4px;font-size:12.5px;color:var(--text-dim);line-height:1.55;}
+.ag-card label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--text-dim);}
+.ag-card input{background:var(--panel2);border:1px solid var(--border2);border-radius:9px;color:var(--text);padding:10px 12px;font-size:13.5px;font-family:inherit;}
+.ag-card input:focus,.ua-table input:focus,.ua-add input:focus,.rc-actions input:focus{outline:2px solid var(--purple);outline-offset:1px;}
+.ag-card .btn-primary{padding:11px;font-size:13.5px;margin-top:4px;}
+.ag-card .btn-primary:disabled{opacity:.6;}
+.ag-err{font-size:12px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:8px 10px;}
+.ag-adv summary{cursor:pointer;font-size:11.5px;color:var(--text-dimmer);margin-bottom:6px;} .ag-adv input{width:100%;}
+.user-chip{display:flex;align-items:center;gap:8px;font-size:12px;}
+.user-chip .uc-name{font-weight:700;color:var(--text);} .user-chip .uc-role{color:var(--text-dimmer);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ua-sub{font-size:12.5px;color:var(--text-dim);margin:-6px 0 12px;}
+.ua-table td{vertical-align:middle;} .ua-table td b{font-size:13px;}
+.ua-you{color:var(--text-dimmer);font-weight:600;font-size:12px;}
+.ua-meta{font-size:11.5px;color:var(--text-dimmer);margin-top:2px;}
+.role-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.role-chip{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+  background:transparent;border:1px solid var(--border2);color:var(--text-dim);}
+.role-chip:hover{color:var(--text);border-color:var(--text-dimmer);}
+.role-chip.on{background:var(--purple-bg);border-color:var(--purple);color:#d9d4ff;}
+.ua-pw{display:flex;gap:6px;} .ua-pw input,.ua-add input,.rc-actions input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12.5px;font-family:inherit;min-width:0;}
+.ua-pw input{width:150px;}
+.ua-del{background:transparent;border:1px solid transparent;color:var(--red);border-radius:7px;padding:5px 8px;cursor:pointer;font-size:11.5px;font-weight:800;font-family:inherit;}
+.ua-del:hover{border-color:rgba(239,68,68,.4);} .ua-del.armed{background:var(--red-bg);border-color:rgba(239,68,68,.5);}
+.ua-add{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.ua-add-h{font-size:12.5px;font-weight:800;margin-bottom:8px;}
+.ua-add-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;} .ua-add-row input{width:150px;}
+.rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+.rc-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;} .rc-actions .btn-primary:disabled{opacity:.5;cursor:default;}
+.rc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+.rc-card{border:1px solid var(--border2);border-radius:12px;background:var(--panel3);padding:14px 14px 10px;min-width:0;}
+.rc-card.locked{border-color:rgba(163,148,255,.45);}
+.rc-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;} .rc-head b{font-size:14px;color:var(--purple);}
+.rc-count{font-size:11px;color:var(--text-dimmer);margin-right:auto;}
+.rc-lock{font-size:10.5px;font-weight:700;color:var(--text-dimmer);}
+.rc-ic{background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:4px;border-radius:6px;} .rc-ic:hover{background:var(--panel2);color:var(--text);} .rc-ic.del{color:var(--red);}
+.rc-rename{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--purple);border-radius:7px;color:var(--text);padding:4px 8px;font-size:13px;font-weight:700;font-family:inherit;}
+.rc-sec{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);margin:12px 0 4px;}
+.rc-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text);padding:4px 0;line-height:1.4;cursor:pointer;}
+.rc-item input{margin-top:2px;accent-color:#7c6cf6;flex-shrink:0;} .rc-item.dis{color:var(--text-dim);cursor:default;}
+@media (max-width:1400px){ .rc-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+@media (max-width:760px){ .rc-grid{grid-template-columns:1fr;} .user-chip .uc-role{display:none;} }
+
 /* ===== PM Copilot: Meeting To-dos + History ===== */
 .pmc-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:16px;border-radius:12px;
   background:var(--panel3);border:1px solid var(--border);font-size:12.5px;color:var(--text-dim);}
@@ -738,6 +791,19 @@ button.project-select{font-family:inherit;}
 </style>
 </head>
 <body>
+<!-- ===== SIGN-IN GATE (PM Copilot agent) ===== -->
+<div class="auth-gate" id="authGate" hidden>
+  <form class="ag-card" onsubmit="authLogin(event)" autocomplete="on">
+    <div class="ag-brand"><div class="logo">D</div><div><b>Delivery Copilot</b><span>RDA</span></div></div>
+    <h1><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></h1>
+    <p><span data-i18n-en="Use the account your admin gave you. What you see depends on your role." data-i18n-zh="请使用管理员为你开通的账号。可见内容取决于你的角色。">Use the account your admin gave you. What you see depends on your role.</span></p>
+    <label><span data-i18n-en="Username" data-i18n-zh="用户名">Username</span><input id="agUser" name="username" autocomplete="username" required></label>
+    <label><span data-i18n-en="Password" data-i18n-zh="密码">Password</span><input id="agPass" name="password" type="password" autocomplete="current-password" required></label>
+    <div class="ag-err" id="agErr" role="alert" hidden></div>
+    <button class="btn-primary" id="agBtn" type="submit"><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></button>
+    <details class="ag-adv"><summary><span data-i18n-en="Server address" data-i18n-zh="服务器地址">Server address</span></summary><input id="agUrl" placeholder="http://host:8790"></details>
+  </form>
+</div>
 <!-- ===== LEFT ICON RAIL (global nav) ===== -->
 <div class="icon-rail">
   <div class="rail-logo">D</div>
@@ -751,8 +817,8 @@ button.project-select{font-family:inherit;}
   <div class="rail-icon" data-page="meetings" title="Meetings" onclick="goPage('meetings')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
   <div class="rail-icon" data-page="luna" title="Luna Queue" onclick="goPage('luna')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="rail-dot" id="railLunaDot"></span></div>
   <div class="rail-spacer"></div>
-  <div class="rail-icon" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-  <div class="rail-avatar" title="Selena">SV</div>
+  <div class="rail-icon" data-page="users" title="Users &amp; Roles" onclick="goPage('users')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  <div class="rail-avatar" id="railAvatar" title="">··</div>
 </div>
 <div class="app">
 
@@ -782,7 +848,7 @@ button.project-select{font-family:inherit;}
       </div>
       <div class="top-right">
         <div class="updated-block">
-          <span class="live"><span class="live-dot"></span><span data-i18n-en="Maintained by Selena" data-i18n-zh="由 Selena 维护">Maintained by Selena</span></span>
+          <span class="live"><span class="live-dot"></span><span id="whoLive"></span></span>
           <span>Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-21 09:15</b></span>
         </div>
         <span class="icon-btn" title="Refresh"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
@@ -790,6 +856,7 @@ button.project-select{font-family:inherit;}
         <div id="langToggle" class="lang-toggle" style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:11.5px;font-weight:700;cursor:pointer;user-select:none;">
           <span data-lang-opt="en" style="padding:5px 9px;">EN</span><span data-lang-opt="zh" style="padding:5px 9px;">中文</span>
         </div>
+        <span class="user-chip" id="userChip"></span>
         <span class="icon-btn"><svg class="i" viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
       </div>
     </div>
@@ -805,6 +872,7 @@ button.project-select{font-family:inherit;}
         <button class="tab active" data-page="portfolio" data-scope="all"><span data-i18n-en="Portfolio" data-i18n-zh="项目组合">Portfolio</span></button>
         <button class="tab" data-page="todo" data-scope="all"><span data-i18n-en="Meeting To-dos" data-i18n-zh="会议待办">Meeting To-dos</span><span id="pmcTodoBadge" class="tab-count" style="display:none"></span></button>
         <button class="tab" data-page="history" data-scope="all"><span data-i18n-en="Meeting History" data-i18n-zh="会议记录">Meeting History</span></button>
+        <button class="tab" data-page="users" data-scope="all"><span data-i18n-en="Users &amp; Roles" data-i18n-zh="用户与角色">Users &amp; Roles</span></button>
         <button class="tab" data-page="overview" data-scope="project"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
         <button class="tab" data-page="blocker" data-scope="project"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
         <button class="tab" data-page="dependency" data-scope="project"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
@@ -895,6 +963,15 @@ button.project-select{font-family:inherit;}
         <div class="panel" id="pmcAudit"></div>
       </div>
     </div>
+  </div>
+
+  <div class="page" id="page-users">
+    <div class="page-head">
+      <h1><span data-i18n-en="Users &amp; Roles" data-i18n-zh="用户与角色">Users &amp; Roles</span></h1>
+      <p><span data-i18n-en="Who can sign in, which pages they see, which projects' data they see, and who may approve to-dos into Jira." data-i18n-zh="谁可以登录、能看到哪些页面和哪些项目的数据,以及谁可以把待办审批写入 Jira。">Who can sign in, which pages they see, which projects' data they see, and who may approve to-dos into Jira.</span></p>
+    </div>
+    <div class="panel" id="uaUsers" style="margin-bottom:18px;"></div>
+    <div class="panel" id="uaRoles"></div>
   </div>
 
   <div class="page" id="page-overview">
@@ -2056,6 +2133,7 @@ function applyKPIs(){
 
 /* ===================== NAV ===================== */
 function goPage(id){
+  if(typeof AUTH_READY!=='undefined' && AUTH_READY && !pageAllowed(id)){ const f = firstAllowedPage(); if(!f) return; id = f; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.rail-icon[data-page]').forEach(r=>r.classList.remove('active'));
@@ -2068,7 +2146,7 @@ function goPage(id){
   if(id==='meetings') renderMeetingsPage();
   // The portfolio spans every client; the remaining tabs are the DayOne NTPE project view.
   const sel = document.getElementById('projSelLabel');
-  const ALL_SCOPE = ['portfolio','todo','history'];
+  const ALL_SCOPE = ['portfolio','todo','history','users'];
   if(sel) sel.textContent = ALL_SCOPE.includes(id)
     ? (LANG==='zh' ? `全部项目(${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})` : `All projects (${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})`)
     : 'DayOne NTP-E';
@@ -2078,6 +2156,7 @@ function goPage(id){
   if(typeof renderProjMenu==='function') renderProjMenu();
   if(id==='portfolio' && typeof renderPortfolio==='function') renderPortfolio();
   if((id==='todo' || id==='history') && typeof pmcRefresh==='function') pmcRefresh();
+  if(id==='users' && typeof uaLoad==='function') uaLoad();
   if(typeof hideSrcTip==='function') hideSrcTip(true);
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
@@ -4009,6 +4088,7 @@ function renderPortfolio(){
         T(`${m.stale60.length} tickets untouched for 60+ days`, `${m.stale60.length} 个工单超过 60 天未更新`), m.fresh.map(t=>t.key).concat(m.stale60.map(t=>t.key))),
   ].join('');
 
+  const briefBanner = document.getElementById('pfBrief').closest('.banner'); if(briefBanner) briefBanner.hidden = PF_SCOPED;
   document.getElementById('pfBrief').textContent = T(
     `${m.gated.length} of ${m.delivery.length} delivery projects are waiting on client data, not on RDA engineering: models, AI and deployments are being built ahead of the data. Two need leadership now. CMI-DE1 has been on hold for five months with about 20% usable data, and BDx SIN1's data-point ticket has been blocked for 15 months. The next ten days hold two client moments, the CMI-SG renewal visit (around 22 Oct) and DayOne's meeting with Zach (23 Oct), plus one hard date: the BDC platform delivery on 31 Oct. ${top.name} carries ${top.n} of ${m.total} open tickets across all ${top.projects} projects.`,
     `${m.delivery.length} 个交付项目中有 ${m.gated.length} 个在等客户数据,而不是卡在 RDA 工程上:模型、AI 和部署都在数据之前先行搭建。两个项目现在就需要管理层介入:CMI-DE1 因可用数据仅约 20% 已暂停五个月;BDx SIN1 的数据点工单已阻塞 15 个月。未来十天有两个客户关键节点(CMI-SG 续约现场会约 10 月 22 日、DayOne 与 Zach 会面 10 月 23 日),以及一个硬性日期:BDC 平台 10 月 31 日交付。${top.name} 一人承担 ${m.total} 个在途工单中的 ${top.n} 个,覆盖全部 ${top.projects} 个项目。`);
@@ -4233,15 +4313,17 @@ document.getElementById('page-portfolio').addEventListener('keydown', e=>{
 const projMenu = document.getElementById('projMenu'), projBtn = document.getElementById('projectSelect');
 function renderProjMenu(){
   if(!projMenu) return;
-  const onAll = ['portfolio','todo','history'].includes(activePageId());
+  const onAll = ['portfolio','todo','history','users'].includes(activePageId());
+  const allowed = id => typeof AUTH_READY==='undefined' || !AUTH_READY || pageAllowed(id);
+  const anyAll = ['portfolio','todo','history','users'].some(allowed), anyDayOne = DAYONE_PAGES.some(allowed);
   const grid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
-  const sorted = PF_PROJECTS.slice().sort((a,b)=>(b.drill?1:0)-(a.drill?1:0) || PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
-  projMenu.innerHTML =
+  const sorted = PF_PROJECTS.slice().filter(p=> p.drill ? anyDayOne : allowed('portfolio')).sort((a,b)=>(b.drill?1:0)-(a.drill?1:0) || PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
+  projMenu.innerHTML = (anyAll ?
     `<button type="button" class="pm-item ${onAll?'active':''}" role="option" aria-selected="${onAll}" data-pm="all">
        <span class="pm-ic">${grid}</span>
        <span class="pm-tx"><b>${T('All projects','全部项目')} (${PF_PROJECTS.length})</b><span>${T('Portfolio overview','项目组合总览')}</span></span>
        <span class="pm-go">${onAll?'✓':''}</span></button>
-     <div class="pm-sep"></div><div class="pm-group">${T('Projects','项目')}</div>` +
+     <div class="pm-sep"></div>` : '') + `<div class="pm-group">${T('Projects','项目')}</div>` +
     sorted.map(p=>{
       const h = PF_HEALTH[p.health], act = !onAll && p.drill;
       return `<button type="button" class="pm-item ${act?'active':''}" role="option" aria-selected="${act}" data-pm="${p.id}">
@@ -4262,7 +4344,7 @@ projMenu.addEventListener('click', e=>{
   const it = e.target.closest('[data-pm]'); if(!it) return;
   toggleProjMenu(false);
   const id = it.dataset.pm;
-  if(id==='all'){ goPage('portfolio'); window.scrollTo({top:0}); return; }
+  if(id==='all'){ goPage(['portfolio','todo','history','users'].find(x=>typeof AUTH_READY==='undefined'||!AUTH_READY||pageAllowed(x))||'portfolio'); window.scrollTo({top:0}); return; }
   const p = projById(id);
   if(p && p.drill){ goPage('overview'); window.scrollTo({top:0}); return; }
   if(activePageId()!=='portfolio') goPage('portfolio');
@@ -4296,7 +4378,8 @@ async function pmcApi(method, path, body){
   if(!res.ok) throw Object.assign(new Error(data.error || `HTTP ${res.status}`), {status:res.status});
   return data;
 }
-const isAdmin = () => PMC.me && PMC.me.role==='admin';
+const can = a => !!(PMC.me && PMC.me.perms && PMC.me.perms.actions.includes(a));
+const canPage = id => !!(PMC.me && PMC.me.perms && PMC.me.perms.pages.includes(id));
 function fmtDT(iso){
   if(!iso) return '—';
   const d = new Date(iso); if(isNaN(d)) return String(iso);
@@ -4310,25 +4393,17 @@ async function pmcRefresh(){
   catch(e){ PMC.health = null; PMC.error = T(`Cannot reach the PM Copilot agent at ${PMC.url}`, `无法连接 PM Copilot agent(${PMC.url})`); }
   if(PMC.health && PMC.token){
     try{
-      const [me, sg, mt, au] = await Promise.all([pmcApi('GET','/api/me'), pmcApi('GET','/api/suggestions'), pmcApi('GET','/api/meetings'), pmcApi('GET','/api/audit')]);
+      const me = await pmcApi('GET','/api/me');
+      const [sg, mt, au] = await Promise.all([
+        me.perms.pages.includes('todo') ? pmcApi('GET','/api/suggestions') : {suggestions:[]},
+        me.perms.pages.includes('history') ? pmcApi('GET','/api/meetings') : {meetings:[]},
+        me.perms.pages.includes('history') ? pmcApi('GET','/api/audit') : {audit:[]}]);
       PMC.me = me; PMC.suggestions = sg.suggestions; PMC.meetings = mt.meetings; PMC.audit = au.audit;
     }catch(e){
-      PMC.me = null;
-      PMC.error = e.status===401 ? T('That sign-in token was not accepted. Ask an admin for a new one.','登录令牌无效,请向管理员申请新的令牌。') : e.message;
+      if(e.status===401) return authSignOut(true);
+      PMC.error = e.message;
     }
   }
-  pmcRender();
-}
-function pmcConnect(){
-  const u = document.getElementById('pmcUrl'), t = document.getElementById('pmcToken');
-  if(u && u.value.trim()) PMC.url = u.value.trim();
-  if(t && t.value.trim()) PMC.token = t.value.trim();
-  try{ localStorage.setItem('dc_pmc_url', PMC.url); localStorage.setItem('dc_pmc_token', PMC.token); }catch(e){}
-  pmcRefresh();
-}
-function pmcSignOut(){
-  PMC.token = ''; PMC.me = null; PMC.suggestions = []; PMC.meetings = []; PMC.audit = [];
-  try{ localStorage.removeItem('dc_pmc_token'); }catch(e){}
   pmcRender();
 }
 async function pmcSync(){
@@ -4342,19 +4417,15 @@ async function pmcSync(){
 function pmcBarHTML(){
   if(PMC.me){
     const h = PMC.health || {};
-    return `<span class="who"><span class="live-dot"></span>${esc(PMC.me.name)} · ${PMC.me.role==='admin'?T('Admin','管理员'):T('Viewer','只读')}</span>
+    return `<span class="who"><span class="live-dot"></span>${esc(PMC.me.displayName)} · ${esc((PMC.me.perms.roles||[]).join(', ')||T('No role','无角色'))}</span>
       <span>· Jira: <b style="color:${h.jiraDryRun?'var(--orange)':'var(--green)'}">${h.jiraDryRun?T('dry run, nothing is written','演练模式,不写入'):T('live','实时写入')}</b></span>
       <span>· Granola: ${h.granola ? (h.lastGranolaSync ? T(`last sync ${fmtDT(h.lastGranolaSync)}`,`上次同步 ${fmtDT(h.lastGranolaSync)}`) : T('not synced yet','尚未同步')) : T('no API key','未配置 API key')}</span>
       <span class="sp"></span>
-      ${isAdmin() && h.granola ? `<button class="btn-ghost" onclick="pmcSync()">${T('Sync Granola now','立即同步 Granola')}</button>` : ''}
+      ${can('ingest') && h.granola ? `<button class="btn-ghost" onclick="pmcSync()">${T('Sync Granola now','立即同步 Granola')}</button>` : ''}
       <button class="btn-ghost" onclick="pmcRefresh()">${T('Refresh','刷新')}</button>
-      <button class="btn-withdraw" onclick="pmcSignOut()">${T('Sign out','退出')}</button>`;
+      `;
   }
-  return `<span class="who"><span class="off-dot"></span>${T('Not signed in','未登录')}</span>
-    <input id="pmcUrl" value="${esc(PMC.url)}" placeholder="http://host:8790" aria-label="${T('Agent URL','Agent 地址')}">
-    <input id="pmcToken" type="password" value="" placeholder="${T('Sign-in token (pmc_…)','登录令牌(pmc_…)')}" aria-label="${T('Sign-in token','登录令牌')}">
-    <button class="btn-primary" onclick="pmcConnect()">${T('Sign in','登录')}</button>
-    ${PMC.error ? `<span style="color:var(--red)">${esc(PMC.error)}</span>` : ''}`;
+  return `<span class="who"><span class="off-dot"></span>${PMC.error ? esc(PMC.error) : T('Not signed in','未登录')}</span>`;
 }
 function pmcSetupHTML(){
   return `<div class="panel pmc-empty">
@@ -4396,12 +4467,12 @@ function sugHTML(s){
     } else if(PMC.rejecting===s.id){
       actions = `<div class="sug-reject"><input id="rj_reason" placeholder="${T('Why? (optional, kept in the audit log)','原因(可选,记入审计日志)')}"><button class="btn-reject" onclick="pmcReject('${s.id}')">${T('Confirm reject','确认驳回')}</button><button class="btn-ghost" onclick="PMC.rejecting=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
     } else {
-      const dis = isAdmin() ? '' : 'disabled';
+      const dis = can('approve') ? '' : 'disabled';
       actions = `<div class="sug-actions">
         <button class="btn-approve" ${dis} onclick="pmcApprove('${s.id}')">${(PMC.health&&PMC.health.jiraDryRun)?T('Approve (dry run)','批准(演练)'):T('Approve to Jira','批准并写入 Jira')}</button>
         <button class="btn-ghost" ${dis} onclick="PMC.editing='${s.id}';PMC.rejecting=null;pmcRender()">${T('Edit','编辑')}</button>
         <button class="btn-reject" ${dis} onclick="PMC.rejecting='${s.id}';PMC.editing=null;pmcRender()">${T('Reject','驳回')}</button>
-        ${isAdmin() ? '' : `<span class="hint">${T('Only admins can approve. You can read and discuss.','仅管理员可审批,你可以查看。')}</span>`}
+        ${can('approve') ? '' : `<span class="hint">${T('Your role can read to-dos but not approve them.','你的角色可以查看待办,但不能审批。')}</span>`}
       </div>`;
     }
   } else {
@@ -4499,18 +4570,18 @@ function renderHistory(){
         <span class="sp" style="flex:1"></span>
         <button class="btn-ghost" onclick="PMC.filter={status:'pending',project:'all',meeting:'${m.id}'};goPage('todo')">${T('View to-dos','查看待办')}</button>
         <button class="btn-ghost" onclick="pmcToggleNotes('${m.id}')">${notes?T('Hide notes','收起纪要'):T('Show notes','查看纪要')}</button>
-        ${isAdmin()?`<button class="btn-withdraw" onclick="pmcReanalyse('${m.id}')">${T('Re-analyse','重新分析')}</button>`:''}
+        ${can('ingest')?`<button class="btn-withdraw" onclick="pmcReanalyse('${m.id}')">${T('Re-analyse','重新分析')}</button>`:''}
       </div>
       ${notes?`<details class="hist-raw" open><summary>${T('Meeting notes','会议纪要')}</summary><pre>${esc(notes)}</pre></details>`:''}
     </div>`; }).join('')
     : `<div class="panel pmc-empty"><h3>${T('No meetings yet','暂无会议')}</h3><p>${T('Sync Granola or import minutes on the right.','请同步 Granola 或在右侧导入纪要。')}</p></div>`;
 
-  imp.innerHTML = `<div class="panel-title">${T('Import minutes','导入纪要')}</div>` + (isAdmin() ? `
+  imp.innerHTML = `<div class="panel-title">${T('Import minutes','导入纪要')}</div>` + (can('ingest') ? `
     <div class="pmc-form">
       <div class="row"><input id="imTitle" placeholder="${T('Meeting title','会议标题')}"><input id="imDate" type="date" value="${PF_TODAY}"></div>
       <textarea id="imText" placeholder="${T('Paste minutes from a meeting Granola did not capture (Feishu, Teams, typed notes)…','粘贴 Granola 未记录的会议纪要(飞书、Teams、手写笔记等)…')}"></textarea>
       <button class="btn-primary" onclick="pmcImport()">${T('Analyse with Claude','用 Claude 分析')}</button>
-    </div>` : `<p class="pf-note" style="margin:0">${T('Only admins can import meetings.','仅管理员可导入会议。')}</p>`);
+    </div>` : `<p class="pf-note" style="margin:0">${T('Your role cannot import meetings.','你的角色不能导入会议。')}</p>`);
 
   aud.innerHTML = `<div class="panel-title">${T('Decision log','决策日志')}</div>` + (PMC.audit.filter(a=>['approve','reject','edit','sync','analyse'].includes(a.action)).slice(0,15).map(a=>`
     <div class="aud-row"><span class="t">${esc(fmtDT(a.at))}</span><span class="a"><b>${esc(a.by)}</b> · ${esc({approve:T('approved','批准'),reject:T('rejected','驳回'),edit:T('edited','编辑'),sync:T('synced Granola','同步 Granola'),analyse:T('analysed','分析')}[a.action]||a.action)}</span>
@@ -4546,12 +4617,248 @@ function pmcRender(){
   const b = document.getElementById('pmcTodoBadge'); if(b){ b.textContent = n; b.style.display = n ? '' : 'none'; }
   const d = document.getElementById('railTodoDot'); if(d) d.style.display = n ? '' : 'none';
 }
-document.addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target && e.target.id==='pmcToken') pmcConnect(); });
 setInterval(()=>{ const a = activePageId(); if(PMC.token && (a==='todo'||a==='history') && !PMC.editing && !PMC.rejecting) pmcRefresh(); }, 60000);
-if(PMC.token) pmcRefresh(); else pmcRender();
+/* boot happens in the AUTH block below, after sign-in */
+
+/* ===================== AUTH + USERS & ROLES =====================
+   The whole dashboard sits behind sign-in to the PM Copilot agent. What a person sees is the
+   union of their roles: pages (menu entries), actions (approve, ingest), projects (whose data).
+   The agent enforces all of it on every API call; this page hides what the role does not grant.
+   Note: the portfolio and DayOne figures are baked into this HTML file, so hiding them here keeps
+   them out of the menu but not out of "view source". Serve those from the agent when that matters. */
+const DAYONE_PAGES = ['overview','blocker','dependency','roadmap','meetings','luna'];
+let AUTH_READY = false, PF_SCOPED = false;
+
+function pageAllowed(id){
+  if(!PMC.me) return false;
+  const p = PMC.me.perms;
+  if(!p.pages.includes(id)) return false;
+  if(DAYONE_PAGES.includes(id) && !(p.projects.includes('*') || p.projects.includes('dayone'))) return false;
+  return true;
+}
+function firstAllowedPage(){
+  return ['portfolio','todo','history',...DAYONE_PAGES,'users'].find(pageAllowed) || null;
+}
+function applyProjectScope(perms){
+  if(perms.projects.includes('*')) return;
+  PF_SCOPED = true;
+  const ok = new Set(perms.projects);
+  const keep = (arr, f) => { const k = arr.filter(f); arr.length = 0; k.forEach(x=>arr.push(x)); };
+  keep(PF_PROJECTS, p=>ok.has(p.id)); keep(PF_Q, t=>ok.has(t.proj)); keep(PF_ASKS, a=>ok.has(a.proj)); keep(PF_EVENTS_EXTRA, e=>ok.has(e.proj));
+  Object.keys(PF_TK).forEach(k=>{ if(!ok.has(PF_TK[k].proj)) delete PF_TK[k]; });
+}
+function applyPagePerms(){
+  document.querySelectorAll('.tab[data-page], .rail-icon[data-page]').forEach(el=>{
+    el.classList.toggle('perm-hidden', !pageAllowed(el.dataset.page));
+  });
+}
+function renderUserChip(){
+  const u = PMC.me; if(!u) return;
+  const initials = (u.displayName||u.username).split(/[\s._@-]+/).filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join('') || '?';
+  const av = document.getElementById('railAvatar'); if(av){ av.textContent = initials; av.title = `${u.displayName} · ${T('Sign out','退出')}`; }
+  const chip = document.getElementById('userChip');
+  if(chip) chip.innerHTML = `<span class="uc-name">${esc(u.displayName)}</span><span class="uc-role">${esc((u.perms.roles||[]).join(', ')||T('No role','无角色'))}</span>
+    <button class="btn-withdraw" onclick="authSignOut()">${T('Sign out','退出')}</button>`;
+  const live = document.getElementById('whoLive'); if(live) live.textContent = T(`Signed in as ${u.displayName}`, `已登录:${u.displayName}`);
+}
+
+function showGate(msg){
+  document.body.classList.add('gated');
+  const g = document.getElementById('authGate');
+  g.hidden = false;
+  document.getElementById('agUrl').value = PMC.url;
+  const e = document.getElementById('agErr'); e.textContent = msg || ''; e.hidden = !msg;
+  setTimeout(()=>{ const u = document.getElementById('agUser'); if(u && !u.value) u.focus(); }, 50);
+}
+async function authLogin(ev){
+  if(ev) ev.preventDefault();
+  const url = document.getElementById('agUrl').value.trim(); if(url) PMC.url = url;
+  const btn = document.getElementById('agBtn'); btn.disabled = true;
+  try{
+    const r = await pmcApi('POST','/api/login', {username:document.getElementById('agUser').value, password:document.getElementById('agPass').value});
+    PMC.token = r.token; PMC.me = r.user;
+    try{ localStorage.setItem('dc_pmc_url', PMC.url); localStorage.setItem('dc_pmc_token', PMC.token); }catch(e){}
+    document.getElementById('agPass').value = '';
+    onSignedIn();
+  }catch(e){
+    showGate(e.status ? e.message : T(`Cannot reach the agent at ${PMC.url}. Check the address and that the service is running.`, `无法连接 ${PMC.url},请检查地址和服务是否运行。`));
+  }
+  btn.disabled = false;
+}
+function onSignedIn(){
+  AUTH_READY = true;
+  applyProjectScope(PMC.me.perms);
+  applyPagePerms();
+  renderUserChip();
+  const first = firstAllowedPage();
+  if(!first){ PMC.me = null; return showGate(T('Your account has no pages yet. Ask an admin to give you a role.','你的账号还没有可见页面,请联系管理员分配角色。')); }
+  document.getElementById('authGate').hidden = true;
+  document.body.classList.remove('gated');
+  renderPortfolio(); renderProjMenu();
+  const cur = activePageId();
+  goPage(pageAllowed(cur) ? cur : first);
+  pmcRefresh();
+}
+async function authSignOut(expired){
+  if(!expired){ try{ await pmcApi('POST','/api/logout'); }catch(e){} }
+  try{ localStorage.removeItem('dc_pmc_token'); }catch(e){}
+  location.reload();
+}
+async function authBoot(){
+  document.body.classList.add('gated');
+  if(!PMC.token) return showGate();
+  try{ PMC.me = await pmcApi('GET','/api/me'); onSignedIn(); }
+  catch(e){
+    if(e.status===401){ try{ localStorage.removeItem('dc_pmc_token'); }catch(x){} PMC.token=''; return showGate(T('Your session has ended. Please sign in again.','登录已过期,请重新登录。')); }
+    showGate(T(`Cannot reach the agent at ${PMC.url}.`, `无法连接 ${PMC.url}。`));
+  }
+}
+
+/* ---------- Users & Roles page ---------- */
+const UA = { catalog:null, users:[], roles:[], draft:null, dirty:false, armed:null, newRoles:[], renaming:null };
+async function uaLoad(){
+  try{
+    const [c,u,r] = await Promise.all([pmcApi('GET','/api/admin/catalog'), pmcApi('GET','/api/admin/users'), pmcApi('GET','/api/admin/roles')]);
+    UA.catalog = c; UA.users = u.users; UA.roles = r.roles;
+    if(!UA.dirty) UA.draft = JSON.parse(JSON.stringify(r.roles));
+  }catch(e){ showToast(T('Could not load users','无法加载用户'), e.message); }
+  uaRender();
+}
+const uaRoleName = id => (UA.roles.find(r=>r.id===id)||{name:id}).name;
+const lbl = o => (LANG==='zh' && o.zh) ? o.zh : o.en;
+function uaUsersHTML(){
+  const meId = PMC.me && PMC.me.id;
+  const chips = (sel, onClick) => UA.roles.map(r=>`<button type="button" class="role-chip ${sel.includes(r.id)?'on':''}" onclick="${onClick(r.id)}" aria-pressed="${sel.includes(r.id)}">${esc(r.name)}</button>`).join('');
+  return `<div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>${T('Users','用户')}</div>
+  <p class="ua-sub">${T('Reset passwords and assign roles. A person with several roles gets everything those roles allow.','重置密码并分配角色。一人可有多个角色,权限取并集。')}</p>
+  <div class="rm-table-wrap"><table class="ua-table"><thead><tr><th>${T('User','用户')}</th><th>${T('Roles','角色')}</th><th>${T('Reset password','重置密码')}</th><th>${T('Last sign-in','最近登录')}</th><th></th></tr></thead><tbody>
+  ${UA.users.map(u=>`<tr>
+    <td><b>${esc(u.displayName)}</b>${u.id===meId?` <span class="ua-you">(${T('you','你')})</span>`:''}<div class="ua-meta">${esc(u.username)}${u.email?` · ${esc(u.email)}`:''}</div></td>
+    <td><div class="role-chips">${chips(u.roles, rid=>`uaToggleUserRole('${u.id}','${rid}')`)}</div></td>
+    <td><div class="ua-pw"><input type="password" id="pw_${u.id}" placeholder="${T('New password','新密码')}" autocomplete="new-password"><button class="btn-ghost" onclick="uaSetPassword('${u.id}')">${T('Set','设置')}</button></div></td>
+    <td class="ua-meta">${u.lastLoginAt?esc(fmtDT(u.lastLoginAt)):T('Never','从未')}</td>
+    <td style="text-align:right">${u.id===meId?'':`<button class="ua-del ${UA.armed===u.id?'armed':''}" title="${T('Delete user','删除用户')}" onclick="uaDelete('${u.id}')">${UA.armed===u.id?T('Delete?','确认删除?'):'<svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>'}</button>`}</td>
+  </tr>`).join('')}
+  </tbody></table></div>
+  <div class="ua-add">
+    <div class="ua-add-h">${T('Add new user','新增用户')}</div>
+    <div class="ua-add-row">
+      <input id="nu_username" placeholder="${T('username','用户名')}" autocomplete="off">
+      <input id="nu_password" type="password" placeholder="${T('password (8+ chars)','密码(至少 8 位)')}" autocomplete="new-password">
+      <input id="nu_display" placeholder="${T('display name','显示名')}">
+      <input id="nu_email" placeholder="email">
+      <div class="role-chips">${chips(UA.newRoles, rid=>`uaToggleNewRole('${rid}')`)}</div>
+      <button class="btn-primary" onclick="uaCreate()">${T('Create','创建')}</button>
+    </div>
+  </div>`;
+}
+function uaRolesHTML(){
+  const c = UA.catalog; if(!c || !UA.draft) return '';
+  const groups = [
+    {id:'all', en:'All projects', zh:'全部项目'},
+    {id:'dayone', en:'DayOne NTP-E project view', zh:'DayOne NTP-E 项目视图'},
+    {id:'admin', en:'Administration', zh:'管理'},
+  ];
+  const cb = (role, kind, val, label, extra='') => {
+    const locked = role.locked;
+    const checked = locked || role[kind].includes(val) || (kind==='projects' && val!=='*' && role.projects.includes('*'));
+    const disabled = locked || (kind==='projects' && val!=='*' && role.projects.includes('*'));
+    return `<label class="rc-item ${disabled?'dis':''}"><input type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''} onchange="uaCheck('${role.id}','${kind}','${val}',this.checked)">${esc(label)}${extra}</label>`;
+  };
+  const cards = UA.draft.map(r=>`<div class="rc-card ${r.locked?'locked':''}">
+    <div class="rc-head">
+      ${UA.renaming===r.id ? `<input class="rc-rename" id="rn_${r.id}" value="${esc(r.name)}" onkeydown="if(event.key==='Enter')uaRename('${r.id}')" onblur="uaRename('${r.id}')">` : `<b>${esc(r.name)}</b>`}
+      <span class="rc-count">${UA.users.filter(u=>u.roles.includes(r.id)).length} ${T('users','人')}</span>
+      ${r.locked ? `<span class="rc-lock">${T('All permissions','全部权限')}</span>` : `
+        <button class="rc-ic" title="${T('Rename','重命名')}" onclick="UA.renaming='${r.id}';uaRender();setTimeout(()=>{const i=document.getElementById('rn_${r.id}');if(i){i.focus();i.select();}},20)"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="rc-ic del" title="${T('Delete role','删除角色')}" onclick="uaDeleteRole('${r.id}')"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`}
+    </div>
+    ${groups.map(g=>{ const ps = c.pages.filter(p=>p.group===g.id); return ps.length?`<div class="rc-sec">${esc(lbl(g))}</div>${ps.map(p=>cb(r,'pages',p.id, lbl(p).replace(/^DayOne \/ /,''))).join('')}`:''; }).join('')}
+    <div class="rc-sec">${T('Can do','可执行操作')}</div>${c.actions.map(a=>cb(r,'actions',a.id,lbl(a))).join('')}
+    <div class="rc-sec">${T('Projects whose data it sees','可见项目数据')}</div>${cb(r,'projects','*',T('All projects','全部项目'))}${c.projects.map(p=>cb(r,'projects',p.id,lbl(p))).join('')}
+  </div>`).join('');
+  return `<div class="rc-top">
+      <div><div class="panel-title" style="margin:0 0 4px"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>${T('Role → what it can see and do','角色 → 可见页面与操作')}</div>
+      <p class="ua-sub" style="margin:0">${T('Tick what each role may see and do. Changes apply after Save; people see them on their next page load.','勾选每个角色可见的页面和可执行的操作。点击保存后生效,用户下次加载页面时看到变化。')}</p></div>
+      <div class="rc-actions"><input id="newRoleName" placeholder="${T('new role name','新角色名称')}"><button class="btn-ghost" onclick="uaAddRole()">+ ${T('Add role','新增角色')}</button>
+      <button class="btn-primary" ${UA.dirty?'':'disabled'} onclick="uaSaveRoles()">${UA.dirty?T('Save changes','保存修改'):T('Saved','已保存')}</button></div>
+    </div>
+    <div class="rc-grid">${cards}</div>`;
+}
+function uaRender(){
+  const a = document.getElementById('uaUsers'), b = document.getElementById('uaRoles');
+  if(!a || !b) return;
+  if(!UA.catalog){ a.innerHTML = `<p class="ua-sub">${T('Loading…','加载中…')}</p>`; b.innerHTML = ''; return; }
+  a.innerHTML = uaUsersHTML(); b.innerHTML = uaRolesHTML();
+}
+async function uaToggleUserRole(uid, rid){
+  const u = UA.users.find(x=>x.id===uid); if(!u) return;
+  const roles = u.roles.includes(rid) ? u.roles.filter(x=>x!==rid) : u.roles.concat(rid);
+  try{ const r = await pmcApi('POST',`/api/admin/users/${uid}`, {roles}); Object.assign(u, r); showToast(T('Roles updated','角色已更新'), `${u.displayName}: ${r.roles.map(uaRoleName).join(', ')||T('none','无')}`); }
+  catch(e){ showToast(T('Could not change roles','无法修改角色'), e.message); }
+  uaRender();
+}
+async function uaSetPassword(uid){
+  const el = document.getElementById('pw_'+uid); const pw = el ? el.value : '';
+  try{ await pmcApi('POST',`/api/admin/users/${uid}/password`, {password:pw}); el.value=''; showToast(T('Password set','密码已设置'), T('Their open sessions were signed out.','该用户已登录的会话已被退出。')); }
+  catch(e){ showToast(T('Could not set password','无法设置密码'), e.message); }
+}
+async function uaDelete(uid){
+  if(UA.armed!==uid){ UA.armed = uid; uaRender(); setTimeout(()=>{ if(UA.armed===uid){ UA.armed=null; uaRender(); } }, 4000); return; }
+  UA.armed = null;
+  try{ await pmcApi('POST',`/api/admin/users/${uid}/delete`); showToast(T('User deleted','用户已删除'), ''); }
+  catch(e){ showToast(T('Could not delete','无法删除'), e.message); }
+  uaLoad();
+}
+function uaToggleNewRole(rid){
+  const keep = ['nu_username','nu_password','nu_display','nu_email'].map(id=>[id,(document.getElementById(id)||{}).value||'']);
+  UA.newRoles = UA.newRoles.includes(rid) ? UA.newRoles.filter(x=>x!==rid) : UA.newRoles.concat(rid);
+  uaRender(); keep.forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.value=v; });
+}
+async function uaCreate(){
+  const v = id => (document.getElementById(id)||{}).value || '';
+  try{
+    const u = await pmcApi('POST','/api/admin/users', {username:v('nu_username'), password:v('nu_password'), displayName:v('nu_display'), email:v('nu_email'), roles:UA.newRoles});
+    UA.newRoles = []; showToast(T('User created','用户已创建'), `${u.displayName} · ${u.roles.map(uaRoleName).join(', ')||T('no role yet','暂无角色')}`);
+    uaLoad();
+  }catch(e){ showToast(T('Could not create user','无法创建用户'), e.message); }
+}
+function uaCheck(rid, kind, val, on){
+  const r = UA.draft.find(x=>x.id===rid); if(!r || r.locked) return;
+  if(kind==='projects' && val==='*'){ r.projects = on ? ['*'] : []; }
+  else r[kind] = on ? Array.from(new Set(r[kind].concat(val))) : r[kind].filter(x=>x!==val);
+  UA.dirty = true; uaRender();
+}
+function uaRename(rid){
+  const el = document.getElementById('rn_'+rid); const r = UA.draft.find(x=>x.id===rid);
+  if(el && r && el.value.trim() && el.value.trim()!==r.name){ r.name = el.value.trim(); UA.dirty = true; }
+  UA.renaming = null; uaRender();
+}
+function uaAddRole(){
+  const el = document.getElementById('newRoleName'); const name = (el.value||'').trim(); if(!name) return el.focus();
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || ('role-'+Date.now());
+  if(UA.draft.some(r=>r.id===id)) return showToast(T('Role exists','角色已存在'), name);
+  UA.draft.push({id, name, pages:[], actions:[], projects:[]}); UA.dirty = true; uaRender();
+}
+function uaDeleteRole(rid){
+  const n = UA.users.filter(u=>u.roles.includes(rid)).length;
+  UA.draft = UA.draft.filter(r=>r.id!==rid); UA.dirty = true; uaRender();
+  if(n) showToast(T('Role removed from the draft','角色已从草稿移除'), T(`${n} users will lose it when you save.`,`保存后 ${n} 位用户将失去该角色。`));
+}
+async function uaSaveRoles(){
+  try{
+    const r = await pmcApi('POST','/api/admin/roles', {roles:UA.draft});
+    UA.roles = r.roles; UA.draft = JSON.parse(JSON.stringify(r.roles)); UA.dirty = false;
+    showToast(T('Roles saved','角色已保存'), T('People see the change on their next page load.','用户下次加载页面时生效。'));
+    uaLoad();
+  }catch(e){ showToast(T('Could not save roles','无法保存角色'), e.message); }
+}
+window.addEventListener('beforeunload', e=>{ if(UA.dirty){ e.preventDefault(); e.returnValue=''; } });
 
 renderPortfolio();
 goPage('portfolio');
+authBoot();
+
 </script>
 </body>
 </html>

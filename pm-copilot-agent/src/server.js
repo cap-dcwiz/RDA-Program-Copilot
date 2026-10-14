@@ -1,93 +1,160 @@
-/* PM Copilot agent HTTP API. No framework; every route below is the whole surface.
+/* PM Copilot agent HTTP API + dashboard host. No framework; every route below is the whole surface.
 
-   GET  /api/health                       public  — config status (no secrets)
-   GET  /api/me                           user    — who the token belongs to
-   GET  /api/meetings                     user    — meeting history (newest first)
-   GET  /api/meetings/:id                 user    — one meeting, incl. notes and its suggestions
-   GET  /api/suggestions?status=pending   user    — the to-do list
-   GET  /api/audit                        user    — who approved/rejected what
-   POST /api/sync                         admin   — pull new Granola notes now
-   POST /api/meetings/import              admin   — analyse pasted minutes {title, date, text}
-   POST /api/meetings/:id/reanalyse       admin   — run Claude again on a stored meeting
-   POST /api/suggestions/:id/edit         admin   — fix a suggestion before approving
-   POST /api/suggestions/:id/approve      admin   — write it to Jira (or dry-run)
-   POST /api/suggestions/:id/reject       admin   — {reason} */
+   Public
+   GET  /                                   the dashboard (docs/DayOne_NTPE_Program_Kanban_EN.html)
+   GET  /api/health                         config status (no secrets)
+   POST /api/login {username,password}      → {token, user}
+   Signed in
+   POST /api/logout
+   GET  /api/me                             user + effective permissions
+   GET  /api/suggestions?status=            page: todo      (only projects the user may see)
+   GET  /api/meetings, /api/meetings/:id    page: history
+   GET  /api/audit                          page: history
+   POST /api/suggestions/:id/approve|reject|edit     action: approve
+   POST /api/sync, /api/meetings/import, /api/meetings/:id/reanalyse   action: ingest
+   Users & Roles (page: users)
+   GET  /api/admin/catalog                  pages, actions, projects that roles can grant
+   GET  /api/admin/users | POST /api/admin/users
+   POST /api/admin/users/:id                {roles, displayName, email, disabled}
+   POST /api/admin/users/:id/password       {password}
+   POST /api/admin/users/:id/delete
+   GET  /api/admin/roles | POST /api/admin/roles   {roles:[...]} replaces the matrix */
+const fs = require('fs');
+const path = require('path');
 const http = require('http');
 const cfg = require('./config');
 const store = require('./store');
 const agent = require('./agent');
 const granola = require('./granola');
 const jira = require('./jira');
-const { whoIs } = require('./auth');
+const auth = require('./auth');
+const P = require('./permissions');
 
+const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
 
 function cors(req, res) {
   const origin = req.headers.origin;
-  const ok = cfg.allowedOrigins.includes('*') || (origin && cfg.allowedOrigins.includes(origin));
-  if (ok) res.setHeader('Access-Control-Allow-Origin', cfg.allowedOrigins.includes('*') ? '*' : origin);
+  const any = cfg.allowedOrigins.includes('*');
+  if (any || (origin && cfg.allowedOrigins.includes(origin))) res.setHeader('Access-Control-Allow-Origin', any ? '*' : origin);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 }
-const send = (res, status, data) => { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); };
+const send = (res, status, data) => { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(data)); };
 const readBody = (req) => new Promise((resolve, reject) => {
   let b = ''; req.on('data', c => { b += c; if (b.length > 5e6) reject(err(413, 'Body too large')); });
   req.on('end', () => { try { resolve(b ? JSON.parse(b) : {}); } catch { reject(err(400, 'Body must be JSON')); } });
 });
-const need = (user, role) => { if (!user) throw err(401, 'Sign in with a PM Copilot token'); if (role === 'admin' && user.role !== 'admin') throw err(403, 'Only an admin can do this'); };
+const signedIn = (u) => { if (!u) throw err(401, 'Please sign in'); };
+const page = (u, id) => { signedIn(u); if (!u.perms.pages.includes(id)) throw err(403, 'Your role does not include this page'); };
+const action = (u, id) => { signedIn(u); if (!u.perms.actions.includes(id)) throw err(403, 'Your role does not allow this'); };
+const seesMeeting = (u, m) => u.perms.projects.includes('*') || (m.projects || []).some(p => P.canSeeProject(u.perms, p));
 
-const meetingCard = (m, db) => {
-  const s = db.suggestions.filter(x => x.meetingId === m.id);
+/* Simple login throttle: 8 failures per username+IP per 15 minutes. */
+const fails = new Map();
+function throttle(key) {
+  const now = Date.now(), f = (fails.get(key) || []).filter(t => now - t < 15 * 60000);
+  fails.set(key, f);
+  if (f.length >= 8) throw err(429, 'Too many failed sign-ins. Try again in 15 minutes.');
+  return () => { f.push(now); fails.set(key, f); };
+}
+
+const meetingCard = (m, db, u) => {
+  const s = db.suggestions.filter(x => x.meetingId === m.id && P.canSeeProject(u.perms, x.project));
   return { id: m.id, source: m.source, title: m.title, date: m.date, url: m.url, attendees: m.attendees, summary: m.summary || [],
-    projects: m.projects || [], status: m.status, error: m.error, ingestedAt: m.ingestedAt, jiraContext: m.jiraContext,
+    projects: (m.projects || []).filter(p => P.canSeeProject(u.perms, p)), status: m.status, error: m.error, ingestedAt: m.ingestedAt, jiraContext: m.jiraContext,
     counts: { pending: s.filter(x => x.status === 'pending').length, approved: s.filter(x => x.status === 'approved').length, rejected: s.filter(x => x.status === 'rejected').length } };
 };
 
 async function route(req, res, user) {
   const url = new URL(req.url, 'http://x');
-  const p = url.pathname.replace(/\/+$/, '');
-  const db = store.load();
+  const p = url.pathname.replace(/\/+$/, '') || '/';
   let m;
 
-  if (req.method === 'GET' && p === '/api/health') return send(res, 200, { ok: true, model: cfg.anthropic.model,
-    claude: !!cfg.anthropic.apiKey, granola: granola.configured(), jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(),
-    lastGranolaSync: db.sync.lastGranolaSync, meetings: db.meetings.length, pending: db.suggestions.filter(s => s.status === 'pending').length });
-
-  need(user);
-  if (req.method === 'GET' && p === '/api/me') return send(res, 200, user);
-  if (req.method === 'GET' && p === '/api/meetings') return send(res, 200, { meetings: db.meetings.map(x => meetingCard(x, db)) });
-  if (req.method === 'GET' && (m = p.match(/^\/api\/meetings\/([\w-]+)$/))) {
-    const mt = db.meetings.find(x => x.id === m[1]); if (!mt) throw err(404, 'Meeting not found');
-    return send(res, 200, { ...meetingCard(mt, db), notesText: mt.notesText, suggestions: db.suggestions.filter(s => s.meetingId === mt.id) });
+  if (req.method === 'GET' && (p === '/' || p === '/index.html')) {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
+    return fs.createReadStream(DASHBOARD).pipe(res);
   }
+  if (req.method === 'GET' && p === '/api/health') {
+    const db = store.load();
+    return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
+      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), lastGranolaSync: db.sync.lastGranolaSync });
+  }
+  if (req.method === 'POST' && p === '/api/login') {
+    const body = await readBody(req);
+    const fail = throttle(`${String(body.username || '').toLowerCase()}|${req.socket.remoteAddress}`);
+    try { const r = auth.login(body.username, body.password); store.audit(r.user.displayName, 'login', r.user.id); store.save(); return send(res, 200, r); }
+    catch (e) { fail(); throw e; }
+  }
+
+  signedIn(user);
+  const db = store.load();
+  if (req.method === 'POST' && p === '/api/logout') { auth.logout(user.token); return send(res, 200, { ok: true }); }
+  if (req.method === 'GET' && p === '/api/me') { const { token, ...u } = user; return send(res, 200, u); }
+
   if (req.method === 'GET' && p === '/api/suggestions') {
+    page(user, 'todo');
     const st = url.searchParams.get('status');
-    const list = db.suggestions.filter(s => !st || s.status === st).map(s => {
+    const list = db.suggestions.filter(s => (!st || s.status === st) && P.canSeeProject(user.perms, s.project)).map(s => {
       const mt = db.meetings.find(x => x.id === s.meetingId) || {};
       return { ...s, meeting: { id: mt.id, title: mt.title, date: mt.date, url: mt.url } };
     }).sort((a, b) => String(b.meeting.date).localeCompare(String(a.meeting.date)));
     return send(res, 200, { suggestions: list, jiraDryRun: jira.dryRun() });
   }
-  if (req.method === 'GET' && p === '/api/audit') return send(res, 200, { audit: db.audit.slice(0, 200) });
+  if (req.method === 'GET' && p === '/api/meetings') { page(user, 'history'); return send(res, 200, { meetings: db.meetings.filter(x => seesMeeting(user, x)).map(x => meetingCard(x, db, user)) }); }
+  if (req.method === 'GET' && (m = p.match(/^\/api\/meetings\/([\w-]+)$/))) {
+    page(user, 'history');
+    const mt = db.meetings.find(x => x.id === m[1]); if (!mt || !seesMeeting(user, mt)) throw err(404, 'Meeting not found');
+    // Full notes cover every project discussed, so only users who see all projects get them.
+    const full = user.perms.projects.includes('*');
+    return send(res, 200, { ...meetingCard(mt, db, user), notesText: full ? mt.notesText : null,
+      suggestions: db.suggestions.filter(s => s.meetingId === mt.id && P.canSeeProject(user.perms, s.project)) });
+  }
+  if (req.method === 'GET' && p === '/api/audit') {
+    page(user, 'history');
+    const visible = new Set(db.suggestions.filter(s => P.canSeeProject(user.perms, s.project)).map(s => s.id));
+    const all = user.perms.projects.includes('*');
+    return send(res, 200, { audit: db.audit.filter(a => all || visible.has(a.target)).slice(0, 200) });
+  }
+
+  if (req.method === 'GET' && p === '/api/admin/catalog') { page(user, 'users'); return send(res, 200, { pages: P.PAGES, actions: P.ACTIONS, projects: P.PROJECTS }); }
+  if (req.method === 'GET' && p === '/api/admin/users') { page(user, 'users'); return send(res, 200, { users: auth.users() }); }
+  if (req.method === 'GET' && p === '/api/admin/roles') { page(user, 'users'); return send(res, 200, { roles: auth.roles() }); }
 
   if (req.method !== 'POST') throw err(404, 'Not found');
-  need(user, 'admin');
   const body = await readBody(req);
-  if (p === '/api/sync') return send(res, 200, await agent.syncGranola(user.name));
+
+  if (p.startsWith('/api/admin/')) {
+    page(user, 'users');
+    const log = (a, t, d) => { store.audit(user.name, a, t, d); store.save(); };
+    if (p === '/api/admin/users') { const u = auth.createUser(body); log('user-create', u.id, `${u.username} · ${u.roles.join(',')}`); return send(res, 200, u); }
+    if (p === '/api/admin/roles') { const r = auth.saveRoles(body.roles || []); log('roles-save', 'roles', r.map(x => x.name).join(', ')); return send(res, 200, { roles: r }); }
+    if ((m = p.match(/^\/api\/admin\/users\/([\w-]+)\/password$/))) { auth.setPassword(m[1], body.password); log('user-password', m[1]); return send(res, 200, { ok: true }); }
+    if ((m = p.match(/^\/api\/admin\/users\/([\w-]+)\/delete$/))) { auth.deleteUser(m[1], user.id); log('user-delete', m[1]); return send(res, 200, { ok: true }); }
+    if ((m = p.match(/^\/api\/admin\/users\/([\w-]+)$/))) { const u = auth.updateUser(m[1], body, user.id); log('user-update', u.id, `${u.username} · ${u.roles.join(',')}`); return send(res, 200, u); }
+    throw err(404, 'Not found');
+  }
+
+  if (p === '/api/sync') { action(user, 'ingest'); return send(res, 200, await agent.syncGranola(user.name)); }
   if (p === '/api/meetings/import') {
+    action(user, 'ingest');
     if (!body.text || body.text.trim().length < 40) throw err(400, 'Paste the meeting notes in "text"');
     const r = await agent.ingest({ source: 'manual', sourceId: null, title: body.title || 'Imported meeting', date: body.date || new Date().toISOString(),
       attendees: body.attendees || [], notesText: body.text, url: null }, user.name);
-    return send(res, 200, meetingCard(r.meeting, store.load()));
+    return send(res, 200, meetingCard(r.meeting, store.load(), user));
   }
   if ((m = p.match(/^\/api\/meetings\/([\w-]+)\/reanalyse$/))) {
+    action(user, 'ingest');
     const mt = db.meetings.find(x => x.id === m[1]); if (!mt) throw err(404, 'Meeting not found');
     const r = await agent.ingest({ ...mt, updatedAt: `re-${Date.now()}` }, user.name);
-    return send(res, 200, meetingCard(r.meeting, store.load()));
+    return send(res, 200, meetingCard(r.meeting, store.load(), user));
   }
   if ((m = p.match(/^\/api\/suggestions\/([\w-]+)\/(approve|reject|edit)$/))) {
-    if (m[2] === 'edit') return send(res, 200, agent.edit(m[1], body, user));
+    action(user, 'approve');
+    const s = db.suggestions.find(x => x.id === m[1]);
+    if (!s || !P.canSeeProject(user.perms, s.project)) throw err(404, 'Suggestion not found');
+    if (m[2] === 'edit') { if (body.project && !P.canSeeProject(user.perms, body.project)) throw err(403, 'You cannot move a to-do to a project you cannot see'); return send(res, 200, agent.edit(m[1], body, user)); }
     return send(res, 200, await agent.decide(m[1], m[2], user, body));
   }
   throw err(404, 'Not found');
@@ -96,13 +163,15 @@ async function route(req, res, user) {
 const server = http.createServer(async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-  try { await route(req, res, whoIs(req)); }
-  catch (e) { if (!e.status) console.error(e); send(res, e.status || 500, { error: e.message }); }
+  try { await route(req, res, auth.whoIs(req)); }
+  catch (e) { if (!e.status) console.error(e); if (!res.headersSent) send(res, e.status || 500, { error: e.message }); }
 });
 
 if (require.main === module) {
+  const first = auth.bootstrap();
   server.listen(cfg.port, () => {
-    console.log(`PM Copilot agent on :${cfg.port} · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
+    console.log(`PM Copilot agent on :${cfg.port} · dashboard at / · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
+    if (first) console.log(`\nFirst start: created user "admin" with password ${first}\nSign in, then change it on Users & Roles.\n`);
     if (granola.configured() && cfg.granola.syncMinutes > 0) {
       const tick = () => agent.syncGranola('scheduler').then(r => r.notes && console.log('[sync]', r)).catch(e => console.warn('[sync]', e.message));
       setTimeout(tick, 3000); setInterval(tick, cfg.granola.syncMinutes * 60000);

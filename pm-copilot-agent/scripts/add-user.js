@@ -1,7 +1,11 @@
-/* Usage: npm run add-user -- "Sherry Liu" admin sherry.liu@rda.ai
-   Prints the sign-in token once. Re-running for the same name replaces the token. */
-const { addUser } = require('../src/auth');
-const [name, role = 'viewer', email] = process.argv.slice(2);
-if (!name) { console.error('Usage: npm run add-user -- "<name>" <admin|viewer> [email]'); process.exit(1); }
-const token = addUser({ name, role, email });
-console.log(`\n${name} (${role}) added. Sign-in token, shown once:\n\n  ${token}\n\nPaste it into the dashboard's "Sign in" box. Keep it private.\n`);
+/* Usage: npm run add-user -- <username> <password> [role,role] ["Display name"] [email]
+   e.g.   npm run add-user -- sherry.liu 'S3cure-pass' pm "Sherry Liu" sherry.liu@rda.ai
+   Normally you add users on the dashboard's Users & Roles page; this is for scripts and recovery. */
+const auth = require('../src/auth');
+const [username, password, roleList = '', displayName, email] = process.argv.slice(2);
+if (!username || !password) { console.error('Usage: npm run add-user -- <username> <password> [role,role] ["Display name"] [email]'); process.exit(1); }
+auth.roles();
+try {
+  const u = auth.createUser({ username, password, displayName, email, roles: roleList.split(',').map(s => s.trim()).filter(Boolean) });
+  console.log(`Added ${u.username} with roles: ${u.roles.join(', ') || '(none)'}`);
+} catch (e) { console.error(e.message); process.exit(1); }
