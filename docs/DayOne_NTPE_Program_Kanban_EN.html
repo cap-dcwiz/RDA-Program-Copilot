@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Delivery Copilot · Program Kanban</title>
+<title>Delivery Copilot · Portfolio</title>
 <style>
 :root{
   --bg:#080b16; --bg2:#0b0f1e;
@@ -487,6 +487,184 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 #toast .toast-title{font-weight:800;font-size:13px;color:var(--purple);margin-bottom:4px;}
 #toast .toast-body{font-size:12px;color:var(--text-dim);}
 
+/* ===== Portfolio (home) =====
+   Leadership view across every active client project. Jira is the data source, not the layout:
+   each card carries data-src (ticket keys, or MTG for the PM weekly sync) and hovering it shows
+   exactly which records the statement was drawn from. */
+/* Project switcher: "All projects" is the portfolio; picking DayOne opens its project view
+   (and only then do the DayOne tabs show). Other projects open their snapshot drawer. */
+.topbar{z-index:20;}
+.proj-dd{position:relative;}
+button.project-select{font-family:inherit;}
+.project-select:hover,.project-select[aria-expanded="true"]{border-color:var(--border2);}
+.project-select[aria-expanded="true"] svg.i{transform:rotate(180deg);}
+.proj-menu{position:absolute;top:calc(100% + 6px);left:0;width:320px;max-width:calc(100vw - 32px);z-index:95;display:none;
+  background:rgba(13,17,34,.97);border:1px solid var(--border2);border-radius:12px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,.6);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.proj-menu.open{display:block;}
+.pm-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;cursor:pointer;border:none;background:transparent;
+  color:var(--text);font-family:inherit;text-align:left;}
+.pm-item:hover,.pm-item:focus-visible{background:var(--panel3);outline:none;}
+.pm-item.active{background:var(--purple-bg);}
+.pm-item .pm-ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--panel2);color:var(--text-dim);}
+.pm-item .pm-ic svg{width:14px;height:14px;}
+.pm-item .pm-ic .dot{width:8px;height:8px;}
+.pm-item .pm-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.pm-item .pm-tx b{font-size:13px;font-weight:700;}
+.pm-item .pm-tx span{font-size:11px;color:var(--text-dimmer);}
+.pm-item .pm-go{font-size:10.5px;font-weight:700;color:var(--text-dimmer);white-space:nowrap;}
+.pm-item.active .pm-go{color:var(--purple);}
+.pm-group{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);padding:8px 10px 4px;}
+.pm-sep{height:1px;background:var(--border);margin:6px 4px;}
+.tabs.mode-all{display:none;}
+.tabs .tab[data-page="portfolio"]{display:none;}
+.stats.n6{grid-template-columns:repeat(6,1fr);}
+.stat-card[data-src]{cursor:help;}
+.pf-asof{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--text-dimmer);}
+.pf-asof code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--text-dim);background:var(--panel3);
+  border:1px solid var(--border);border-radius:6px;padding:2px 7px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pf-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px;flex-wrap:wrap;}
+.pf-section-head h2{font-size:15px;font-weight:800;margin:0;}
+.pf-section-head span{font-size:12px;color:var(--text-dimmer);}
+.pf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px;}
+.pf-card{position:relative;display:flex;flex-direction:column;gap:11px;padding:16px 18px;border-radius:var(--radius);
+  background:var(--panel);border:1px solid var(--border);cursor:pointer;transition:transform .15s,border-color .15s;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 8px 36px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.09);
+  background-image:linear-gradient(155deg, rgba(255,255,255,.10), rgba(255,255,255,0) 45%);}
+.pf-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.pf-card:focus-visible,.lc-cell:focus-visible,.ask:focus-visible{outline:2px solid var(--purple);outline-offset:2px;}
+.pf-card.h-red{border-color:rgba(239,68,68,.45);}
+.pf-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.pf-name{font-size:15px;font-weight:800;line-height:1.25;}
+.pf-client{font-size:11.5px;color:var(--text-dim);margin-top:2px;}
+.pf-phase{font-size:10.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);}
+.pf-headline{font-size:12.5px;line-height:1.6;color:#d6d9ee;margin:0;}
+.pf-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.pf-chip{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--border2);color:var(--text-dim);white-space:nowrap;}
+.pf-chip.warn{color:var(--orange);border-color:rgba(245,158,11,.35);}
+.pf-chip.bad{color:var(--red);border-color:rgba(239,68,68,.35);}
+.pf-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid var(--border);margin-top:auto;}
+.pf-next{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-dim);min-width:0;}
+.pf-next .d{flex-shrink:0;font-weight:800;font-size:10.5px;color:var(--purple);background:var(--purple-bg);border-radius:6px;padding:2px 7px;font-variant-numeric:tabular-nums;}
+.pf-next .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pf-open{flex-shrink:0;font-size:11.5px;font-weight:800;color:var(--purple);display:inline-flex;align-items:center;gap:4px;}
+.pf-open svg{width:13px;height:13px;}
+.pf-drillnote{font-size:10px;color:var(--text-dimmer);font-weight:600;}
+
+/* Lifecycle strip (card) and matrix (panel) share one state encoding: fill + glyph + texture for blocked */
+.lc-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;}
+.lc-seg{height:6px;border-radius:3px;}
+.lc-labels{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:4px;font-size:9.5px;color:var(--text-dimmer);font-weight:700;}
+.st-done{background:var(--green);} .st-wip{background:var(--blue);} .st-risk{background:var(--orange);}
+.st-blocked{background:repeating-linear-gradient(135deg,var(--red) 0 4px,rgba(239,68,68,.45) 4px 7px);}
+.st-todo{background:var(--panel2);box-shadow:inset 0 0 0 1px var(--border2);} .st-na{background:transparent;box-shadow:inset 0 0 0 1px var(--border);}
+.lc-wrap{overflow-x:auto;}
+.lc-matrix{display:grid;grid-template-columns:150px repeat(5,minmax(112px,1fr));gap:6px;min-width:720px;}
+.lc-h{font-size:10.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);padding:0 4px 4px;}
+.lc-h small{display:block;font-size:9.5px;font-weight:700;letter-spacing:.2px;text-transform:none;color:var(--red);margin-top:2px;}
+.lc-proj{font-size:12.5px;font-weight:800;display:flex;flex-direction:column;justify-content:center;padding:0 4px;cursor:pointer;}
+.lc-proj span{font-size:10.5px;font-weight:600;color:var(--text-dimmer);}
+.lc-cell{border-radius:9px;padding:8px 9px;font-size:11px;line-height:1.4;color:var(--text-dim);min-height:58px;cursor:help;
+  border:1px solid var(--border);background:var(--panel3);}
+.lc-cell b{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.2px;margin-bottom:3px;}
+.lc-cell .g{width:14px;height:14px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:9.5px;color:#0b0f1e;flex-shrink:0;}
+.lc-cell.c-done{border-color:rgba(34,197,94,.3);} .lc-cell.c-done b{color:var(--green);}
+.lc-cell.c-wip{border-color:rgba(59,130,246,.4);} .lc-cell.c-wip b{color:var(--blue);}
+.lc-cell.c-risk{border-color:rgba(245,158,11,.45);background:linear-gradient(180deg,rgba(245,158,11,.08),transparent),var(--panel3);} .lc-cell.c-risk b{color:var(--orange);}
+.lc-cell.c-blocked{border-color:rgba(239,68,68,.5);background:linear-gradient(180deg,rgba(239,68,68,.1),transparent),var(--panel3);} .lc-cell.c-blocked b{color:var(--red);}
+.lc-cell.c-todo,.lc-cell.c-na{border-style:dashed;color:var(--text-dimmer);} .lc-cell.c-todo b,.lc-cell.c-na b{color:var(--text-dimmer);}
+.lc-cell .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lc-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-dim);}
+.lc-legend span{display:inline-flex;align-items:center;gap:6px;}
+.lc-legend i{width:18px;height:8px;border-radius:3px;display:inline-block;}
+.pf-insight{margin-top:12px;font-size:12.5px;line-height:1.6;color:#d6d9ee;background:var(--purple-bg);border-radius:10px;padding:10px 12px;}
+.pf-insight b{color:var(--purple);}
+
+/* Leadership asks */
+.ask{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:12px 0;border-bottom:1px dashed var(--border);cursor:help;}
+.ask:last-of-type{border-bottom:none;padding-bottom:0;}
+.ask .ask-k{grid-row:span 3;padding-top:1px;}
+.ask .ask-t{font-size:13px;font-weight:700;line-height:1.4;}
+.ask .ask-w{font-size:12px;color:var(--text-dim);line-height:1.55;}
+.ask .ask-a{font-size:12px;color:var(--text);line-height:1.55;}
+.ask .ask-a em{font-style:normal;font-weight:800;color:var(--purple);margin-right:4px;}
+.pf-rec-note{font-size:11px;color:var(--text-dimmer);margin:-6px 0 6px;}
+
+/* Next 30 days */
+.pf-week + .pf-week{margin-top:12px;}
+.pf-week h5{margin:0 0 4px;font-size:10.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);}
+.pf-ev{display:grid;grid-template-columns:78px 1fr auto;gap:12px;padding:9px 0;border-bottom:1px dashed var(--border);align-items:start;cursor:help;}
+.pf-week .pf-ev:last-child{border-bottom:none;}
+.pf-ev .d{font-weight:800;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums;}
+.pf-ev .d span{display:block;color:var(--text-dimmer);font-size:10.5px;font-weight:600;}
+.pf-ev .t{font-size:12.5px;line-height:1.5;color:var(--text);}
+.pf-ev .t .tent{display:inline-block;margin-left:6px;font-size:9.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--orange);}
+.proj-tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--border2);color:var(--text-dim);white-space:nowrap;}
+
+/* Team load + Jira freshness */
+.hbar-row{display:grid;grid-template-columns:118px 1fr 70px;align-items:center;gap:10px;font-size:12px;padding:6px 0;cursor:help;}
+.hbar-row .nm{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hbar-row .v{text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;font-size:11.5px;}
+.hbar-row .v b{color:var(--text);font-size:12.5px;}
+.hbar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;}
+.hbar i{display:block;height:100%;border-radius:4px;background:var(--purple);}
+.hbar.cy i{background:var(--cyan);}
+.pf-sub{font-size:11px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);margin:16px 0 6px;}
+.pf-sub:first-of-type{margin-top:0;}
+.pf-note{font-size:12px;color:var(--text-dim);line-height:1.6;margin-top:10px;}
+.pf-note b{color:var(--text);}
+
+/* Source tooltip */
+.src-tip{position:fixed;z-index:130;width:380px;max-width:calc(100vw - 24px);background:rgba(13,17,34,.97);border:1px solid var(--border2);
+  border-radius:12px;padding:12px 14px;box-shadow:0 16px 48px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .12s;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.src-tip.show{opacity:1;pointer-events:auto;}
+.src-tip .st-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--text-dimmer);margin-bottom:6px;}
+.src-tip .st-note{font-size:11.5px;color:var(--text-dim);line-height:1.5;margin-bottom:6px;}
+.src-tip .st-row{padding:7px 0;border-top:1px dashed var(--border);}
+.src-tip .st-row:first-of-type{border-top:none;}
+.src-tip .st-l1{display:flex;align-items:center;gap:8px;font-size:11.5px;}
+.src-tip .st-key{font-weight:800;color:var(--cyan);text-decoration:none;flex-shrink:0;}
+.src-tip .st-key:hover{text-decoration:underline;}
+.src-tip .st-sum{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-weight:600;}
+.src-tip .st-l2{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:10.5px;color:var(--text-dimmer);}
+.src-tip .st-l2 .badge{padding:1px 7px;font-size:9.5px;}
+.src-tip .st-l2 .stale{color:var(--orange);font-weight:700;}
+.src-tip .st-sig{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:4px;}
+.src-tip .st-mtg .st-key{color:var(--violet);}
+
+/* Project snapshot drawer */
+.pf-scrim{position:fixed;inset:0;background:rgba(4,6,14,.55);z-index:110;opacity:0;pointer-events:none;transition:opacity .2s;}
+.pf-scrim.show{opacity:1;pointer-events:auto;}
+.pf-drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,100vw);z-index:111;background:var(--bg2);border-left:1px solid var(--border2);
+  transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:22px 24px 40px;box-shadow:-20px 0 60px rgba(0,0,0,.5);}
+.pf-drawer.show{transform:none;}
+.pf-drawer h3{font-size:20px;margin:0;font-weight:800;}
+.pf-drawer h4{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);margin:20px 0 8px;}
+.pf-drawer .dr-close{position:absolute;top:18px;right:18px;}
+.pf-drawer ul.dr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.pf-drawer ul.dr-list li{font-size:12.5px;line-height:1.55;color:var(--text);padding-left:14px;position:relative;cursor:help;}
+.pf-drawer ul.dr-list li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--orange);}
+.pf-drawer .dr-src{font-size:10.5px;color:var(--text-dimmer);font-weight:700;margin-left:6px;}
+.dr-tk{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--panel3);margin-bottom:8px;}
+.dr-tk .st-l1{display:flex;align-items:center;gap:8px;font-size:12px;}
+.dr-tk .st-key{font-weight:800;color:var(--cyan);text-decoration:none;}
+.dr-tk .st-sum{flex:1;min-width:0;color:var(--text);font-weight:600;}
+.dr-tk .st-l2{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:11px;color:var(--text-dimmer);flex-wrap:wrap;}
+.dr-tk .st-l2 .badge{padding:1px 7px;font-size:9.5px;}
+.dr-tk .st-sig{font-size:11.5px;color:var(--text-dim);line-height:1.55;margin-top:6px;}
+
+@media (max-width:1400px){
+  .stats.n6{grid-template-columns:repeat(3,1fr);}
+  .pf-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:860px){
+  .pf-grid{grid-template-columns:1fr;}
+  .stats.n6{grid-template-columns:repeat(2,1fr);}
+}
+
 @media (max-width:1400px){
   .stats{grid-template-columns:repeat(3,1fr);}
   .row2{grid-template-columns:1fr;}
@@ -501,7 +679,8 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 <!-- ===== LEFT ICON RAIL (global nav) ===== -->
 <div class="icon-rail">
   <div class="rail-logo">D</div>
-  <div class="rail-icon active" data-page="overview" title="Overview" onclick="goPage('overview')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+  <div class="rail-icon active" data-page="portfolio" title="Portfolio" onclick="goPage('portfolio')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+  <div class="rail-icon" data-page="overview" title="DayOne NTPE · Overview" onclick="goPage('overview')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
   <div class="rail-icon" data-page="blocker" title="Blocker Impact Map" onclick="goPage('blocker')"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5L15.5 10.5M8.5 16.5L15.5 13.5"/></svg></div>
   <div class="rail-icon" data-page="dependency" title="Dependency View" onclick="goPage('dependency')"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
   <div class="rail-icon" data-page="roadmap" title="Roadmap View" onclick="goPage('roadmap')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
@@ -551,12 +730,16 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       </div>
     </div>
     <div class="topbar-row" style="justify-content:flex-start;gap:14px;">
-      <div class="project-select" title="Switch project">
-        <span class="lbl"><span data-i18n-en="Project:" data-i18n-zh="项目:">Project:</span></span> DayOne NTPE
-        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="proj-dd" id="projDD">
+        <button type="button" class="project-select" id="projectSelect" aria-haspopup="listbox" aria-expanded="false" aria-controls="projMenu">
+          <span class="lbl"><span data-i18n-en="Project:" data-i18n-zh="项目:">Project:</span></span> <span id="projSelLabel">DayOne NTPE</span>
+          <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="proj-menu" id="projMenu" role="listbox"></div>
       </div>
       <div class="tabs">
-        <button class="tab active" data-page="overview"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
+        <button class="tab active" data-page="portfolio"><span data-i18n-en="Portfolio" data-i18n-zh="项目组合">Portfolio</span></button>
+        <button class="tab" data-page="overview"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
         <button class="tab" data-page="blocker"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
         <button class="tab" data-page="dependency"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
         <button class="tab" data-page="roadmap"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
@@ -569,7 +752,59 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <!-- OVERVIEW -->
   <!-- ============================================================ -->
-  <div class="page active" id="page-overview">
+  <!-- ============================================================ -->
+  <!-- PORTFOLIO (home) — rendered from PF_TICKETS / PF_PROJECTS    -->
+  <!-- ============================================================ -->
+  <div class="page active" id="page-portfolio">
+    <div class="page-head">
+      <h1><span data-i18n-en="Portfolio Overview" data-i18n-zh="项目组合总览">Portfolio Overview</span></h1>
+      <p><span data-i18n-en="Every active client project on one page: where each stands, what is stuck, and what leadership needs to decide. Hover any card to see the records behind it." data-i18n-zh="所有在执行的客户项目汇总在一页:各自进展、卡在哪里、需要管理层拍板什么。悬停任一卡片可查看其背后的数据记录。">Every active client project on one page: where each stands, what is stuck, and what leadership needs to decide. Hover any card to see the records behind it.</span></p>
+      <div class="pf-asof" id="pfAsOf"></div>
+    </div>
+
+    <div class="stats n6" id="pfKpis"></div>
+
+    <div class="banner" data-src="MTG,BA-2010,BA-1098,BA-1864,BA-2380">
+      <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div style="flex:1;min-width:0;">
+        <div class="banner-title"><span data-i18n-en="Portfolio Brief" data-i18n-zh="组合简报">Portfolio Brief</span><span class="ai-tag">PM</span></div>
+        <div class="banner-text" id="pfBrief"></div>
+      </div>
+    </div>
+
+    <div class="pf-section-head">
+      <h2><span data-i18n-en="Project Health" data-i18n-zh="项目健康度">Project Health</span></h2>
+      <span><span data-i18n-en="Sorted by what needs attention first · click DayOne for its full project view" data-i18n-zh="按需关注程度排序 · 点击 DayOne 进入完整项目视图">Sorted by what needs attention first · click DayOne for its full project view</span></span>
+    </div>
+    <div class="pf-grid" id="pfCards"></div>
+
+    <div class="row2">
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="1.5"/><circle cx="14" cy="12" r="1.5"/><circle cx="10" cy="18" r="1.5"/></svg></div><span data-i18n-en="Where the Portfolio Is Stuck" data-i18n-zh="组合卡点在哪里">Where the Portfolio Is Stuck</span></div>
+        <div class="lc-wrap"><div class="lc-matrix" id="pfMatrix"></div></div>
+        <div class="lc-legend" id="pfMatrixLegend"></div>
+        <div class="pf-insight" id="pfMatrixInsight"></div>
+      </div>
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span data-i18n-en="Decisions for Leadership" data-i18n-zh="需管理层决策事项">Decisions for Leadership</span></div>
+        <div class="pf-rec-note"><span data-i18n-en="Facts come from Jira and the 12 Oct PM sync; the recommended action is the PM's call." data-i18n-zh="事实来自 Jira 与 10 月 12 日项目周会;建议动作为 PM 的判断。">Facts come from Jira and the 12 Oct PM sync; the recommended action is the PM's call.</span></div>
+        <div id="pfAsks"></div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span data-i18n-en="Next 30 Days" data-i18n-zh="未来 30 天">Next 30 Days</span></div>
+        <div id="pfTimeline"></div>
+      </div>
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span data-i18n-en="Team Load & Data Freshness" data-i18n-zh="团队负载与数据新鲜度">Team Load &amp; Data Freshness</span></div>
+        <div id="pfTeam"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-overview">
     <div class="page-head">
       <h1><span data-i18n-en="Program Overview" data-i18n-zh="项目总览">Program Overview</span></h1>
       <p><span data-i18n-en="Program management console · health, blocker impact, and key actions at a glance" data-i18n-zh="项目管理控制台 · 一览健康度、阻塞影响与关键行动项">Program management console · health, blocker impact, and key actions at a glance</span></p>
@@ -1314,6 +1549,9 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 </div>
 
 <div id="toast"><div class="toast-title" id="toastTitle">Program updated</div><div class="toast-body" id="toastBody"></div></div>
+<div class="src-tip" id="srcTip" role="tooltip"></div>
+<div class="pf-scrim" id="pfScrim" onclick="closeProjectDrawer()"></div>
+<aside class="pf-drawer" id="pfDrawer" aria-hidden="true" aria-label="Project snapshot"></aside>
 
 <div class="snap-hint" id="snapHint">
   <span id="snapHintText"></span>
@@ -1735,6 +1973,17 @@ function goPage(id){
   if(id==='dependency') requestAnimationFrame(()=>requestAnimationFrame(drawDepConnectors));
   if(id==='blocker') requestAnimationFrame(()=>requestAnimationFrame(drawBimConnectors));
   if(id==='meetings') renderMeetingsPage();
+  // The portfolio spans every client; the remaining tabs are the DayOne NTPE project view.
+  const sel = document.getElementById('projSelLabel');
+  if(sel) sel.textContent = id==='portfolio'
+    ? (LANG==='zh' ? `全部项目(${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})` : `All projects (${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})`)
+    : 'DayOne NTP-E';
+  const upd = document.getElementById('updatedTime');
+  if(upd) upd.textContent = id==='portfolio' ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '') : '2026-08-21 09:15';
+  const tabsEl = document.querySelector('.tabs'); if(tabsEl) tabsEl.classList.toggle('mode-all', id==='portfolio');
+  if(typeof renderProjMenu==='function') renderProjMenu();
+  if(id==='portfolio' && typeof renderPortfolio==='function') renderPortfolio();
+  if(typeof hideSrcTip==='function') hideSrcTip(true);
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
 
@@ -3038,7 +3287,7 @@ try{ SNAP_ENABLED = localStorage.getItem('dc_snap') !== 'off'; }catch(e){}
 const EDGE_IDLE_RESET = 400;  // ms of stillness that ends a gesture, for momentum detection
 let _snapUntil = 0, _edgePush = 0, _edgeDir = 0, _edgeLast = 0, _awaitIdle = false;
 
-function pageOrder(){ return [...document.querySelectorAll('.tab[data-page]')].map(t=>t.dataset.page); }
+function pageOrder(){ return [...document.querySelectorAll('.tab[data-page]')].filter(t=>t.offsetParent!==null).map(t=>t.dataset.page); }
 function activePageId(){ const el = document.querySelector('.page.active'); return el ? el.id.replace('page-','') : null; }
 function pageLabel(id){
   const tab = document.querySelector(`.tab[data-page="${id}"]`);
@@ -3287,6 +3536,8 @@ function setLang(lang){
   renderList();
   buildGantt();
   render();
+  if(typeof renderPortfolio==='function') renderPortfolio();
+  const active = activePageId(); if(active) goPage(active);
 }
 document.getElementById('langToggle').querySelectorAll('[data-lang-opt]').forEach(el=>{
   el.addEventListener('click', ()=> setLang(el.dataset.langOpt));
@@ -3296,6 +3547,642 @@ updateLangToggleUI();
 
 /* set updated timestamp to now (Singapore) */
 document.getElementById('updatedTime').textContent = '2026-08-21 09:15';
+</script>
+<script>
+/* =====================================================================================
+   PORTFOLIO (home page)
+
+   Data model, kept deliberately in two layers:
+     · PF_TICKETS  — a snapshot of the Jira query below. These are the facts. KPIs, freshness,
+                     overdue and team-load figures are COMPUTED from this array, never typed in.
+                     To refresh, re-run the JQL and replace the rows (key/status/assignee/updated/due).
+     · PF_PROJECTS — the PM's reading of those facts: health, what is stuck, what is next.
+                     Every statement carries src: [...] so the page can show where it came from.
+   A src entry is a Jira key, or 'MTG' for the PM weekly sync minutes (12 Oct 2026), which is
+   ahead of Jira on several projects. Hovering anything with data-src shows those records.
+   ===================================================================================== */
+const PF_ASOF = new Date('2026-10-14T14:45:00+08:00');
+const PF_ASOF_LABEL = '2026-10-14 14:45';
+const PF_JQL = 'project = BA AND "client[dropdown]" != RDA AND status NOT IN (Done, Backlog) ORDER BY cf[10019] ASC';
+const JIRA_BROWSE = 'https://projects-teams.atlassian.net/browse/';
+const PF_MEETING = { id:'MTG', title:'PM weekly sync · 12 Oct 2026', titleZh:'项目周会 · 2026-10-12', file:'智能纪要：1012project meeting' };
+
+// inQuery:false = parent/master ticket outside the JQL (status Backlog), shown for context only.
+const PF_TICKETS = [
+  {key:'BA-2380', proj:'dayone', summary:'[DayOne-NTPE] Master Ticket', type:'epic', status:'inprogress', assignee:'Xu Mingchen', created:'2026-07-17', updated:'2026-09-28', due:null,
+   signal:'28 Sep: GA calibration complete but Month 3 behind. GB data missing exports, 2 sensors with wrong start dates; only half of GC/GD received. IPMVP validation must come before AI policy training.'},
+  {key:'BA-2384', proj:'dayone', summary:'[DayOne-NTPE][3.1] Historical Data Export', status:'inprogress', assignee:'Sherry', created:'2026-07-17', updated:'2026-09-02', due:null,
+   signal:'1 data hall connected, 13 to go (Justin). System A chiller plant first. PUE formula confirmed.'},
+  {key:'BA-2386', proj:'dayone', summary:'[DayOne-NTPE][2.3] Historical data analysis and twin calibration', status:'inprogress', assignee:'Xu Mingchen', created:'2026-07-20', updated:'2026-09-28', due:'2026-07-23',
+   signal:'Moved to Month 3 on 28 Sep. Tied to the IPMVP engine (BA-2118).'},
+  {key:'BA-2387', proj:'dayone', summary:'[DayOne-NTPE][1.2] Chiller Plant Modelling + Cooling system topology mapping', status:'inprogress', assignee:'Valdy Lionel Christian', created:'2026-07-21', updated:'2026-09-10', due:null,
+   signal:'Chiller plant modelled as four systems (A–D). CRAH-to-hall mapping inferred from naming, still to validate against site drawings.'},
+  {key:'BA-2447', proj:'dayone', summary:'[DayOne-NTPE][2.1] Discretised data hall simulation model', status:'inprogress', assignee:'Xu Mingchen', created:'2026-08-25', updated:'2026-09-02', due:null,
+   signal:'Per-hall model (E-GA first) at row/rack level, beyond what dctwin resolves. Dummy simulation ran 25 Aug.'},
+
+  {key:'BA-1864', proj:'bdc', summary:'[P2-01] BDC data integration', status:'inprogress', assignee:'Xu Mingchen', created:'2026-03-09', updated:'2026-10-12', due:'2026-09-10',
+   signal:'9 Oct: client asked for the platform, so build it first and wait for data. Missing ~30 CRAH points and all IT load. E+ model complete but uncalibrated; AI policy pre-trained; ingestion mappings deployed.'},
+  {key:'BA-1774', proj:'bdc', summary:'[P0-03] [BDC-MY02] Cookbook', status:'todo', assignee:'Valdy Lionel Christian', created:'2026-01-30', updated:'2026-09-25', due:null,
+   signal:'Not started.'},
+  {key:'BA-2554', proj:'bdc', inQuery:false, summary:'[BDC-MY2] Master Ticket', type:'epic', status:'backlog', assignee:'—', created:'2026-09-25', updated:'2026-09-28', due:null,
+   signal:'Phase 1 done (10 tickets). Phase 2 data integration in progress; ingestion layer not built yet; a new engineer is joining.'},
+
+  {key:'BA-1098', proj:'bdx', summary:'[BDX-SIN1] Integrate new points', status:'blocked', assignee:'Lin Liangtao', created:'2025-07-14', updated:'2026-09-14', due:null,
+   signal:'Open since Jul 2025. Jan 2026: "escalate to upper management if still stalled". 72 existing points return data (3 Jun); new points, remote access and VPN bandwidth still open. No maintenance contract with BDx-SIN1.'},
+  {key:'BA-1897', proj:'bdx', summary:'[BDX-SIN1] Result analysis', status:'review', assignee:'Xu Mingchen', created:'2026-03-18', updated:'2026-09-14', due:null,
+   signal:'Mar: AI and baseline looked equal because the baseline setpoint was hard-coded at 14 °C. Scripts updated.'},
+  {key:'BA-2027', proj:'bdx', summary:'[BDX-SIN1] Test new data points', status:'inprogress', assignee:'Valdy Lionel Christian', created:'2026-05-04', updated:'2026-09-28', due:null,
+   signal:'50 of 60 new points OK, 10 return no value. Broken-point list exported to Sherry for an online review meeting.'},
+  {key:'BA-2429', proj:'bdx', summary:'[BDX-SIN1] Update the Chiller Plant & E+ model', status:'review', assignee:'Xu Mingchen', created:'2026-08-17', updated:'2026-09-14', due:'2026-09-11',
+   signal:'Scenario and cookbook updated (L7 roof loop, chiller swap). E+ model with Dr. Xu for check.'},
+  {key:'BA-2498', proj:'bdx', summary:'[BDX-SIN1] Local Deployment', status:'review', assignee:'Lin Liangtao', created:'2026-09-14', updated:'2026-10-05', due:null,
+   signal:'Deployed to GCP VM; InfluxDB and cookbook tested. Pending check with Dr. Xu.'},
+  {key:'BA-2499', proj:'bdx', inQuery:false, summary:'[BDX-SIN1] Master Ticket', type:'epic', status:'backlog', assignee:'—', created:'2026-09-14', updated:'2026-09-28', due:null,
+   signal:'28 Sep: E+ model updated; the data dependency that blocked progress is cleared. Data-problem list to go to Liangtao and BDx.'},
+
+  {key:'BA-1885', proj:'cmide', summary:'[CMI-DE1] Prepare deployment — data, frontend & AI integration', status:'review', assignee:'Xu Mingchen', created:'2026-03-16', updated:'2026-06-17', due:'2026-04-24',
+   signal:'17 Apr: AI engine integration ~80%; baseline and recommendation run without mocks. No update since June.'},
+  {key:'BA-2010', proj:'cmide', summary:'[CMI-G] Review and help task implementation', status:'blocked', assignee:'Ng Jia Hua', created:'2026-04-20', updated:'2026-07-12', due:null,
+   signal:'Platform layer deployed 5 May; application layer on hold because client data points have degraded since March. Handover note 12 Jul; patched code not yet merged into dcwiz-task-library.'},
+  {key:'BA-2034', proj:'cmide', summary:'CMI-DE deployment & monitoring/calibration', status:'inprogress', assignee:'Xu Mingchen', created:'2026-05-05', updated:'2026-08-03', due:null,
+   signal:'Jun–Aug: chiller and IT power readings flat; client still fixing data. Last note: "to review the data again".'},
+
+  {key:'BA-2566', proj:'cmisg', summary:'[CMI-SG] Chiller Leak Analysis', status:'inprogress', assignee:'Valdy Lionel Christian', created:'2026-09-28', updated:'2026-10-01', due:null,
+   signal:'CH-1 water-side COP 1.836 / 1.838 / 1.829 (Jul / Aug / Sep): no leak detectable; an early leak is not ruled out. Report handed to Mingchen for 2 Oct.'},
+  {key:'BA-2567', proj:'cmisg', summary:'[CMI-SG] Report Creation', status:'inprogress', assignee:'Xu Mingchen', created:'2026-09-28', updated:'2026-09-28', due:null,
+   signal:'Outline: savings on DH-3-01 and DH-3-03, overall chiller savings, CH02 leak status, CH01 recovery.'},
+
+  {key:'BA-2572', proj:'imdc', summary:'Q3 Report', status:'inprogress', assignee:'Xu Mingchen', created:'2026-10-05', updated:'2026-10-05', due:null,
+   signal:'Created 5 Oct. No description yet.'},
+  {key:'BA-1857', proj:'imdc', summary:'[IMDC] Upgrade project deployment (frontend integration)', status:'todo', priority:'High', assignee:'Valdy Lionel Christian', created:'2026-03-06', updated:'2026-05-22', due:null,
+   signal:'Waiting on the data-integration upgrade (BA-1846). Untouched since May.'},
+];
+const PF_TK = {}; PF_TICKETS.forEach(t=>{ PF_TK[t.key] = t; });
+const PF_Q = PF_TICKETS.filter(t=>t.inQuery!==false);   // exactly the JQL result set
+
+/* Lifecycle stages every RDA deployment passes through, left to right. */
+const PF_STAGES = [
+  {id:'data',   en:'Data access',      zh:'数据接入'},
+  {id:'model',  en:'Digital twin',     zh:'数字孪生'},
+  {id:'ai',     en:'AI & validation',  zh:'AI 与验证'},
+  {id:'deploy', en:'Deployment',       zh:'部署'},
+  {id:'ops',    en:'Operate & report', zh:'运营与报告'},
+];
+const PF_STATE = {
+  done:   {en:'Done',        zh:'已完成', g:'✓', cls:'st-done'},
+  wip:    {en:'In progress', zh:'进行中', g:'●', cls:'st-wip'},
+  risk:   {en:'At risk',     zh:'有风险', g:'!', cls:'st-risk'},
+  blocked:{en:'Blocked',     zh:'已阻塞', g:'✕', cls:'st-blocked'},
+  todo:   {en:'Not started', zh:'未开始', g:'',  cls:'st-todo'},
+  na:     {en:'Not in scope',zh:'不在范围', g:'–', cls:'st-na'},
+};
+const PF_HEALTH = {
+  red:  {en:'Escalate', zh:'需升级', badge:'red',    rank:0},
+  amber:{en:'At risk',  zh:'有风险', badge:'orange', rank:1},
+  green:{en:'On track', zh:'正常',   badge:'green',  rank:2},
+};
+
+const PF_PROJECTS = [
+  { id:'dayone', name:'DayOne NTP-E', client:{en:'DayOne · Johor, MY', zh:'DayOne · 马来西亚柔佛'}, kind:'delivery', health:'amber', gate:'client', drill:true,
+    phase:{en:'Month 3 of 9 · AI optimisation training', zh:'第 3/9 月 · AI 优化训练'},
+    headline:{en:'Twin is calibrated for hall GA only. GB, GC and GD data are still incomplete, so Month 3 is running behind plan.',
+              zh:'数字孪生仅完成 GA 机房标定,GB/GC/GD 数据仍不完整,第 3 月进度落后于计划。'},
+    owners:'Xu Mingchen · Valdy · Sherry',
+    tickets:['BA-2380','BA-2384','BA-2386','BA-2387','BA-2447'],
+    stages:{
+      data:  {s:'risk',    en:'GA complete; GB/GC/GD partial; live BMS at 1 of 14 halls', zh:'GA 完成;GB/GC/GD 部分到位;实时 BMS 仅 1/14 个机房', src:['BA-2380','BA-2384']},
+      model: {s:'wip',     en:'GA calibrated; per-hall rack-level model in build', zh:'GA 已标定;机房级(机柜粒度)模型构建中', src:['BA-2386','BA-2447','BA-2387']},
+      ai:    {s:'wip',     en:'Single-zone RL agreed as default; IPMVP gate before savings claims', zh:'已确定单区 RL 为默认版本;节能结论须先过 IPMVP 验证', src:['MTG','BA-2380']},
+      deploy:{s:'todo',    en:'Control-parameter scope to confirm on site', zh:'控制参数范围待现场确认', src:['MTG']},
+      ops:   {s:'todo',    en:'—', zh:'—', src:[]},
+    },
+    risks:[
+      {en:'GB is missing exports and has 2 sensors with wrong start dates; only half of GC/GD has arrived.', zh:'GB 缺少导出数据且有 2 个传感器起始日期错误;GC/GD 仅到位一半。', src:['BA-2380']},
+      {en:'Live BMS connectivity covers 1 of 14 data halls.', zh:'实时 BMS 连接仅覆盖 14 个机房中的 1 个。', src:['BA-2384']},
+      {en:'ECU status data reports repair state instead of on/off, likely a client data-entry error. Justin asked to verify.', zh:'ECU 状态数据给的是维修状态而非开关状态,疑似客户录入错误,已请 Justin 核实。', src:['MTG']},
+      {en:'Single-zone simulation shows a 6 °C deviation; root cause due within 1–2 days of 12 Oct.', zh:'单区仿真出现 6°C 偏差,10 月 12 日起 1–2 天内给出原因。', src:['MTG']},
+      {en:'Calibration ticket is 83 days past its 23 Jul due date.', zh:'标定任务已超过 7 月 23 日截止日 83 天。', src:['BA-2386']},
+    ],
+    next:[
+      {date:'2026-10-23', en:'Face-to-face with Zach (content pre-brief 19 Oct)', zh:'与 Zach 面对面会议(10 月 19 日预演内容)', src:['MTG']},
+      {date:'2026-10-28', tentative:true, en:'JB site visit: confirm controllable equipment and ranges', zh:'JB 现场考察:确认可控设备与参数范围', src:['MTG']},
+    ]},
+
+  { id:'bdc', name:'BDC MY2', client:{en:'Bridge Data Centres · Malaysia', zh:'Bridge Data Centres · 马来西亚'}, kind:'delivery', health:'amber', gate:'client',
+    phase:{en:'Phase 2 · Platform build ahead of data', zh:'第 2 阶段 · 先建平台、后补数据'},
+    headline:{en:'Committed to show the full platform by 31 Oct, but ~30 CRAH points and all IT load are still missing, so recommendations will come from a pre-trained policy.',
+              zh:'已承诺 10 月 31 日前交付完整平台,但仍缺约 30 个 CRAH 点位及全部 IT 负载数据,控制建议只能基于预训练策略。'},
+    owners:'Xu Mingchen · Valdy',
+    tickets:['BA-1864','BA-1774','BA-2554'],
+    stages:{
+      data:  {s:'blocked', en:'Chiller side mostly in; ~30 CRAH and all IT load missing', zh:'冷站侧基本到位;约 30 个 CRAH 及全部 IT 负载缺失', src:['BA-1864','MTG']},
+      model: {s:'risk',    en:'E+ model complete, uncalibrated until data lands', zh:'E+ 模型已完成,数据到位前无法标定', src:['BA-1864']},
+      ai:    {s:'risk',    en:'Policy pre-trained to prove the pipeline, not savings', zh:'策略已预训练,用于证明链路可用,不代表节能效果', src:['BA-1864']},
+      deploy:{s:'wip',     en:'Mappings, E+ and AI deployed; app and live ingestion due 31 Oct', zh:'映射、E+、AI 已部署;应用与实时接入 10 月 31 日交付', src:['BA-1864','MTG']},
+      ops:   {s:'todo',    en:'—', zh:'—', src:[]},
+    },
+    risks:[
+      {en:'Only 10–30% of total data points are usable; no IT load at all.', zh:'可用数据点仅占总量 10–30%,IT 负载完全缺失。', src:['MTG','BA-1864']},
+      {en:'Data-integration ticket is 34 days past its 10 Sep due date.', zh:'数据集成任务已超过 9 月 10 日截止日 34 天。', src:['BA-1864']},
+      {en:'Delivery lead hands over after 31 Oct; a new engineer is joining ingestion.', zh:'交付负责人 10 月 31 日后交接,新工程师加入数据接入。', src:['MTG','BA-2554']},
+      {en:'Without a written data-gap notice, a demo on missing data invites a dispute about what was delivered.', zh:'若无书面数据缺口通知,基于缺失数据的演示容易引发交付争议。', src:['MTG']},
+    ],
+    next:[
+      {date:'2026-10-16', en:'Send missing-data list and formal data-gap email (call first)', zh:'发送缺失数据清单与正式数据缺口邮件(先电话沟通)', src:['MTG']},
+      {date:'2026-10-31', en:'Full platform walkthrough: 3D data hall, preliminary control recommendations', zh:'完整平台演示:3D 机房视图、初步控制建议', src:['MTG','BA-1864']},
+    ]},
+
+  { id:'bdx', name:'BDx SIN1', client:{en:'BDx · Singapore (chiller plant)', zh:'BDx · 新加坡(冷站)'}, kind:'delivery', health:'red', gate:'client',
+    phase:{en:'Digital-twin migration · local deployment in review', zh:'数字孪生迁移 · 本地部署审查中'},
+    headline:{en:'Model and local deployment are ready, but the data-point ticket opened in July 2025 is still blocked and the client contact has gone quiet while on leave.',
+              zh:'模型与本地部署已就绪,但 2025 年 7 月开的数据点工单至今仍为阻塞,客户对接人休假期间失联。'},
+    owners:'Lin Liangtao · Valdy · Xu Mingchen',
+    tickets:['BA-1098','BA-2027','BA-2429','BA-2498','BA-1897','BA-2499'],
+    stages:{
+      data:  {s:'blocked', en:'10 of 60 new points empty; abnormal points awaiting client review', zh:'60 个新点位中 10 个无值;异常点位待客户核对', src:['BA-2027','BA-1098','MTG']},
+      model: {s:'done',    en:'Chiller plant and E+ model updated', zh:'冷站与 E+ 模型已更新', src:['BA-2429','BA-2499']},
+      ai:    {s:'risk',    en:'Result analysis in review since March', zh:'结果分析自 3 月起处于审查中', src:['BA-1897']},
+      deploy:{s:'wip',     en:'On GCP VM; InfluxDB and cookbook tested; awaiting Dr. Xu', zh:'已部署至 GCP VM;InfluxDB 与 cookbook 已测;待 Dr. Xu 确认', src:['BA-2498']},
+      ops:   {s:'na',      en:'Legacy system on site; no maintenance contract', zh:'现场旧系统运行中;无维保合同', src:['BA-1098']},
+    },
+    risks:[
+      {en:'The data-point ticket has been open 15 months and is Blocked. Escalation to management was already flagged in January.', zh:'数据点工单已开 15 个月且为阻塞状态,1 月已提出需向管理层升级。', src:['BA-1098']},
+      {en:'Client lead was on leave without notice; WhatsApp sent 12 Oct, call if no reply.', zh:'客户负责人未告知即休假;10 月 12 日已发 WhatsApp,无回复则电话联系。', src:['MTG']},
+      {en:'There is no maintenance contract, so support beyond scope has to be quoted.', zh:'无维保合同,超出范围的支持需另行报价。', src:['BA-1098']},
+      {en:'Model update ticket is 33 days past its 11 Sep due date (in review).', zh:'模型更新任务已超过 9 月 11 日截止日 33 天(审查中)。', src:['BA-2429']},
+    ],
+    next:[
+      {date:'2026-10-16', en:'Book data-review meeting with the BDx 360 team', zh:'与 BDx 360 团队约数据核对会议', src:['MTG']},
+      {date:null, en:'Dr. Xu sign-off on the GCP deployment', zh:'Dr. Xu 确认 GCP 部署', src:['BA-2498']},
+    ]},
+
+  { id:'cmide', name:'CMI-DE1', client:{en:'CMI · Germany', zh:'CMI · 德国'}, kind:'delivery', health:'red', gate:'client',
+    phase:{en:'Deployment on hold · waiting for client data', zh:'部署暂停 · 等待客户数据'},
+    headline:{en:'Platform layer went live on 5 May. The application layer has been on hold for 162 days because only about 20% of client data is accurate.',
+              zh:'平台层已于 5 月 5 日上线,但仅约 20% 的客户数据准确,应用层已暂停 162 天。'},
+    owners:'Xu Mingchen · Ng Jia Hua (handed over)',
+    tickets:['BA-1885','BA-2010','BA-2034'],
+    stages:{
+      data:  {s:'blocked', en:'~20% accurate; points degrading since March', zh:'准确率约 20%;点位自 3 月起持续劣化', src:['MTG','BA-2010']},
+      model: {s:'done',    en:'Physical models integrated', zh:'物理模型已集成', src:['BA-1885']},
+      ai:    {s:'done',    en:'Baseline, recommendation and partial deployment work end to end', zh:'基线、推荐、局部部署流程已跑通', src:['BA-2010','BA-1885']},
+      deploy:{s:'blocked', en:'Platform live 5 May; application layer on hold', zh:'平台层 5 月 5 日上线;应用层暂停', src:['BA-2010','BA-2034']},
+      ops:   {s:'todo',    en:'—', zh:'—', src:[]},
+    },
+    risks:[
+      {en:'About 20% of received data is accurate, with widespread gaps and connection issues.', zh:'收到的数据仅约 20% 准确,大面积缺失且存在连接问题。', src:['MTG']},
+      {en:'The team has stopped internal data checks, so progress now depends entirely on the client.', zh:'团队已停止内部数据核查,进展完全取决于客户。', src:['MTG']},
+      {en:'Deployment ticket is 173 days past its 24 Apr due date, with no update since June.', zh:'部署任务已超过 4 月 24 日截止日 173 天,6 月后无更新。', src:['BA-1885']},
+      {en:'Patched code is not yet merged into dcwiz-task-library; the original engineer has handed over.', zh:'临时补丁代码尚未合入 dcwiz-task-library;原负责工程师已交接。', src:['BA-2010']},
+    ],
+    next:[
+      {date:'2026-10-16', en:'Meeting with CMI Germany to push their data integration', zh:'与 CMI 德国开会,推动其完成数据集成', src:['MTG']},
+    ]},
+
+  { id:'cmisg', name:'CMI-SG', client:{en:'CMI · Singapore', zh:'CMI · 新加坡'}, kind:'ops', health:'green', gate:'none',
+    phase:{en:'In operation · reporting and renewal', zh:'运营中 · 报告与续约'},
+    headline:{en:'Chiller 1 leak check found nothing detectable (COP steady at 1.83–1.84). Next week’s on-site with the new client PM is the renewal moment.',
+              zh:'1 号冷机泄漏排查未发现异常(COP 稳定在 1.83–1.84)。下周与客户新任 PM 的现场会议是续约窗口。'},
+    owners:'Valdy · Xu Mingchen',
+    tickets:['BA-2566','BA-2567'],
+    stages:{
+      data:  {s:'done', en:'Live', zh:'已接入', src:[]},
+      model: {s:'done', en:'Live', zh:'已上线', src:[]},
+      ai:    {s:'done', en:'Live', zh:'已上线', src:[]},
+      deploy:{s:'done', en:'Live', zh:'已上线', src:[]},
+      ops:   {s:'wip',  en:'Leak analysis done; report in progress; quote next week', zh:'泄漏分析完成;报告编写中;下周报价', src:['BA-2566','BA-2567','MTG']},
+    },
+    risks:[
+      {en:'Report was due 2 Oct and is still in progress.', zh:'报告原定 10 月 2 日完成,目前仍在编写。', src:['BA-2566','BA-2567']},
+      {en:'Client PM changed: Wayne resigned and Yang Shuo takes over, so the relationship restarts.', zh:'客户 PM 更换:Wayne 离职,由 Yang Shuo 接任,关系需重新建立。', src:['MTG']},
+      {en:'Current data cannot rule out an early-stage leak on CH-1.', zh:'现有数据无法排除 CH-1 早期泄漏。', src:['BA-2566']},
+    ],
+    next:[
+      {date:'2026-10-22', tentative:true, en:'On-site with Terry and Yang Shuo: last report, new-feature demo, next year’s maintenance quote', zh:'与 Terry、Yang Shuo 现场会议:上期报告、新功能演示、明年维保报价', src:['MTG']},
+    ]},
+
+  { id:'imdc', name:'Iron Mountain SIN1', client:{en:'Iron Mountain · Singapore', zh:'Iron Mountain · 新加坡'}, kind:'ops', health:'green', gate:'none',
+    phase:{en:'In operation · quarterly reporting', zh:'运营中 · 季度报告'},
+    headline:{en:'Q3 report is in progress. The frontend upgrade has not moved since May and is waiting on the data-integration upgrade.',
+              zh:'Q3 报告编写中。前端升级自 5 月起未推进,等待数据集成升级完成。'},
+    owners:'Xu Mingchen · Valdy',
+    tickets:['BA-2572','BA-1857'],
+    stages:{
+      data:  {s:'done', en:'Live', zh:'已接入', src:[]},
+      model: {s:'done', en:'Live', zh:'已上线', src:[]},
+      ai:    {s:'done', en:'Live', zh:'已上线', src:[]},
+      deploy:{s:'risk', en:'Upgrade to the latest release not started (High priority)', zh:'升级到最新版本尚未开始(高优先级)', src:['BA-1857']},
+      ops:   {s:'wip',  en:'Q3 report in progress', zh:'Q3 报告编写中', src:['BA-2572']},
+    },
+    risks:[
+      {en:'Frontend upgrade (High) untouched for 145 days, waiting on BA-1846.', zh:'前端升级(高优先级)已 145 天无更新,等待 BA-1846。', src:['BA-1857']},
+      {en:'The quarterly report depends on one person; Yu Hui is shadowing, with no handover yet.', zh:'季度报告依赖单人;Yu Hui 跟学中,尚未交接。', src:['MTG','BA-2572']},
+    ],
+    next:[
+      {date:null, en:'Deliver the Q3 report (no due date in Jira)', zh:'交付 Q3 报告(Jira 中无截止日期)', src:['BA-2572']},
+    ]},
+];
+
+/* Decisions that need someone above the project. Facts are sourced; the action is the PM's recommendation. */
+const PF_ASKS = [
+  {proj:'cmide', kind:'escalate', src:['MTG','BA-2010','BA-1885'],
+   t:{en:'CMI-DE1 has been stalled by client data for 5 months', zh:'CMI-DE1 因客户数据停滞已 5 个月'},
+   w:{en:'Platform is live and the AI workflow works end to end; only ~20% of their data is accurate.', zh:'平台已上线、AI 流程已跑通,但对方数据仅约 20% 准确。'},
+   a:{en:'Agree a data-readiness deadline at this week’s meeting, and decide internally what follows if it is missed (pause, re-scope or re-price).', zh:'在本周会议上约定数据就绪截止日,并在内部决定逾期后的处理(暂停、调整范围或重新定价)。'}},
+  {proj:'bdx', kind:'escalate', src:['BA-1098','BA-2027','MTG'],
+   t:{en:'BDx SIN1 needs sponsor-level contact', zh:'BDx SIN1 需要高层对接'},
+   w:{en:'The data-point ticket has been blocked for 15 months and the project lead is unreachable.', zh:'数据点工单阻塞 15 个月,客户项目负责人联系不上。'},
+   a:{en:'Approve outreach above the project lead and confirm the out-of-contract support boundary before more engineering time goes in.', zh:'批准越过项目负责人向上沟通,并在继续投入工程时间前明确合同外支持边界。'}},
+  {proj:'bdc', kind:'decide', src:['MTG','BA-1864'],
+   t:{en:'Sign off the BDC data-gap notice before 31 Oct', zh:'在 10 月 31 日前签发 BDC 数据缺口通知'},
+   w:{en:'We will demo a complete platform running on 10–30% of the data.', zh:'我们将用 10–30% 的数据演示完整平台。'},
+   a:{en:'Call first, then send a formal email listing the missing points, so delivery with data gaps is on record.', zh:'先电话沟通,再正式邮件列出缺失点位,把带数据缺口交付记录在案。'}},
+  {proj:'team', kind:'decide', src:['MTG'], srcTickets:'xu',
+   t:{en:'Reduce key-person dependency on Xu Mingchen', zh:'降低对 Xu Mingchen 的单点依赖'},
+   w:{en:'He holds 10 of 19 open tickets across all six projects, and the BDC lead hands over after 31 Oct.', zh:'他承担 19 个在途工单中的 10 个,覆盖全部 6 个项目;BDC 负责人 10 月 31 日后交接。'},
+   a:{en:'Name a backup for CMI-SG and Iron Mountain reporting now; Yu Hui is shadowing but cannot take it over yet.', zh:'现在就为 CMI-SG 与 Iron Mountain 报告指定备份;Yu Hui 正在跟学,尚不能接手。'}},
+  {proj:'dayone', kind:'align', src:['MTG','BA-2380'],
+   t:{en:'Agree the message for Zach on 23 Oct', zh:'对齐 10 月 23 日与 Zach 的沟通口径'},
+   w:{en:'Single-zone AI is the default path; multi-zone is still in development and IPMVP validation comes before any savings claim.', zh:'单区 AI 为默认路径;多区仍在开发,任何节能结论须先通过 IPMVP 验证。'},
+   a:{en:'Present multi-zone as the planned upgrade and avoid committing a savings date at this meeting.', zh:'将多区定位为后续升级版本,本次会议不承诺节能结论时间。'}},
+  {proj:'cmisg', kind:'opportunity', src:['MTG'],
+   t:{en:'Approve next year’s CMI-SG maintenance quote', zh:'审批 CMI-SG 明年维保报价'},
+   w:{en:'The quote goes out at the on-site meeting with the new client PM, tentatively 22 Oct.', zh:'报价将在与客户新任 PM 的现场会议上发出,暂定 10 月 22 日。'},
+   a:{en:'Price it before the visit and pair it with the leak-check result as evidence of value.', zh:'在会前定价,并以泄漏排查结论作为价值佐证。'}},
+];
+const PF_ASK_KIND = {
+  escalate:   {en:'Escalate',    zh:'升级',   badge:'red'},
+  decide:     {en:'Decide',      zh:'决策',   badge:'orange'},
+  align:      {en:'Align',       zh:'对齐',   badge:'blue'},
+  opportunity:{en:'Opportunity', zh:'机会',   badge:'green'},
+};
+
+/* Dated commitments from the 12 Oct sync and Jira. 'This week' items are pinned to Fri 16 Oct. */
+const PF_EVENTS_EXTRA = [
+  {date:'2026-10-19', proj:'internal', en:'Workshop slide draft due', zh:'Workshop 幻灯片初稿截止', src:['MTG']},
+  {date:'2026-10-20', proj:'internal', en:'Capella digital-team demo, 2:30 pm (online)', zh:'Capella 数字化团队演示,下午 2:30(线上)', src:['MTG']},
+  {date:'2026-10-21', proj:'dayone', en:'Single-zone AI training work targeted', zh:'单区 AI 训练工作目标完成日', src:['MTG']},
+];
+
+/* ---------- helpers ---------- */
+const L = o => (o == null) ? '' : (typeof o === 'string' ? o : ((LANG==='zh' && o.zh) ? o.zh : o.en));
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pfDays = (a,b) => Math.round((new Date(b+'T00:00:00+08:00') - new Date(a+'T00:00:00+08:00'))/86400000);
+const PF_TODAY = '2026-10-14';
+const ageDays = t => pfDays(t.updated, PF_TODAY);
+const overdueDays = t => t.due ? pfDays(t.due, PF_TODAY) : 0;
+const MON_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], DOW_ZH = ['周日','周一','周二','周三','周四','周五','周六'];
+function fmtD(iso, withDow){
+  if(!iso) return LANG==='zh' ? '待定' : 'TBC';
+  const d = new Date(iso+'T00:00:00+08:00');
+  if(LANG==='zh') return `${d.getMonth()+1}月${d.getDate()}日` + (withDow?` ${DOW_ZH[d.getDay()]}`:'');
+  return (withDow?`${DOW_EN[d.getDay()]} `:'') + `${d.getDate()} ${MON_EN[d.getMonth()]}`;
+}
+const PF_TSTATUS = {
+  inprogress:{en:'In Progress', zh:'进行中', c:'blue'},
+  review:    {en:'In Review',   zh:'审查中', c:'violet'},
+  blocked:   {en:'Blocked',     zh:'已阻塞', c:'red'},
+  todo:      {en:'To Do',       zh:'待办',   c:'gray'},
+  backlog:   {en:'Backlog',     zh:'Backlog', c:'gray'},
+};
+const tBadge = s => { const m = PF_TSTATUS[s]||{en:s,c:'gray'}; return `<span class="badge ${m.c}">${esc(L(m))}</span>`; };
+const projById = id => PF_PROJECTS.find(p=>p.id===id);
+const projName = id => id==='internal' ? (LANG==='zh'?'内部':'Internal') : id==='team' ? (LANG==='zh'?'团队':'Team') : ((projById(id)||{}).name || id);
+const srcAttr = arr => esc((arr||[]).join(','));
+const T = (en, zh) => LANG==='zh' ? zh : en;
+
+/* ---------- computed portfolio metrics (from PF_Q only) ---------- */
+function pfMetrics(){
+  const overdue = PF_Q.filter(t=>t.due && overdueDays(t)>0).sort((a,b)=>overdueDays(b)-overdueDays(a));
+  const fresh   = PF_Q.filter(t=>ageDays(t)<=14);
+  const stale60 = PF_Q.filter(t=>ageDays(t)>60);
+  const blocked = PF_Q.filter(t=>t.status==='blocked');
+  const byOwner = {};
+  PF_Q.forEach(t=>{ (byOwner[t.assignee] = byOwner[t.assignee] || {n:0, projects:new Set(), keys:[]}); byOwner[t.assignee].n++; byOwner[t.assignee].projects.add(t.proj); byOwner[t.assignee].keys.push(t.key); });
+  const owners = Object.entries(byOwner).map(([name,v])=>({name, n:v.n, projects:v.projects.size, keys:v.keys})).sort((a,b)=>b.n-a.n);
+  const delivery = PF_PROJECTS.filter(p=>p.kind==='delivery');
+  const gated = PF_PROJECTS.filter(p=>p.gate==='client');
+  const reds = PF_PROJECTS.filter(p=>p.health==='red');
+  const buckets = [
+    {en:'≤ 14 days', zh:'≤ 14 天', test:d=>d<=14},
+    {en:'15–30 days', zh:'15–30 天', test:d=>d>14&&d<=30},
+    {en:'31–60 days', zh:'31–60 天', test:d=>d>30&&d<=60},
+    {en:'> 60 days', zh:'> 60 天', test:d=>d>60},
+  ].map(b=>({...b, keys:PF_Q.filter(t=>b.test(ageDays(t))).map(t=>t.key)}));
+  return {overdue, fresh, stale60, blocked, owners, delivery, gated, reds, buckets, total:PF_Q.length};
+}
+
+/* ---------- render ---------- */
+function renderPortfolio(){
+  if(!document.getElementById('pfKpis')) return;
+  const m = pfMetrics();
+  const top = m.owners[0];
+
+  document.getElementById('pfAsOf').innerHTML =
+    `<span>${T('Jira snapshot','Jira 快照')} <b style="color:var(--text)">${T(fmtD(PF_TODAY)+' 2026', '2026年'+fmtD(PF_TODAY))}</b> · ${m.total} ${T('open tickets','个在途工单')}</span>
+     <code title="${esc(PF_JQL)}">${esc(PF_JQL)}</code>
+     <span data-src="MTG" style="cursor:help;text-decoration:underline dotted;">+ ${esc(T(PF_MEETING.title, PF_MEETING.titleZh))}</span>`;
+
+  const kpi = (icon, color, label, value, sub, src, subCls) => `
+    <div class="stat-card" data-src="${srcAttr(src)}" tabindex="0">
+      <div class="stat-top"><div class="icon-box" style="background:var(--${color}-bg);color:var(--${color})">${icon}</div><div class="stat-label">${esc(label)}</div></div>
+      <div class="stat-value">${value}</div>
+      <div class="stat-sub ${subCls||''}">${esc(sub)}</div>
+    </div>`;
+  const I = {
+    grid:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+    flag:'<svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    lock:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    clock:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    user:'<svg class="i" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    pulse:'<svg class="i" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  };
+  const allKeys = PF_Q.map(t=>t.key);
+  const keysOf = ps => PF_Q.filter(t=>ps.some(p=>p.id===t.proj)).map(t=>t.key);
+  document.getElementById('pfKpis').innerHTML = [
+    kpi(I.grid,'purple', T('Active Projects','在执行项目'), PF_PROJECTS.length,
+        T(`${m.delivery.length} in delivery · ${PF_PROJECTS.length-m.delivery.length} in operation`, `${m.delivery.length} 个交付中 · ${PF_PROJECTS.length-m.delivery.length} 个运营中`), allKeys),
+    kpi(I.flag,'red', T('Need Escalation','需升级'), m.reds.length, m.reds.map(p=>p.name).join(' · '), keysOf(m.reds).concat(['MTG']), 'up'),
+    kpi(I.lock,'orange', T('Waiting on Client Data','受阻于客户数据'), `${m.gated.length}<span style="font-size:15px;color:var(--text-dimmer);font-weight:700"> / ${m.delivery.length}</span>`,
+        T('delivery projects; not an RDA engineering gap','个交付项目;并非 RDA 工程能力问题'), keysOf(m.gated).concat(['MTG'])),
+    kpi(I.clock,'red', T('Past Due Date','超过截止日'), m.overdue.length,
+        m.overdue.length ? T(`oldest ${overdueDays(m.overdue[0])} days (${m.overdue[0].key})`, `最久 ${overdueDays(m.overdue[0])} 天(${m.overdue[0].key})`) : '—', m.overdue.map(t=>t.key)),
+    kpi(I.user,'orange', T('Key-Person Load','关键人负载'), `${Math.round(top.n/m.total*100)}%`,
+        T(`${top.name}: ${top.n}/${m.total} tickets, ${top.projects}/${PF_PROJECTS.length} projects`, `${top.name}:${top.n}/${m.total} 个工单,覆盖 ${top.projects}/${PF_PROJECTS.length} 个项目`), top.keys, 'up'),
+    kpi(I.pulse,'cyan', T('Updated in 14 Days','14 天内有更新'), `${Math.round(m.fresh.length/m.total*100)}%`,
+        T(`${m.stale60.length} tickets untouched for 60+ days`, `${m.stale60.length} 个工单超过 60 天未更新`), m.fresh.map(t=>t.key).concat(m.stale60.map(t=>t.key))),
+  ].join('');
+
+  document.getElementById('pfBrief').textContent = T(
+    `${m.gated.length} of ${m.delivery.length} delivery projects are waiting on client data, not on RDA engineering: models, AI and deployments are being built ahead of the data. Two need leadership now. CMI-DE1 has been on hold for five months with about 20% usable data, and BDx SIN1's data-point ticket has been blocked for 15 months. The next ten days hold two client moments, the CMI-SG renewal visit (around 22 Oct) and DayOne's meeting with Zach (23 Oct), plus one hard date: the BDC platform delivery on 31 Oct. ${top.name} carries ${top.n} of ${m.total} open tickets across all ${top.projects} projects.`,
+    `${m.delivery.length} 个交付项目中有 ${m.gated.length} 个在等客户数据,而不是卡在 RDA 工程上:模型、AI 和部署都在数据之前先行搭建。两个项目现在就需要管理层介入:CMI-DE1 因可用数据仅约 20% 已暂停五个月;BDx SIN1 的数据点工单已阻塞 15 个月。未来十天有两个客户关键节点(CMI-SG 续约现场会约 10 月 22 日、DayOne 与 Zach 会面 10 月 23 日),以及一个硬性日期:BDC 平台 10 月 31 日交付。${top.name} 一人承担 ${m.total} 个在途工单中的 ${top.n} 个,覆盖全部 ${top.projects} 个项目。`);
+
+  /* project cards */
+  const sorted = PF_PROJECTS.slice().sort((a,b)=>PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
+  document.getElementById('pfCards').innerHTML = sorted.map(p=>{
+    const h = PF_HEALTH[p.health];
+    const tks = p.tickets.map(k=>PF_TK[k]).filter(t=>t && t.inQuery!==false);
+    const od = tks.filter(t=>t.due && overdueDays(t)>0).length;
+    const st = tks.filter(t=>ageDays(t)>30).length;
+    const bl = tks.filter(t=>t.status==='blocked').length;
+    const chips = [];
+    if(p.gate==='client') chips.push(`<span class="pf-chip warn">${T('Waiting on client data','等待客户数据')}</span>`);
+    if(bl) chips.push(`<span class="pf-chip bad">${bl} ${T('blocked','个阻塞')}</span>`);
+    if(od) chips.push(`<span class="pf-chip bad">${od} ${T('past due','个逾期')}</span>`);
+    if(st) chips.push(`<span class="pf-chip">${st} ${T('stale > 30d','个超 30 天未更新')}</span>`);
+    chips.push(`<span class="pf-chip">${tks.length} ${T('open in Jira','个 Jira 在途')}</span>`);
+    const nx = p.next[0];
+    const src = p.tickets.concat(p.risks.some(r=>r.src.includes('MTG'))?['MTG']:[]);
+    const open = p.drill
+      ? `<span class="pf-open">${T('Open project','进入项目')} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>`
+      : `<span class="pf-open">${T('Snapshot','快照')} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>`;
+    return `<div class="pf-card h-${p.health}" tabindex="0" role="button" data-proj="${p.id}" data-src="${srcAttr(src)}"
+               data-src-note="${esc(T('Card drawn from these records','卡片内容来自以下记录'))}">
+      <div class="pf-card-top">
+        <div style="min-width:0;"><div class="pf-name">${esc(p.name)}</div><div class="pf-client">${esc(L(p.client))}</div></div>
+        <span class="badge ${h.badge}"><span class="dot"></span>${esc(L(h))}</span>
+      </div>
+      <div class="pf-phase">${esc(L(p.phase))}</div>
+      <p class="pf-headline">${esc(L(p.headline))}</p>
+      <div>
+        <div class="lc-strip">${PF_STAGES.map(s=>`<div class="lc-seg ${PF_STATE[p.stages[s.id].s].cls}"></div>`).join('')}</div>
+        <div class="lc-labels">${PF_STAGES.map(s=>`<span>${esc(L(s))}</span>`).join('')}</div>
+      </div>
+      <div class="pf-chips">${chips.join('')}</div>
+      <div class="pf-foot">
+        <div class="pf-next"><span class="d">${esc(fmtD(nx.date))}${nx.tentative?'?':''}</span><span class="t">${esc(L(nx))}</span></div>
+        ${open}
+      </div>
+      ${p.drill?`<div class="pf-drillnote">${T('Project view holds DayOne data as of 21 Aug 2026','项目视图中的 DayOne 数据截至 2026-08-21')}</div>`:''}
+    </div>`;
+  }).join('');
+
+  /* lifecycle matrix */
+  const mx = document.getElementById('pfMatrix');
+  const stuckBy = PF_STAGES.map(s=>PF_PROJECTS.filter(p=>['blocked','risk'].includes(p.stages[s.id].s)).length);
+  let html = `<div class="lc-h"></div>` + PF_STAGES.map((s,i)=>`<div class="lc-h">${esc(L(s))}${stuckBy[i]?`<small>${stuckBy[i]} ${T('stuck or at risk','个受阻/有风险')}</small>`:''}</div>`).join('');
+  sorted.forEach(p=>{
+    html += `<div class="lc-proj" data-proj="${p.id}">${esc(p.name)}<span>${esc(L(PF_HEALTH[p.health]))}</span></div>`;
+    PF_STAGES.forEach(s=>{
+      const c = p.stages[s.id], st = PF_STATE[c.s];
+      html += `<div class="lc-cell c-${c.s}" tabindex="0" data-src="${srcAttr(c.src)}" data-src-note="${esc(p.name+' · '+L(s)+': '+L(c))}">
+        <b><span class="g ${st.cls}">${st.g}</span>${esc(L(st))}</b><span class="n">${esc(L(c))}</span></div>`;
+    });
+  });
+  mx.innerHTML = html;
+  document.getElementById('pfMatrixLegend').innerHTML = ['done','wip','risk','blocked','todo'].map(k=>`<span><i class="${PF_STATE[k].cls}"></i>${esc(L(PF_STATE[k]))}</span>`).join('');
+  const dataStuck = stuckBy[0], dataBlocked = PF_PROJECTS.filter(p=>p.stages.data.s==='blocked').length;
+  const builtAhead = PF_PROJECTS.filter(p=>['blocked','risk'].includes(p.stages.data.s) && ['wip','done','risk','blocked'].includes(p.stages.deploy.s)).length;
+  document.getElementById('pfMatrixInsight').innerHTML = T(
+    `<b>The bottleneck is data access.</b> It is blocked or at risk in ${dataStuck} of ${PF_PROJECTS.length} projects (${dataBlocked} blocked outright), while ${builtAhead} of those already have a deployment built or in progress. The value is built but cannot be proven until clients deliver data, so the lever is client escalation, not more engineering.`,
+    `<b>瓶颈在数据接入。</b>${PF_PROJECTS.length} 个项目中有 ${dataStuck} 个在该环节受阻或有风险(其中 ${dataBlocked} 个完全阻塞),而这些项目里有 ${builtAhead} 个已完成或正在部署。价值已经搭好,但在客户交付数据前无法被证明;抓手是推动客户,而不是追加工程投入。`);
+
+  /* leadership asks */
+  const xuKeys = (m.owners.find(o=>o.name==='Xu Mingchen')||{keys:[]}).keys;
+  document.getElementById('pfAsks').innerHTML = PF_ASKS.map(a=>{
+    const k = PF_ASK_KIND[a.kind];
+    const src = a.srcTickets==='xu' ? a.src.concat(xuKeys) : a.src;
+    return `<div class="ask" tabindex="0" data-src="${srcAttr(src)}">
+      <div class="ask-k"><span class="badge ${k.badge}">${esc(L(k))}</span></div>
+      <div class="ask-t">${esc(L(a.t))} <span class="proj-tag" style="margin-left:4px">${esc(projName(a.proj))}</span></div>
+      <div class="ask-w">${esc(L(a.w))}</div>
+      <div class="ask-a"><em>${T('Recommend','建议')}</em>${esc(L(a.a))}</div>
+    </div>`;
+  }).join('');
+
+  /* next 30 days */
+  const evs = [];
+  PF_PROJECTS.forEach(p=>p.next.forEach(n=>{ if(n.date) evs.push({...n, proj:p.id}); }));
+  PF_EVENTS_EXTRA.forEach(e=>evs.push(e));
+  const end = '2026-11-13';
+  const inWin = evs.filter(e=>e.date>=PF_TODAY && e.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
+  const weeks = [
+    {en:'This week', zh:'本周', from:'2026-10-12', to:'2026-10-18'},
+    {en:'Next week', zh:'下周', from:'2026-10-19', to:'2026-10-25'},
+    {en:'Week of 26 Oct', zh:'10 月 26 日当周', from:'2026-10-26', to:'2026-11-01'},
+    {en:'Later', zh:'之后', from:'2026-11-02', to:end},
+  ];
+  document.getElementById('pfTimeline').innerHTML = weeks.map(w=>{
+    const items = inWin.filter(e=>e.date>=w.from && e.date<=w.to);
+    if(!items.length) return '';
+    return `<div class="pf-week"><h5>${esc(L(w))}</h5>${items.map(e=>{
+      const thisWeekLoose = w.from==='2026-10-12' && e.date==='2026-10-16';
+      return `<div class="pf-ev" data-src="${srcAttr(e.src)}">
+        <div class="d">${thisWeekLoose ? T('By Fri','周五前') : esc(fmtD(e.date))}<span>${thisWeekLoose ? esc(fmtD(e.date)) : esc(fmtD(e.date,true).split(' ')[LANG==='zh'?1:0])}</span></div>
+        <div class="t">${esc(L(e))}${e.tentative?`<span class="tent">${T('Tentative','暂定')}</span>`:''}</div>
+        <span class="proj-tag">${esc(projName(e.proj))}</span>
+      </div>`; }).join('')}</div>`;
+  }).join('') + `<div class="pf-note">${T(
+    'Every dated item here comes from the 12 Oct PM sync. None of them is a due date in Jira yet.',
+    '以上带日期事项均来自 10 月 12 日项目周会,目前都还不是 Jira 中的截止日期。')}</div>`;
+
+  /* team load + freshness */
+  const maxN = top.n, maxB = Math.max(...m.buckets.map(b=>b.keys.length));
+  const mtgOnly = PF_PROJECTS.filter(p=>p.risks.some(r=>r.src.length===1 && r.src[0]==='MTG')).length;
+  document.getElementById('pfTeam').innerHTML =
+    `<div class="pf-sub">${T('Open tickets by assignee','各负责人在途工单')}</div>` +
+    m.owners.map(o=>`<div class="hbar-row" data-src="${srcAttr(o.keys)}">
+       <span class="nm">${esc(o.name)}</span><div class="hbar"><i style="width:${o.n/maxN*100}%"></i></div>
+       <span class="v"><b>${o.n}</b> · ${o.projects} ${T('proj.','项目')}</span></div>`).join('') +
+    `<div class="pf-sub">${T('Days since last Jira update','距上次 Jira 更新天数')}</div>` +
+    m.buckets.map(b=>`<div class="hbar-row" data-src="${srcAttr(b.keys)}">
+       <span class="nm">${esc(L(b))}</span><div class="hbar cy"><i style="width:${maxB? b.keys.length/maxB*100:0}%"></i></div>
+       <span class="v"><b>${b.keys.length}</b> ${T('tickets','个')}</span></div>`).join('') +
+    `<div class="pf-note">${T(
+      `<b>Jira trails the weekly meeting.</b> ${mtgOnly} of ${PF_PROJECTS.length} projects have material updates in the 12 Oct sync (the CMI-DE1 accuracy figure, BDC's 31 Oct commitment, the CMI-SG renewal) that are not in Jira. Approving them through Meetings keeps this page honest.`,
+      `<b>Jira 落后于周会。</b>${PF_PROJECTS.length} 个项目中有 ${mtgOnly} 个在 10 月 12 日周会上有重要更新(CMI-DE1 数据准确率、BDC 10 月 31 日承诺、CMI-SG 续约)尚未写入 Jira。通过「会议」页审批后回写,才能让本页保持准确。`)}</div>`;
+}
+
+/* ---------- source tooltip ---------- */
+const tip = document.getElementById('srcTip');
+let _tipTimer = null, _tipFor = null;
+function srcRowsHTML(keys){
+  return keys.map(k=>{
+    if(k==='MTG') return `<div class="st-row st-mtg"><div class="st-l1"><span class="st-key">${T('Meeting','会议')}</span><span class="st-sum">${esc(T(PF_MEETING.title, PF_MEETING.titleZh))}</span></div>
+      <div class="st-l2">${T('Minutes · not yet in Jira','会议纪要 · 尚未写入 Jira')}</div></div>`;
+    const t = PF_TK[k]; if(!t) return '';
+    const age = ageDays(t), od = overdueDays(t);
+    return `<div class="st-row"><div class="st-l1"><a class="st-key" href="${JIRA_BROWSE}${t.key}" target="_blank" rel="noopener">${t.key}</a><span class="st-sum" title="${esc(t.summary)}">${esc(t.summary)}</span></div>
+      <div class="st-l2">${tBadge(t.status)}<span>${esc(t.assignee)}</span><span class="${age>30?'stale':''}">${T(`updated ${age}d ago`,`${age} 天前更新`)}</span>${od>0?`<span class="stale" style="color:var(--red)">${T(`${od}d past due`,`逾期 ${od} 天`)}</span>`:''}${t.inQuery===false?`<span>${T('parent · outside query','父工单 · 不在查询内')}</span>`:''}</div></div>`;
+  }).join('');
+}
+function showSrcTip(el, x, y){
+  const keys = (el.getAttribute('data-src')||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if(!keys.length) return;
+  const jiraN = keys.filter(k=>k!=='MTG').length, hasM = keys.includes('MTG');
+  const head = [jiraN?`Jira · ${jiraN}`:'', hasM?T('Meeting','会议'):''].filter(Boolean).join(' + ');
+  const note = el.getAttribute('data-src-note');
+  const MAX = 7, shown = keys.slice(0, MAX), more = keys.length - shown.length;
+  tip.innerHTML = `<div class="st-h"><span>${T('Data source','数据来源')}</span><span>${esc(head)}</span></div>` +
+    (note?`<div class="st-note">${esc(note)}</div>`:'') + srcRowsHTML(shown) +
+    (more>0?`<div class="st-row" style="font-size:11px;color:var(--text-dimmer)">+ ${more} ${T('more','个')}</div>`:'');
+  tip.classList.add('show');
+  const r = tip.getBoundingClientRect(), pad = 12;
+  let left = x + 16, top = y + 16;
+  if(left + r.width > window.innerWidth - pad) left = Math.max(pad, x - r.width - 16);
+  if(top + r.height > window.innerHeight - pad) top = Math.max(pad, y - r.height - 16);
+  tip.style.left = left+'px'; tip.style.top = top+'px';
+}
+function hideSrcTip(now){
+  clearTimeout(_tipTimer);
+  const go = ()=>{ tip.classList.remove('show'); _tipFor = null; };
+  if(now) go(); else _tipTimer = setTimeout(go, 160);
+}
+document.addEventListener('mouseover', e=>{
+  if(tip.contains(e.target)){ clearTimeout(_tipTimer); return; }
+  const el = e.target.closest('[data-src]');
+  if(!el){ if(_tipFor) hideSrcTip(); return; }
+  if(el === _tipFor){ clearTimeout(_tipTimer); return; }
+  clearTimeout(_tipTimer);
+  _tipFor = el;
+  showSrcTip(el, e.clientX, e.clientY);
+});
+document.addEventListener('focusin', e=>{
+  const el = e.target.closest && e.target.closest('[data-src]');
+  if(el && !tip.contains(el)){ const r = el.getBoundingClientRect(); _tipFor = el; showSrcTip(el, r.left, r.bottom - 8); }
+});
+document.addEventListener('focusout', e=>{ if(_tipFor && e.target===_tipFor) hideSrcTip(); });
+window.addEventListener('scroll', ()=>{ if(_tipFor) hideSrcTip(true); }, {passive:true});
+
+/* ---------- card click: DayOne opens its project view, others open a snapshot ---------- */
+function openProject(id){
+  const p = projById(id); if(!p) return;
+  hideSrcTip(true);
+  if(p.drill){ goPage('overview'); window.scrollTo({top:0}); return; }
+  openProjectDrawer(id);
+}
+function openProjectDrawer(id){
+  const p = projById(id); if(!p) return;
+  const h = PF_HEALTH[p.health];
+  const d = document.getElementById('pfDrawer');
+  d.innerHTML = `
+    <span class="icon-btn dr-close" role="button" tabindex="0" onclick="closeProjectDrawer()" title="${T('Close','关闭')}"><svg class="i" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+    <div class="pf-phase">${esc(L(p.client))}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin:6px 40px 8px 0;flex-wrap:wrap;"><h3>${esc(p.name)}</h3><span class="badge ${h.badge}"><span class="dot"></span>${esc(L(h))}</span></div>
+    <div class="pf-phase" style="margin-bottom:10px">${esc(L(p.phase))} · ${esc(p.owners)}</div>
+    <p class="pf-headline">${esc(L(p.headline))}</p>
+    <h4>${T('Lifecycle','生命周期')}</h4>
+    <div class="lc-strip">${PF_STAGES.map(s=>`<div class="lc-seg ${PF_STATE[p.stages[s.id].s].cls}"></div>`).join('')}</div>
+    <div class="lc-labels">${PF_STAGES.map(s=>`<span>${esc(L(s))}</span>`).join('')}</div>
+    <h4>${T('What is at risk','风险点')}</h4>
+    <ul class="dr-list">${p.risks.map(r=>`<li data-src="${srcAttr(r.src)}">${esc(L(r))}<span class="dr-src">${esc(r.src.map(k=>k==='MTG'?T('Meeting 12 Oct','10/12 周会'):k).join(' · '))}</span></li>`).join('')}</ul>
+    <h4>${T('Next','下一步')}</h4>
+    <ul class="dr-list">${p.next.map(n=>`<li data-src="${srcAttr(n.src)}"><b>${esc(fmtD(n.date,true))}${n.tentative?' ('+T('tentative','暂定')+')':''}</b> · ${esc(L(n))}</li>`).join('')}</ul>
+    <h4>${T('Jira records','Jira 记录')} (${p.tickets.length})</h4>
+    ${p.tickets.map(k=>{ const t = PF_TK[k]; if(!t) return ''; const age = ageDays(t), od = overdueDays(t);
+      return `<div class="dr-tk"><div class="st-l1"><a class="st-key" href="${JIRA_BROWSE}${t.key}" target="_blank" rel="noopener">${t.key}</a><span class="st-sum">${esc(t.summary)}</span></div>
+        <div class="st-l2">${tBadge(t.status)}<span>${esc(t.assignee)}</span><span style="${age>30?'color:var(--orange)':''}">${T(`updated ${fmtD(t.updated)} (${age}d)`,`${fmtD(t.updated)} 更新(${age} 天)`)}</span>${t.due?`<span style="${od>0?'color:var(--red)':''}">${T('due','截止')} ${fmtD(t.due)}</span>`:''}${t.inQuery===false?`<span>${T('parent · outside query','父工单 · 不在查询内')}</span>`:''}</div>
+        <div class="st-sig">${esc(t.signal)}</div></div>`; }).join('')}`;
+  d.classList.add('show'); d.setAttribute('aria-hidden','false');
+  document.getElementById('pfScrim').classList.add('show');
+  d.scrollTop = 0;
+}
+function closeProjectDrawer(){
+  document.getElementById('pfDrawer').classList.remove('show');
+  document.getElementById('pfDrawer').setAttribute('aria-hidden','true');
+  document.getElementById('pfScrim').classList.remove('show');
+  hideSrcTip(true);
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeProjectDrawer(); });
+document.getElementById('page-portfolio').addEventListener('click', e=>{
+  if(e.target.closest('a')) return;
+  const c = e.target.closest('[data-proj]'); if(c) openProject(c.dataset.proj);
+});
+document.getElementById('page-portfolio').addEventListener('keydown', e=>{
+  if(e.key!=='Enter' && e.key!==' ') return;
+  const c = e.target.closest('.pf-card[data-proj]'); if(c){ e.preventDefault(); openProject(c.dataset.proj); }
+});
+
+/* ---------- project switcher ---------- */
+const projMenu = document.getElementById('projMenu'), projBtn = document.getElementById('projectSelect');
+function renderProjMenu(){
+  if(!projMenu) return;
+  const onAll = activePageId()==='portfolio';
+  const grid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
+  const sorted = PF_PROJECTS.slice().sort((a,b)=>(b.drill?1:0)-(a.drill?1:0) || PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
+  projMenu.innerHTML =
+    `<button type="button" class="pm-item ${onAll?'active':''}" role="option" aria-selected="${onAll}" data-pm="all">
+       <span class="pm-ic">${grid}</span>
+       <span class="pm-tx"><b>${T('All projects','全部项目')} (${PF_PROJECTS.length})</b><span>${T('Portfolio overview','项目组合总览')}</span></span>
+       <span class="pm-go">${onAll?'✓':''}</span></button>
+     <div class="pm-sep"></div><div class="pm-group">${T('Projects','项目')}</div>` +
+    sorted.map(p=>{
+      const h = PF_HEALTH[p.health], act = !onAll && p.drill;
+      return `<button type="button" class="pm-item ${act?'active':''}" role="option" aria-selected="${act}" data-pm="${p.id}">
+        <span class="pm-ic" style="color:var(--${h.badge})"><span class="dot"></span></span>
+        <span class="pm-tx"><b>${esc(p.name)}</b><span>${esc(L(h))} · ${esc(L(p.client))}</span></span>
+        <span class="pm-go">${act?'✓':(p.drill?T('Project view','项目视图'):T('Snapshot','快照'))}</span></button>`;
+    }).join('');
+}
+function toggleProjMenu(open){
+  const willOpen = (open===undefined) ? !projMenu.classList.contains('open') : open;
+  if(willOpen) renderProjMenu();
+  projMenu.classList.toggle('open', willOpen);
+  projBtn.setAttribute('aria-expanded', String(willOpen));
+  if(willOpen){ hideSrcTip(true); const a = projMenu.querySelector('.pm-item.active') || projMenu.querySelector('.pm-item'); if(a) a.focus(); }
+}
+projBtn.addEventListener('click', e=>{ e.stopPropagation(); toggleProjMenu(); });
+projMenu.addEventListener('click', e=>{
+  const it = e.target.closest('[data-pm]'); if(!it) return;
+  toggleProjMenu(false);
+  const id = it.dataset.pm;
+  if(id==='all'){ goPage('portfolio'); window.scrollTo({top:0}); return; }
+  const p = projById(id);
+  if(p && p.drill){ goPage('overview'); window.scrollTo({top:0}); return; }
+  if(activePageId()!=='portfolio') goPage('portfolio');
+  openProjectDrawer(id);
+});
+projMenu.addEventListener('keydown', e=>{
+  const items = [...projMenu.querySelectorAll('.pm-item')], i = items.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'){ e.preventDefault(); items[Math.min(items.length-1,i+1)].focus(); }
+  if(e.key==='ArrowUp'){ e.preventDefault(); items[Math.max(0,i-1)].focus(); }
+  if(e.key==='Escape'){ e.stopPropagation(); toggleProjMenu(false); projBtn.focus(); }
+});
+document.addEventListener('click', e=>{ if(projMenu.classList.contains('open') && !e.target.closest('#projDD')) toggleProjMenu(false); });
+
+renderPortfolio();
+goPage('portfolio');
 </script>
 </body>
 </html>
