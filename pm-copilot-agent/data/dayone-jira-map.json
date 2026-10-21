@@ -1,0 +1,14 @@
+{
+  "note": "Which DayOne plan task (Gantt id) each Jira ticket feeds. Status, owner, target date and the latest comment come from Jira for mapped tasks. Jira tickets not listed here and not ignored appear as their own tasks, placed by the month in their [x.y] code. Edit and restart the agent (or click Sync now) to apply.",
+  "epic": "BA-2380",
+  "tasks": {
+    "00": "BA-2364",
+    "02": "BA-2362",
+    "03": "BA-2384",
+    "04": "BA-2447",
+    "05": "BA-2386",
+    "08": "BA-2387",
+    "09": "BA-2383"
+  },
+  "ignore": ["BA-2380", "BA-2382", "BA-2481"]
+}

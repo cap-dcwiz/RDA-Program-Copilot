@@ -95,6 +95,23 @@ changed what), validated on the server, and applied for everyone after sign-in. 
 cyan dot; **Restore original plan** in the editor drops a task's edits. Every change is also in the
 decision log.
 
+## Nightly Jira sync
+
+Monday to Friday at 24:00 Singapore time (00:00 Tue–Sat), the agent reads Jira with
+`JIRA_EMAIL` + `JIRA_API_TOKEN` (read only; `JIRA_DRY_RUN` does not affect it) and refreshes:
+
+- **DayOne plan** (`DAYONE_JQL`, default: children of epic BA-2380 plus `[DayOne-NTPE]` tickets).
+  Tasks linked in `data/dayone-jira-map.json` take **status, owner and target date** from Jira, plus
+  the latest comment; those fields are read-only on the Gantt (change them in Jira). Title, dates,
+  progress and next step stay editable. DayOne tickets that are not mapped appear as extra rows
+  in the month taken from their `[DayOne-NTPE][m.n]` code. Result: `data/dayone-jira.json`.
+- **Portfolio** (`JIRA_JQL`): open tickets' status, assignee, due date and latest comment.
+  Result: `data/portfolio.live.json` (the committed `portfolio.json` is the fallback).
+
+`JIRA_SYNC=off` turns the schedule off. People with `edit_plan` can also press **Sync Jira now**
+on Roadmap View (`POST /api/jira/sync`). Last and next run are in `/api/health`. To link another
+plan task, add `"<task id>": "BA-xxxx"` to `tasks` in `dayone-jira-map.json`.
+
 ## API
 
 See the header of `src/server.js`. All routes except `/`, `/api/health` and `/api/login` need `Authorization: Bearer <session token>`.
@@ -108,6 +125,7 @@ src/jira.js      Open-ticket read (live or data/jira.snapshot.json) and approved
 src/agent.js     ingest → analyse → store; approve / reject / edit
 src/auth.js      users, password login, sessions, roles
 src/permissions.js  the pages / actions / projects a role can grant, and the starting roles
+src/jirasync.js  nightly Jira → DayOne plan + portfolio sync, and its schedule
 src/plan.js      Gantt edits per project, with validation and history
 src/store.js     JSON file store (data/store.json, git-ignored)
 src/server.js    HTTP routes

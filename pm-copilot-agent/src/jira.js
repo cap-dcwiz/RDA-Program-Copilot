@@ -70,4 +70,34 @@ async function apply(s, meeting, approver) {
   return { dryRun: false, steps: steps.map(x => ({ method: x.method, path: x.path })), createdKey, url: browse(createdKey || s.jiraKey) };
 }
 
-module.exports = { openTickets, apply, plan, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
+/* ---------- read helpers for the nightly sync ---------- */
+async function searchAll(jql, fields) {
+  const out = []; let token = null;
+  do {
+    const q = new URLSearchParams({ jql, maxResults: '100', fields: fields.join(',') });
+    if (token) q.set('nextPageToken', token);
+    const r = await call('GET', `/rest/api/3/search/jql?${q}`);
+    out.push(...(r.issues || []));
+    token = r.isLast === false ? r.nextPageToken : null;
+  } while (token);
+  return out;
+}
+/* ADF → plain text, enough for a one-line "latest update". */
+function adfText(n) {
+  if (!n) return '';
+  if (typeof n === 'string') return n;
+  if (n.type === 'text') return n.text || '';
+  if (n.type === 'mention') return (n.attrs && n.attrs.text) || '';
+  if (n.type === 'hardBreak') return '\n';
+  const inner = (n.content || []).map(adfText).join(n.type === 'doc' || n.type === 'bulletList' || n.type === 'orderedList' ? '\n' : '');
+  return ['paragraph', 'listItem', 'heading'].includes(n.type) ? inner + '\n' : inner;
+}
+async function lastComment(key) {
+  const r = await call('GET', `/rest/api/3/issue/${key}/comment?orderBy=-created&maxResults=1`);
+  const c = (r.comments || [])[0];
+  if (!c) return null;
+  const text = adfText(c.body).replace(/\n{2,}/g, '\n').trim();
+  return { at: c.created, by: c.author ? c.author.displayName : null, text: text.slice(0, 600) };
+}
+
+module.exports = { searchAll, lastComment, adfText, openTickets, apply, plan, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };

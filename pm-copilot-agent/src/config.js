@@ -48,6 +48,11 @@ module.exports = {
     issueTypeId: env('JIRA_ISSUE_TYPE_ID', '10006'),
     clientField: env('JIRA_CLIENT_FIELD', 'customfield_10034'),
     dryRun: bool('JIRA_DRY_RUN', true),
+    // Nightly read sync. Default: the end of every working day, Mon–Fri 24:00 Singapore time
+    // (= 00:00 Tue–Sat). JIRA_SYNC=off disables it; the "Sync now" button still works.
+    sync: env('JIRA_SYNC', 'on') !== 'off',
+    syncTz: env('JIRA_SYNC_TZ_OFFSET', '+08:00'),
+    dayoneJql: env('DAYONE_JQL', 'project = BA AND (parent = BA-2380 OR summary ~ "DayOne-NTPE") ORDER BY key ASC'),
   },
   CLIENT_OPTIONS,
   port: Number(env('PORT', '8790')),

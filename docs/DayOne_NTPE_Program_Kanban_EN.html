@@ -680,6 +680,10 @@ button.project-select{font-family:inherit;}
 .pe-grid input:focus,.pe-grid select:focus,.pe-grid textarea:focus{outline:2px solid var(--purple);outline-offset:1px;}
 .pe-grid textarea{min-height:64px;resize:vertical;}
 .pe-grid .was{font-weight:600;color:var(--text-dimmer);font-size:10.5px;}
+.pe-jira{border:1px solid rgba(34,211,238,.35);background:var(--cyan-bg);border-radius:10px;padding:10px 12px;margin:0 0 14px;font-size:12.5px;color:var(--text);}
+.pe-jira a{color:var(--cyan);text-decoration:none;} .pe-jira-note{font-size:11px;color:var(--text-dim);margin-top:4px;}
+.pe-jira-c{font-size:11.5px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);line-height:1.55;white-space:pre-wrap;}
+.pe-grid input:disabled,.pe-grid select:disabled{opacity:.55;cursor:not-allowed;}
 .pe-err{font-size:12px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:8px 10px;margin-top:12px;}
 .pe-actions{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap;} .pe-actions .sp{flex:1;}
 .pe-hist{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-dim);}
@@ -1842,7 +1846,7 @@ const TASKS = [
  {id:'15',name:'DCWiz Telemetry & What-if Validation',nameZh:'DCWiz 遥测与假设分析验证',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
 ];
 const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',nameZh:'数字孪生标定完成',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28',month:2};
-const TODAY = new Date('2026-08-21');
+const TODAY = new Date(new Date(Date.now()+8*3600e3).toISOString().slice(0,10));   // today, Singapore
 
 /* ===================== i18n (EN / ZH switch) =====================
    Scope (per product decision): UI chrome (nav, headers, buttons, badges,
@@ -2192,7 +2196,8 @@ function goPage(id){
     ? (LANG==='zh' ? `全部项目(${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})` : `All projects (${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})`)
     : 'DayOne NTP-E';
   const upd = document.getElementById('updatedTime');
-  if(upd) upd.textContent = ALL_SCOPE.includes(id) ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '') : '2026-08-21 09:15';
+  if(upd) upd.textContent = ALL_SCOPE.includes(id) ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '')
+    : ((typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.syncedAt) ? `${fmtDT(PLAN.jira.syncedAt)} (Jira)` : '2026-08-21 09:15');
   const tabsEl = document.querySelector('.tabs'); if(tabsEl) tabsEl.classList.toggle('mode-all', ALL_SCOPE.includes(id));
   if(typeof renderProjMenu==='function') renderProjMenu();
   if(id==='portfolio' && typeof renderPortfolio==='function') renderPortfolio();
@@ -2515,7 +2520,7 @@ function buildGantt(){
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else {
       const t=r.t;
-      leftRows.innerHTML += `<div class="gr" data-task="${t.id}"><span class="gid">${t.id}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
+      leftRows.innerHTML += `<div class="gr" data-task="${t.id}"><span class="gid">${String(t.id).replace(/^BA-/,'')}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     }
@@ -3779,7 +3784,7 @@ document.getElementById('updatedTime').textContent = '2026-08-21 09:15';
    ahead of Jira on several projects. Hovering anything with data-src shows those records.
    ===================================================================================== */
 const PF_ASOF = new Date('2026-10-14T14:45:00+08:00');
-const PF_ASOF_LABEL = '2026-10-14 14:45';
+let PF_ASOF_LABEL = '';
 const PF_JQL = 'project = BA AND "client[dropdown]" != RDA AND status NOT IN (Done, Backlog) ORDER BY cf[10019] ASC';
 const JIRA_BROWSE = 'https://projects-teams.atlassian.net/browse/';
 const PF_MEETING = { id:'MTG', title:'PM weekly sync · 12 Oct 2026', titleZh:'项目周会 · 2026-10-12', file:'智能纪要：1012project meeting' };
@@ -3797,6 +3802,7 @@ function pfLoad(data){
   Object.keys(PF_TK).forEach(k=>delete PF_TK[k]); PF_TICKETS.forEach(t=>{ PF_TK[t.key] = t; });
   fill(PF_Q, PF_TICKETS.filter(t=>t.inQuery!==false));
   Object.keys(PF_TEXT).forEach(k=>delete PF_TEXT[k]); Object.assign(PF_TEXT, data.text || {});
+  PF_ASOF_LABEL = data.syncedAt ? fmtDT(data.syncedAt) : (data.asOf || '');
 }
 
 /* Lifecycle stages every RDA deployment passes through, left to right. */
@@ -3839,7 +3845,7 @@ const PF_EVENTS_EXTRA = [];   // filled after sign-in from the agent (GET /api/p
 const L = o => (o == null) ? '' : (typeof o === 'string' ? o : ((LANG==='zh' && o.zh) ? o.zh : o.en));
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pfDays = (a,b) => Math.round((new Date(b+'T00:00:00+08:00') - new Date(a+'T00:00:00+08:00'))/86400000);
-const PF_TODAY = '2026-10-14';
+const PF_TODAY = new Date(Date.now()+8*3600e3).toISOString().slice(0,10);   // today, Singapore
 const ageDays = t => pfDays(t.updated, PF_TODAY);
 const overdueDays = t => t.due ? pfDays(t.due, PF_TODAY) : 0;
 const MON_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -3891,7 +3897,7 @@ function renderPortfolio(){
   const top = m.owners[0];
 
   document.getElementById('pfAsOf').innerHTML =
-    `<span>${T('Jira snapshot','Jira 快照')} <b style="color:var(--text)">${T(fmtD(PF_TODAY)+' 2026', '2026年'+fmtD(PF_TODAY))}</b> · ${m.total} ${T('open tickets','个在途工单')}</span>
+    `<span>${T('Jira, synced','Jira 同步于')} <b style="color:var(--text)">${esc(PF_ASOF_LABEL)}</b> · ${m.total} ${T('open tickets','个在途工单')}</span>
      <code title="${esc(PF_JQL)}">${esc(PF_JQL)}</code>
      <span data-src="MTG" style="cursor:help;text-decoration:underline dotted;">+ ${esc(T(PF_MEETING.title, PF_MEETING.titleZh))}</span>`;
 
@@ -4741,9 +4747,32 @@ function planApply(data){
   // so a reset or another manager's change is not masked by an older copy cached in this browser.
   const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next'];
   TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; }); });
+  // 2) Jira (nightly sync): status, owner and target date of linked tasks; Jira-only tickets become tasks.
+  const J = data.jira; PLAN.jira = J || null;
+  TASKS.forEach(t=>{ delete t.jira; });
+  if(J){
+    const mmdd = d => d ? d.slice(5).replace('-','/') : null;
+    Object.entries(J.tasks||{}).forEach(([id, x])=>{
+      const t = TASKS_BY_ID[id]; if(!t) return;
+      t.status = x.status; if(x.owner) t.owner = x.owner; if(x.due) t.due = mmdd(x.due);
+      if(x.status==='done') t.progress = 100;
+      t.jira = x;
+    });
+    (J.extra||[]).forEach(x=>{
+      let t = TASKS_BY_ID[x.key];
+      const ge = [x.due, x.resolved, x.updated].find(Boolean) || x.created;
+      const fields = { name:x.title, nameZh:x.title, en:x.summary, month:x.month, owner:x.owner||'—', status:x.status, health:'none',
+        progress: x.status==='done' ? 100 : 0, next:'—', due: mmdd(ge), ms:'—', gs:x.created, ge: ge < x.created ? x.created : ge };
+      if(!t){ t = Object.assign({id:x.key}, fields); TASKS.push(t); TASKS_BY_ID[x.key] = t; TASK_BASELINE[x.key] = Object.assign({}, t); }
+      else Object.assign(t, fields);
+      t.jira = x;
+    });
+  }
+  // 3) Manual edits made on the Gantt, except fields Jira owns on linked tasks.
   Object.entries(data.tasks||{}).forEach(([id, f])=>{
     const t = TASKS_BY_ID[id]; if(!t) return;
     const c = Object.assign({}, f);
+    if(t.jira){ delete c.status; delete c.owner; delete c.due; }
     if(c.due){ c.due = c.due.slice(5).replace('-','/'); }
     Object.assign(t, c);
   });
@@ -4751,7 +4780,8 @@ function planApply(data){
 }
 async function planLoad(){
   if(!(typeof pageAllowed==='function' && DAYONE_PAGES.some(pageAllowed))) return;
-  try{ planApply(await pmcApi('GET',`/api/plan/${PLAN.project}`)); render(); renderList(); buildGantt(); }
+  try{ if(!PMC.health){ try{ PMC.health = await pmcApi('GET','/api/health'); }catch(e){} }
+       planApply(await pmcApi('GET',`/api/plan/${PLAN.project}`)); render(); renderList(); buildGantt(); }
   catch(e){ showToast(T('Could not load plan edits','无法加载计划修改'), e.message); }
 }
 function planMarkEditable(){
@@ -4761,14 +4791,19 @@ function planMarkEditable(){
   document.querySelectorAll('.gantt-wrap [data-task]').forEach(el=>{
     const id = el.dataset.task;
     el.classList.toggle('edited', PLAN.edited.has(id) && (el.classList.contains('gr') || el.classList.contains('gantt-bar')));
-    if(on) el.title = T('Click to edit','点击编辑');
+    const t = TASKS_BY_ID[id];
+    const jt = t && t.jira ? `Jira ${t.jira.key} · ${t.jira.statusName||''}${t.jira.lastComment ? ' · ' + t.jira.lastComment.text.split('\n')[0].slice(0,140) : ''}` : '';
+    el.title = [jt, on ? T('Click to edit','点击编辑') : ''].filter(Boolean).join('\n');
   });
   const hint = document.getElementById('planHint');
   if(hint){
     hint.hidden = !(on || PLAN.history.length);
     const last = PLAN.history[0];
     hint.innerHTML = (on ? `<span>✎ <b>${T('Click a task or its bar to edit it.','点击任务名或任务条即可编辑。')}</b></span>` : '') +
-      (last ? `<span class="pf-chip">${T('Last edit','最近修改')}: ${esc(last.by)} · ${esc(fmtDT(last.at))} · ${esc(last.taskId==='milestone'?msName():taskName(TASKS_BY_ID[last.taskId])||last.taskId)}</span>` : '') +
+      (last ? `<span class="pf-chip">${T('Last manual edit','最近手动修改')}: ${esc(last.by)} · ${esc(fmtDT(last.at))} · ${esc(last.taskId==='milestone'?msName():taskName(TASKS_BY_ID[last.taskId])||last.taskId)}</span>` : '') +
+      (PLAN.jira ? `<span class="pf-chip">Jira: ${T('synced','同步于')} ${esc(fmtDT(PLAN.jira.syncedAt))} · ${Object.keys(PLAN.jira.tasks||{}).length + (PLAN.jira.extra||[]).length} ${T('tasks linked','个任务已关联')}${PMC.health && PMC.health.nextJiraSync ? ` · ${T('next','下次')} ${esc(fmtDT(PMC.health.nextJiraSync))}` : ''}</span>`
+        : `<span class="pf-chip">${T('Not synced with Jira yet','尚未与 Jira 同步')}</span>`) +
+      (on ? `<button class="btn-ghost" id="jiraSyncBtn" onclick="planJiraSync()">${T('Sync Jira now','立即同步 Jira')}</button>` : '') +
       (PLAN.edited.size ? `<span class="pf-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:5px"></span>${PLAN.edited.size} ${T('tasks changed from the original plan','个任务已改动(相对原计划)')}</span>` : '');
   }
 }
@@ -4792,15 +4827,19 @@ function planOpen(id){
     const base = TASK_BASELINE[id] || {};
     const was = (k, v) => (PLAN.edited.has(id) && base[k]!==undefined && String(base[k])!==String(v)) ? ` <span class="was">(${T('was','原')} ${esc(k==='due'?base[k]:base[k])})</span>` : '';
     const opt = Object.keys(STATUS_META).map(k=>`<option value="${k}" ${t.status===k?'selected':''}>${esc(tr(STATUS_META[k].label))}</option>`).join('');
-    m.innerHTML = `<h3 id="peTitle">${T('Edit task','编辑任务')} ${esc(t.id)}</h3><div class="pe-sub">${esc(phaseLabel(t.month))}</div>
+    const J = t.jira, lock = J ? 'disabled' : '';
+    const jiraHTML = J ? `<div class="pe-jira"><a href="${esc(J.url)}" target="_blank" rel="noopener"><b>${esc(J.key)}</b></a> · ${esc(J.statusName||'')} · ${esc(J.owner||'—')}${J.due?` · ${T('due','截止')} ${esc(fmtD(J.due))}`:''}
+        <div class="pe-jira-note">${T('Status, owner and target date come from Jira; change them there. Synced','状态、负责人、目标日期来自 Jira,请在 Jira 中修改。同步于')} ${esc(fmtDT(PLAN.jira && PLAN.jira.syncedAt))}</div>
+        ${J.lastComment ? `<div class="pe-jira-c"><b>${esc(J.lastComment.by||'')}</b> · ${esc(fmtDT(J.lastComment.at))}<br>${esc(J.lastComment.text.slice(0,400))}</div>` : ''}</div>` : '';
+    m.innerHTML = `<h3 id="peTitle">${T('Edit task','编辑任务')} ${esc(t.id)}</h3><div class="pe-sub">${esc(phaseLabel(t.month))}</div>${jiraHTML}
       <div class="pe-grid">
         <label class="full">${T('Title (EN)','题目(英文)')}${was('name',t.name)}<input id="pe_name" value="${esc(t.name)}"></label>
         <label class="full">${T('Title (中文)','题目(中文)')}${was('nameZh',t.nameZh)}<input id="pe_nameZh" value="${esc(t.nameZh||'')}"></label>
         <label>${T('Start','开始')}${was('gs',t.gs)}<input id="pe_gs" type="date" value="${esc(t.gs)}"></label>
         <label>${T('End','结束')}${was('ge',t.ge)}<input id="pe_ge" type="date" value="${esc(t.ge)}"></label>
-        <label>${T('Target date','目标日期')}${was('due',t.due)}<input id="pe_due" type="date" value="${esc(isoDue(t))}"></label>
-        <label>${T('Owner','负责人')}${was('owner',t.owner)}<input id="pe_owner" value="${esc(t.owner)}"></label>
-        <label>${T('Status','状态')}<select id="pe_status">${opt}</select></label>
+        <label>${T('Target date','目标日期')}${was('due',t.due)}<input id="pe_due" type="date" value="${esc(isoDue(t))}" ${lock}></label>
+        <label>${T('Owner','负责人')}${was('owner',t.owner)}<input id="pe_owner" value="${esc(t.owner)}" ${lock}></label>
+        <label>${T('Status','状态')}<select id="pe_status" ${lock}>${opt}</select></label>
         <label>${T('Progress %','进度 %')}<input id="pe_progress" type="number" min="0" max="100" step="5" value="${esc(t.progress)}"></label>
         <label class="full">${T('Next step','下一步')}<textarea id="pe_next">${esc(t.next==='—'?'':t.next)}</textarea></label>
       </div>
@@ -4824,7 +4863,7 @@ async function planSave(id){
   if(next.gs > next.ge) return planErr(T('The end date is before the start date.','结束日期早于开始日期。'));
   const cur = { name:t.name, nameZh:t.nameZh||'', gs:t.gs, ge:t.ge, due:isoDue(t), owner:t.owner, status:t.status, progress:t.progress, next:t.next };
   const fields = {}, before = {};
-  Object.keys(next).forEach(k=>{ if(String(next[k])!==String(cur[k]) && !(k==='nameZh' && !next[k])){ fields[k] = next[k]; before[k] = cur[k]; } });
+  Object.keys(next).forEach(k=>{ if(t.jira && ['status','owner','due'].includes(k)) return; if(String(next[k])!==String(cur[k]) && !(k==='nameZh' && !next[k])){ fields[k] = next[k]; before[k] = cur[k]; } });
   if(!Object.keys(fields).length) return planClose();
   try{
     await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}`, {fields, before});
@@ -4842,6 +4881,18 @@ async function planSaveMs(){
   try{ const r = await pmcApi('POST',`/api/plan/${PLAN.project}/milestone`, body); const ms = r.milestone||{}; if(ms.date){ MILESTONE.date = ms.date; MILESTONE.due = ms.date.slice(5).replace('-','/'); } if(ms.name){ MILESTONE.name = ms.name; MILESTONE.en = ms.name; }
        const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; planClose(); planRerender(); showToast(T('Milestone updated','里程碑已更新'), msName()); }
   catch(e){ planErr(e.message); }
+}
+async function planJiraSync(){
+  const b = document.getElementById('jiraSyncBtn'); if(b){ b.disabled = true; b.textContent = T('Syncing…','同步中…'); }
+  try{
+    const r = await pmcApi('POST','/api/jira/sync');
+    if(!r.ok) showToast(T('Jira sync failed','Jira 同步失败'), r.error||'');
+    else showToast(T('Jira synced','Jira 已同步'), T(`DayOne: ${r.dayone.tickets} tickets · portfolio: ${r.portfolio.open} open`,`DayOne:${r.dayone.tickets} 个工单 · 组合:${r.portfolio.open} 个在途`));
+    try{ pfLoad(await pmcApi('GET','/api/portfolio')); renderPortfolio(); }catch(e){}
+    try{ PMC.health = await pmcApi('GET','/api/health'); }catch(e){}
+    await planLoad(); goPage(activePageId());
+  }catch(e){ showToast(T('Jira sync failed','Jira 同步失败'), e.message); }
+  if(b){ b.disabled = false; }
 }
 async function planReset(id){
   try{

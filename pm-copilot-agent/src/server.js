@@ -18,6 +18,7 @@
    POST /api/plan/:project/tasks/:id        {fields, before}   action: edit_plan
    POST /api/plan/:project/tasks/:id/reset                     action: edit_plan
    POST /api/plan/:project/milestone        {date, name}       action: edit_plan
+   POST /api/jira/sync                      run the Jira read sync now                    action: edit_plan
    Users & Roles (page: users)
    GET  /api/admin/catalog                  pages, actions, projects that roles can grant
    GET  /api/admin/users | POST /api/admin/users
@@ -36,6 +37,7 @@ const jira = require('./jira');
 const auth = require('./auth');
 const P = require('./permissions');
 const plan = require('./plan');
+const jirasync = require('./jirasync');
 
 const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -86,7 +88,9 @@ async function route(req, res, user) {
   if (req.method === 'GET' && p === '/api/health') {
     const db = store.load();
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
-      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), lastGranolaSync: db.sync.lastGranolaSync });
+      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), lastGranolaSync: db.sync.lastGranolaSync,
+      lastJiraSync: db.sync.lastJiraSync ? { at: db.sync.lastJiraSync.at, ok: db.sync.lastJiraSync.ok, error: db.sync.lastJiraSync.error || null } : null,
+      nextJiraSync: db.sync.nextJiraSync || null });
   }
   if (req.method === 'POST' && p === '/api/login') {
     const body = await readBody(req);
@@ -110,7 +114,7 @@ async function route(req, res, user) {
   if (req.method === 'GET' && p === '/api/portfolio') {
     // Each role receives only its projects. Without the Portfolio page you get the project list
     // (for the project switcher) and nothing else; portfolio-wide narrative needs every project.
-    const all = JSON.parse(fs.readFileSync(path.join(cfg.DATA_DIR, 'portfolio.json'), 'utf8'));
+    const all = jirasync.readPortfolio();
     const sees = (id) => P.canSeeProject(user.perms, id);
     const projects = all.projects.filter(x => sees(x.id));
     if (!user.perms.pages.includes('portfolio')) {
@@ -118,7 +122,7 @@ async function route(req, res, user) {
         phase: x.phase, headline: x.headline, stages: x.stages, tickets: [], risks: [], next: [] })), tickets: [], asks: [], events: [], text: {} });
     }
     const wide = user.perms.projects.includes('*');
-    return send(res, 200, { asOf: all.asOf, projects, tickets: all.tickets.filter(t => sees(t.proj)),
+    return send(res, 200, { asOf: all.asOf, syncedAt: all.syncedAt || null, projects, tickets: all.tickets.filter(t => sees(t.proj)),
       asks: all.asks.filter(a => wide || sees(a.proj)), events: all.events.filter(e => wide || sees(e.proj)), text: wide ? all.text : {} });
   }
 
@@ -149,7 +153,9 @@ async function route(req, res, user) {
 
   if (req.method === 'GET' && (m = p.match(/^\/api\/plan\/([a-z0-9-]+)$/))) {
     if (!P.canSeeProject(user.perms, m[1])) throw err(404, 'Project not found');
-    return send(res, 200, plan.get(m[1]));
+    const out = plan.get(m[1]);
+    if (m[1] === 'dayone') out.jira = jirasync.readDayone();
+    return send(res, 200, out);
   }
   if (req.method === 'GET' && p === '/api/admin/catalog') { page(user, 'users'); return send(res, 200, { pages: P.PAGES, actions: P.ACTIONS, projects: P.PROJECTS }); }
   if (req.method === 'GET' && p === '/api/admin/users') { page(user, 'users'); return send(res, 200, { users: auth.users() }); }
@@ -176,10 +182,15 @@ async function route(req, res, user) {
     const log = (target, detail) => { store.audit(user.name, 'plan-edit', `${project}:${target}`, detail); store.save(); };
     if (m[2] === 'milestone') { const ms = plan.editMilestone(project, body, user.name); log('milestone', JSON.stringify(ms)); return send(res, 200, { milestone: ms }); }
     if (m[4]) { plan.resetTask(project, m[3], user.name); log(m[3], 'reset to original'); return send(res, 200, plan.get(project)); }
+    // Status, owner and target date of a task fed by Jira are owned by Jira; change them there.
+    const jd = project === 'dayone' ? jirasync.readDayone() : null;
+    const linked = jd && (jd.tasks[m[3]] || (jd.extra || []).find(x => x.key === m[3]));
+    if (linked) { const owned = ['status', 'owner', 'due'].filter(k => k in (body.fields || {})); if (owned.length) throw err(400, `${owned.join(', ')} come from Jira ${linked.key}; change them in Jira`); }
     const r = plan.editTask(project, m[3], body.fields, body.before, user.name);
     log(m[3], Object.keys(body.fields || {}).join(', '));
     return send(res, 200, r);
   }
+  if (p === '/api/jira/sync') { action(user, 'edit_plan'); return send(res, 200, await jirasync.runAll(user.name)); }
   if (p === '/api/sync') { action(user, 'ingest'); return send(res, 200, await agent.syncGranola(user.name)); }
   if (p === '/api/meetings/import') {
     action(user, 'ingest');
@@ -216,6 +227,8 @@ if (require.main === module) {
   server.listen(cfg.port, () => {
     console.log(`PM Copilot agent on :${cfg.port} · dashboard at / · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
     if (first) console.log(`\nFirst start: created ${first.created.map(c => c[0]).join(', ')}.\nTemporary passwords are in ${first.file} — hand them out privately, then delete the file.\n`);
+    const nj = jirasync.schedule();
+    console.log(nj ? `Jira sync: next run ${nj.toISOString()} (Mon–Fri 24:00 SGT)${jira.hasCreds() ? '' : ' — needs JIRA_EMAIL and JIRA_API_TOKEN'}` : 'Jira sync: off');
     if (granola.configured() && cfg.granola.syncMinutes > 0) {
       const tick = () => agent.syncGranola('scheduler').then(r => r.notes && console.log('[sync]', r)).catch(e => console.warn('[sync]', e.message));
       setTimeout(tick, 3000); setInterval(tick, cfg.granola.syncMinutes * 60000);
