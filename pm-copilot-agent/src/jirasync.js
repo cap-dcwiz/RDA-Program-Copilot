@@ -38,6 +38,19 @@ function ticketRow(i) {
     due: f.duedate || null, created: day(f.created), updated: day(f.updated), resolved: day(f.resolutiondate), parent: f.parent ? f.parent.key : null };
 }
 
+/* The project's current phase, as the PM keeps it in the epic description, e.g.
+   "Current Phase: Transitioning from MONTH 2 → MONTH 3" → months [2, 3]. */
+async function epicPhase(key) {
+  if (!key) return null;
+  const i = await jira.issue(key, ['description', 'updated']);
+  const text = jira.adfText(i.fields && i.fields.description);
+  const line = text.split('\n').map(l => l.replace(/[*_#>]/g, '').trim()).find(l => /current phase/i.test(l));
+  if (!line) return null;
+  const months = [...line.matchAll(/month\s*(\d+)/gi)].map(m => Number(m[1])).filter(n => n >= 1 && n <= 12);
+  if (!months.length) return null;
+  return { key, text: line, months: [...new Set(months)], updated: day(i.fields.updated) };
+}
+
 async function syncDayone() {
   const map = readJson(F('dayone-jira-map.json'), { tasks: {}, ignore: [] });
   const byKey = Object.fromEntries(Object.entries(map.tasks || {}).map(([task, key]) => [key, task]));
@@ -57,8 +70,9 @@ async function syncDayone() {
       extra.push(r);
     }
   }
+  const phase = await epicPhase(map.epic).catch(() => null);
   const missing = Object.entries(map.tasks || {}).filter(([, key]) => !rows.find(r => r.key === key)).map(([task, key]) => `${task}→${key}`);
-  const out = { syncedAt: new Date().toISOString(), jql: cfg.jira.dayoneJql, tickets: rows.length, tasks, extra, missing };
+  const out = { syncedAt: new Date().toISOString(), jql: cfg.jira.dayoneJql, tickets: rows.length, tasks, extra, missing, phase };
   writeJson(F('dayone-jira.json'), out);
   return { tickets: rows.length, mapped: Object.keys(tasks).length, extra: extra.length, missing };
 }

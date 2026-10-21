@@ -635,6 +635,7 @@ button.project-select{font-family:inherit;}
 .ds-strip .ds-lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-right:2px;}
 .ds-strip .ds-hint{margin-left:auto;font-size:11px;}
 .stat-card .ds-foot{margin-top:8px;}
+.ds-jd{font-size:10.5px;color:var(--cyan);opacity:.85;}
 .ds-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:middle;flex-shrink:0;}
 .ds-static{border-left:2px dashed color-mix(in srgb,var(--gray) 55%,transparent);padding-left:8px;cursor:help;}
 .panel-title .ds-own,.banner-title .ds-own,.side-card h3 .ds-own,.reco-card h4 .ds-own{margin-left:8px;}
@@ -1057,7 +1058,6 @@ body.gated{padding-left:0;}
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,20 14,22 28,14 42,18 56,9 70,15 84,6 100,11" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="blocked">2</div>
         <div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Tasks blocked" data-i18n-zh="阻塞任务数">Tasks blocked</span></div>
       </div>
@@ -1066,7 +1066,6 @@ body.gated{padding-left:0;}
           <div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <div class="stat-label"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,18 14,12 28,16 42,8 56,13 70,7 84,12 100,5" fill="none" stroke="var(--orange)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="atrisk">8</div>
         <div class="stat-sub up" data-kpi="atrisk-sub"><span data-i18n-en="Tasks at risk" data-i18n-zh="有风险任务数">Tasks at risk</span></div>
       </div>
@@ -1075,7 +1074,6 @@ body.gated{padding-left:0;}
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,10 14,16 28,12 42,20 56,15 70,22 84,18 100,24" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="overdue">1</div>
         <div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Tasks overdue" data-i18n-zh="逾期任务数">Tasks overdue</span></div>
       </div>
@@ -1084,7 +1082,6 @@ body.gated{padding-left:0;}
           <div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Due in 7 Days" data-i18n-zh="7天内到期">Due in 7 Days</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,8 14,14 28,10 42,17 56,13 70,19 84,15 100,20" fill="none" stroke="var(--blue)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="duesoon">2</div>
         <div class="stat-sub down" data-kpi="duesoon-sub"><span data-i18n-en="Tasks due soon" data-i18n-zh="即将到期任务数">Tasks due soon</span></div>
       </div>
@@ -1093,7 +1090,6 @@ body.gated{padding-left:0;}
           <div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Current Phase" data-i18n-zh="当前阶段">Current Phase</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><circle cx="50" cy="15" r="11" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-dasharray="52 69"/></svg>
         <div class="stat-value small"><span data-i18n-en="Month 2" data-i18n-zh="第 2 月">Month 2</span></div>
         <div class="stat-sub">Aug 2026 · Digital Twin Construction</div>
       </div>
@@ -1260,23 +1256,23 @@ body.gated{padding-left:0;}
     <div class="stats">
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></div></div>
-        <div class="stat-value" data-kpi="blocked">2</div><div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="blocked">2</div><div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Tasks blocked" data-i18n-zh="阻塞任务数">Tasks blocked</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-label"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></div></div>
-        <div class="stat-value" data-kpi="atrisk">8</div><div class="stat-sub up" data-kpi="atrisk-sub"><span data-i18n-en="+1 vs. last week" data-i18n-zh="较上周 +1">+1 vs. last week</span></div>
+        <div class="stat-value" data-kpi="atrisk">8</div><div class="stat-sub" data-kpi="atrisk-sub"><span data-i18n-en="Tasks at risk" data-i18n-zh="有风险任务数">Tasks at risk</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></div></div>
-        <div class="stat-value" data-kpi="overdue">1</div><div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="overdue">1</div><div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Tasks overdue" data-i18n-zh="逾期任务数">Tasks overdue</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="stat-label"><span data-i18n-en="Current Blocker Sources" data-i18n-zh="当前阻塞源数量">Current Blocker Sources</span></div></div>
-        <div class="stat-value" data-kpi="blockersources">2</div><div class="stat-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="blockersources">2</div><div class="stat-sub"><span data-i18n-en="Tasks holding up others" data-i18n-zh="卡住其他任务的任务">Tasks holding up others</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="stat-label"><span data-i18n-en="Milestones Impacted" data-i18n-zh="受影响里程碑数">Milestones Impacted</span></div></div>
-        <div class="stat-value" data-kpi="msimpacted">1</div><div class="stat-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="msimpacted">1</div><div class="stat-sub"><span data-i18n-en="Milestones with a late input" data-i18n-zh="有输入滞后的里程碑">Milestones with a late input</span></div>
       </div>
     </div>
 
@@ -1480,7 +1476,7 @@ body.gated{padding-left:0;}
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="stat-label"><span data-i18n-en="Tasks This Month" data-i18n-zh="本月任务数">Tasks This Month</span></div></div>
-        <div class="stat-value" data-kpi="monthtasks">10</div><div class="stat-sub up"><span data-i18n-en="+1 vs. last month" data-i18n-zh="较上月 +1">+1 vs. last month</span></div>
+        <div class="stat-value" data-kpi="monthtasks">10</div><div class="stat-sub"><span data-i18n-en="Tasks scheduled" data-i18n-zh="已排期任务">Tasks scheduled</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label"><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></div></div>
@@ -2187,7 +2183,8 @@ function computeKPIs(){
   });
   const blockerSourceIds = new Set(TASKS.filter(t=>(t.status==='blocked'||isOverdue(t)) && EDGES.some(e=>e.from===t.id)).map(t=>t.id));
   const msImpacted = EDGES.some(e=>e.to==='MS2' && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]))) ? 1 : 0;
-  const monthTasks = TASKS.filter(t=>t.month===2);
+  const CUR = (typeof dsPhase==='function') ? dsPhase().months : [2];
+  const monthTasks = TASKS.filter(t=>CUR.includes(t.month));
   const monthDone = monthTasks.filter(t=>t.status==='done');
   const monthProg = monthTasks.filter(t=>t.status==='inprogress');
   return {
@@ -4975,7 +4972,7 @@ const dsAsOf = () => T('as of 21 Aug 2026','截至 2026-08-21');
 
 function dsField(t, f){
   const J = t && t.jira, syncAt = PLAN.jira && PLAN.jira.syncedAt;
-  const jira = d => ({k:'jira', d:[J.key, d, T('synced','同步于')+' '+fmtDT(syncAt)].filter(Boolean).join(' · ')});
+  const jira = d => ({k:'jira', d:[J.key, d, J.updated && T(`ticket updated ${J.updated}`,`工单更新于 ${J.updated}`), T('synced','同步于')+' '+fmtDT(syncAt)].filter(Boolean).join(' · ')});
   if(J && /^BA-/.test(t.id)){   // a DayOne ticket that is not in the original plan
     if(f==='next' || f==='health') return {k:'calc', d:T('not tracked for tickets outside the plan','原计划外的工单不跟踪此项')};
     return jira({gs:T('created','创建日期'), ge:T('due, resolved or last-updated date','截止、解决或最近更新日期'), due:T('due, resolved or last-updated date','截止、解决或最近更新日期'),
@@ -4984,7 +4981,7 @@ function dsField(t, f){
   if(J){
     if(f==='status') return jira(J.statusName);
     if(f==='owner' && J.owner) return jira(T('assignee','经办人'));
-    if(f==='due' && J.due) return jira(T('due date','截止日期'));
+    if(f==='due' && J.due) return jira(T(`Jira due date ${J.due}`,`Jira 截止日期 ${J.due}`));
     if(f==='progress' && J.status==='done') return jira(T('done in Jira → 100%','Jira 已完成 → 100%'));
   }
   const e = PLAN.edits && PLAN.edits[t.id];
@@ -5048,9 +5045,9 @@ const DS_KPI = {
   depmsimpacted:['Milestones with a blocked or overdue input.','有输入任务阻塞或逾期的里程碑。'],
   harddeps:     ['Hard dependency links. The links themselves are from the original plan.','硬依赖条数。依赖关系本身来自原始计划。'],
   softdeps:     ['Soft dependency links. The links themselves are from the original plan.','软依赖条数。依赖关系本身来自原始计划。'],
-  monthtasks:   ['Tasks in Month 2. The page treats Month 2 as the current phase (original plan).','第 2 月的任务。页面把第 2 月当作当前阶段(原始计划)。'],
-  monthdone:    ['Month 2 tasks that are done.','第 2 月中已完成的任务。'],
-  monthprog:    ['Month 2 tasks that are in progress.','第 2 月中进行中的任务。'],
+  monthtasks:   ['Tasks scheduled in the current phase.','当前阶段排期的任务。'],
+  monthdone:    ['Tasks in the current phase that are done.','当前阶段中已完成的任务。'],
+  monthprog:    ['Tasks in the current phase that are in progress.','当前阶段中进行中的任务。'],
   snap:         ['Average progress of the tasks listed in this month.','本月所列任务的平均进度。'],
 };
 function dsInputsLine(){
@@ -5072,6 +5069,7 @@ function dsTipHTML(el){
       const up = EDGES.filter(e=>e.to===t.id && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]||{}))).map(e=>e.from);
       rows += dsRow(T('Shown as','显示为'), [blocked ? tr('Blocked') : '', od ? tr('Overdue') : ''].filter(Boolean).join(' · '),
         {k:'calc', d: blocked && up.length ? T(`upstream ${up.join(', ')} not finished`,`上游 ${up.join('、')} 未完成`) : T('target date has passed','已过目标日期')}); }
+    if(t.jira) rows += `<div class="ds-row"><span class="ds-f">${T('Jira ticket','Jira 工单')}</span><span class="ds-v" style="grid-column:2/4">${esc(t.jira.key)} · ${esc(t.jira.statusName||'')}</span><span class="ds-d">${esc(dsJiraDates(t.jira))}</span></div>`;
     if(t.jira && t.jira.lastComment){ const c = t.jira.lastComment;
       rows += `<div class="ds-row"><span class="ds-f">${T('Latest Jira comment','Jira 最新评论')}</span><span class="ds-v" style="grid-column:2/4;font-weight:500">${esc(c.text.split('\n')[0].slice(0,160))}</span><span class="ds-d">${esc(c.by||'')} · ${esc(fmtDT(c.at))}</span></div>`; }
     return head(`${t.id} ${taskName(t)}`) + rows + dsLegend(kinds);
@@ -5081,10 +5079,14 @@ function dsTipHTML(el){
     return head(`◆ ${MILESTONE.id} ${msName()}`) + dsRow(T('Date','日期'), MILESTONE.date, s) + dsRow(T('Owner','负责人'), MILESTONE.owner, {k:'plan', d:dsAsOf()}) +
       dsRow(T('Shown status','显示状态'), T('from its input tasks','由输入任务决定'), {k:'calc', d:''}) + dsLegend([s.k,'plan','calc']);
   }
+  if(type==='phase'){
+    const ph = dsPhase();
+    return head(dsK(ph.k)) + `<div class="st-note">${esc(dsPhaseNote())}</div>` + dsLegend([ph.k]);
+  }
   if(type==='kpi'){
     const x = DS_KPI[a] || ['',''];
     return head(dsK('calc')) + `<div class="st-note">${esc(T(x[0],x[1]))}</div><div class="st-note">${esc(dsInputsLine())}</div>` +
-      (b==='illus' ? `<div class="st-note" style="color:var(--orange)">${esc(T('The trend line and any "vs. last week / month" text on this card are fixed illustrations: no history is stored yet.','卡片上的趋势线和「较上周/上月」文字是固定示意,目前没有保存历史数据。'))}</div>` : '') + dsLegend(['calc']);
+      (/^month/.test(a) ? `<div class="st-note">${esc(dsPhaseNote())}</div>` : '') + dsLegend(/^month/.test(a) ? ['calc', dsPhase().k] : ['calc']);
   }
   if(DS_KIND[type]) return head(dsK(type)) + `<div class="st-note">${esc(T(DS_NOTE[type][0], DS_NOTE[type][1]))}</div>`;
   return '';
@@ -5135,10 +5137,16 @@ function applyDataSources(){
   DS_PAGES.forEach(pid=>{
     document.querySelectorAll(`#page-${pid} .stat-card`).forEach(card=>{
       const kpi = card.querySelector('[data-kpi]:not([data-kpi$="-sub"])');
-      const illus = card.querySelector('.stat-spark') || /vs\.? last|较上/.test(card.textContent) ? ':illus' : '';
       let spec, k, label;
       if(pid==='luna'){ spec = 'sample'; k = 'sample'; }
-      else if(kpi){ spec = `kpi:${kpi.dataset.kpi}${illus}`; k = 'calc'; }
+      else if(/Current Phase|当前阶段/.test(card.querySelector('.stat-label')?.textContent||'')){
+        const ph = dsPhase(); spec = 'phase'; k = ph.k; label = ph.k==='jira' ? `Jira ${ph.key}` : T('Plan · 21 Aug','计划 · 8/21');
+        const v = card.querySelector('.stat-value'), sb = card.querySelector('.stat-sub');
+        if(v) v.textContent = dsPhaseLabel();
+        if(sb) sb.textContent = ph.k==='jira' ? T(`Moving to ${phaseTitle(ph.months[ph.months.length-1])}`,`进入「${phaseTitle(ph.months[ph.months.length-1])}」`) : (PHASES_BY_MONTH[2].dateLabel+' · '+phaseTitle(2));
+      }
+      else if(kpi){ spec = `kpi:${kpi.dataset.kpi}`; k = 'calc';
+        if(kpi.dataset.kpi==='monthtasks'){ const l = card.querySelector('.stat-label'); if(l) l.textContent = T(`Tasks in ${dsMonthsWord()}`,`${dsMonthsWord()}任务数`); } }
       else if(/MS2|milestone|里程碑/i.test(card.textContent)){ const s = dsMsField(); spec = 'ms:MS2'; k = s.k; }
       else { spec = 'plan'; k = 'plan'; label = T('Plan · 21 Aug','计划 · 8/21'); }
       card.setAttribute('data-ds', spec);
@@ -5153,7 +5161,8 @@ function applyDataSources(){
     const meta = c.querySelector('.fc-meta, .mc-meta');
     if(meta){
       const owner = isMs ? MILESTONE.owner : t.owner, iso = isMs ? MILESTONE.date : dsIsoDue(t), mmdd = isMs ? MILESTONE.due : (t.due||'—');
-      meta.innerHTML = meta.classList.contains('fc-meta') ? `👤 ${esc(owner)} &nbsp;·&nbsp; 📅 ${T('Due','截止')}: ${esc(iso)}` : `👤 ${esc(owner)} &nbsp; 📅 ${esc(mmdd)}`;
+      const jd = !isMs && t.jira && dsField(t,'due').k==='jira' ? ` <span class="ds-jd">(Jira ${esc(t.jira.key)} · ${T('updated','更新')} ${esc((t.jira.updated||'').slice(5).replace('-','/'))})</span>` : '';
+      meta.innerHTML = (meta.classList.contains('fc-meta') ? `👤 ${esc(owner)} &nbsp;·&nbsp; 📅 ${T('Due','截止')}: ${esc(iso)}` : `👤 ${esc(owner)} &nbsp; 📅 ${esc(mmdd)}`) + jd;
     }
     c.setAttribute('data-ds', isMs ? 'ms:MS2' : 'task:'+id);
     const bd = c.querySelector('.fc-badges, .mc-badges');
@@ -5170,6 +5179,17 @@ function applyDataSources(){
     const t = TASKS_BY_ID[id], k = id==='MS2' ? dsMsField().k : (t ? dsTaskLabel(t).k : 'plan');
     let dot = it.querySelector('.ds-dot'); if(!dot){ it.querySelector('.lbl')?.insertAdjacentHTML('afterbegin','<span class="ds-dot"></span>'); dot = it.querySelector('.ds-dot'); }
     if(dot) dot.className = 'ds-dot k-'+k;
+  });
+  const PH = dsPhase();
+  document.querySelectorAll('.snap-grid .snap-col').forEach((col, i)=>{
+    const m = i + 1, tag = col.querySelector('.snap-tag'); if(!tag) return;
+    const state = PH.months.includes(m) ? 'current' : m < Math.min(...PH.months) ? 'done' : 'next';
+    col.classList.toggle('current', state==='current');
+    tag.textContent = state==='current' ? T('Current','当前') : state==='done' ? T('Completed','已完成') : T('Upcoming','即将开始');
+    tag.setAttribute('data-ds','phase');
+  });
+  document.querySelectorAll('.side-card .info-row').forEach(r=>{
+    if(/Project Phase|项目阶段/.test(r.querySelector('span')?.textContent||'')){ const b = r.querySelector('b'); if(b) b.textContent = T(`${dsPhaseLabel()} / of 9`,`${dsPhaseLabel()} / 共 9 月`); r.setAttribute('data-ds','phase'); }
   });
   document.querySelectorAll('.snap-col').forEach(col=>{
     const ids = [...col.querySelectorAll('.badge-slot[data-node]')].map(s=>s.dataset.node).filter(id=>TASKS_BY_ID[id]);
@@ -5203,6 +5223,23 @@ function applyDataSources(){
   // Meetings page
   document.querySelectorAll('#meetList .meet-item').forEach(m=>{ if(!m.querySelector('.ds-tag')) m.querySelector('b')?.insertAdjacentHTML('afterend', ` ${dsTag('meeting','meeting',T('Minutes','纪要'))}`); });
   document.querySelectorAll('#proposalList .proposal-card').forEach(c=>{ const ev = c.querySelector('.prop-evidence'); if(ev && !ev.querySelector('.ds-tag')) ev.insertAdjacentHTML('afterbegin', dsTag('meeting','meeting',dsK('meeting'))+' '); });
+}
+/* Current phase: from the epic description in Jira when the sync found it, else the original plan (Month 2). */
+function dsPhase(){
+  const P = PLAN.jira && PLAN.jira.phase;
+  if(P && P.months && P.months.length) return {k:'jira', months:P.months, key:P.key, text:P.text, updated:P.updated};
+  return {k:'plan', months:[2]};
+}
+function dsMonthsWord(){ const m = dsPhase().months; return m.length > 1 ? T(`Month ${m[0]}–${m[m.length-1]}`,`第 ${m[0]}–${m[m.length-1]} 月`) : monthWord(m[0]); }
+function dsPhaseLabel(){ const m = dsPhase().months; return m.length > 1 ? T(`Month ${m[0]} → ${m[m.length-1]}`,`第 ${m[0]} → ${m[m.length-1]} 月`) : monthWord(m[0]); }
+function dsPhaseNote(){
+  const ph = dsPhase();
+  return ph.k==='jira' ? T(`Current phase from the Jira epic ${ph.key} (updated ${ph.updated}): "${ph.text}". Counts cover ${dsMonthsWord()}.`,`当前阶段来自 Jira Epic ${ph.key}(${ph.updated} 更新):「${ph.text}」。统计范围为${dsMonthsWord()}。`)
+                       : T('Current phase from the original plan (Month 2); the Jira epic has not been synced yet.','当前阶段来自原始计划(第 2 月),尚未同步 Jira Epic。');
+}
+function dsJiraDates(J){
+  return [J.created && T(`created ${J.created}`,`创建 ${J.created}`), J.updated && T(`updated ${J.updated}`,`更新 ${J.updated}`),
+          T(`due ${J.due||'not set'}`,`截止 ${J.due||'未设置'}`), J.resolved && T(`resolved ${J.resolved}`,`解决 ${J.resolved}`)].filter(Boolean).join(' · ');
 }
 function dsActionTag(a){
   if(a.source){ const m = MEETINGS.find(x=>x.id===a.source); return `<span class="ds-tag k-meeting" data-ds="meeting" data-ds-note="${esc(m ? m.title+' · '+m.date : '')}"><i></i>${esc(dsK('meeting'))}</span>`; }

@@ -92,6 +92,9 @@ function adfText(n) {
   const inner = (n.content || []).map(adfText).join(n.type === 'doc' || n.type === 'bulletList' || n.type === 'orderedList' ? '\n' : '');
   return ['paragraph', 'listItem', 'heading'].includes(n.type) ? inner + '\n' : inner;
 }
+async function issue(key, fields) {
+  return call('GET', `/rest/api/3/issue/${key}?fields=${encodeURIComponent(fields.join(','))}`);
+}
 async function lastComment(key) {
   const r = await call('GET', `/rest/api/3/issue/${key}/comment?orderBy=-created&maxResults=1`);
   const c = (r.comments || [])[0];
@@ -100,4 +103,4 @@ async function lastComment(key) {
   return { at: c.created, by: c.author ? c.author.displayName : null, text: text.slice(0, 600) };
 }
 
-module.exports = { searchAll, lastComment, adfText, openTickets, apply, plan, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
+module.exports = { searchAll, issue, lastComment, adfText, openTickets, apply, plan, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
