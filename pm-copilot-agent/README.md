@@ -54,17 +54,17 @@ Everything sits behind sign-in. A role grants three things; a user with several 
 | Grant | Meaning | Enforced |
 |---|---|---|
 | **Pages** | Which menu entries show: Portfolio, Meeting To-dos, Meeting History, the DayOne project pages, Users & Roles | API routes check the page (`todo` → suggestions, `history` → meetings and audit, `users` → admin routes) |
-| **Can do** | `approve` — approve, edit, reject to-dos (writes to Jira) · `ingest` — sync Granola, import, re-analyse | every write route |
+| **Can do** | `approve` — approve, edit, reject to-dos (writes to Jira) · `ingest` — sync Granola, import, re-analyse · `edit_plan` — edit the DayOne Gantt (title, dates, target date, owner, status, progress, next step, milestone) | every write route |
 | **Projects** | Whose data the role sees, or all projects | suggestions, meetings and the decision log are filtered per project; full meeting notes only for all-projects roles |
 
 Starting roles:
 
-| Role | Sees | Approves to Jira | Users & Roles |
-|---|---|---|---|
-| **Super Admin** (locked) | everything | yes | yes |
-| **RDA Manager** | every page and project | yes | no |
-| **RDA Member** | every page and project; can import meetings | no | no |
-| **Customer · DayOne** | DayOne overview and roadmap only | no | no |
+| Role | Sees | Approves to Jira | Edits the plan (Gantt) | Users & Roles |
+|---|---|---|---|---|
+| **Super Admin** (locked) | everything | yes | yes | yes |
+| **RDA Manager** | every page and project | yes | yes | no |
+| **RDA Member** | every page and project; can import meetings | no | no | no |
+| **Customer · DayOne** | DayOne overview and roadmap only | no | no | no |
 
 Add a `Customer · <client>` role per client as their project views are built.
 Edit them on Users & Roles → *Role → what it can see and do* and click **Save**.
@@ -87,6 +87,14 @@ who should not see DayOne.
 Accounts an admin creates, or whose password an admin resets, must set a new password at next
 sign-in. People change their own password from the header.
 
+## Editing the plan
+
+On DayOne → Roadmap View, people with `edit_plan` click a task name or its Gantt bar to edit it, or
+the ◆ row to move the milestone. Edits are stored in `data/plan.json` (only what changed, plus who
+changed what), validated on the server, and applied for everyone after sign-in. Edited tasks carry a
+cyan dot; **Restore original plan** in the editor drops a task's edits. Every change is also in the
+decision log.
+
 ## API
 
 See the header of `src/server.js`. All routes except `/`, `/api/health` and `/api/login` need `Authorization: Bearer <session token>`.
@@ -100,6 +108,7 @@ src/jira.js      Open-ticket read (live or data/jira.snapshot.json) and approved
 src/agent.js     ingest → analyse → store; approve / reject / edit
 src/auth.js      users, password login, sessions, roles
 src/permissions.js  the pages / actions / projects a role can grant, and the starting roles
+src/plan.js      Gantt edits per project, with validation and history
 src/store.js     JSON file store (data/store.json, git-ignored)
 src/server.js    HTTP routes
 ```

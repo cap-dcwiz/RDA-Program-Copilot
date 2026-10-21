@@ -14,6 +14,10 @@
    GET  /api/audit                          page: history
    POST /api/suggestions/:id/approve|reject|edit     action: approve
    POST /api/sync, /api/meetings/import, /api/meetings/:id/reanalyse   action: ingest
+   GET  /api/plan/:project                  plan edits (Gantt) for a project the user may see
+   POST /api/plan/:project/tasks/:id        {fields, before}   action: edit_plan
+   POST /api/plan/:project/tasks/:id/reset                     action: edit_plan
+   POST /api/plan/:project/milestone        {date, name}       action: edit_plan
    Users & Roles (page: users)
    GET  /api/admin/catalog                  pages, actions, projects that roles can grant
    GET  /api/admin/users | POST /api/admin/users
@@ -31,6 +35,7 @@ const granola = require('./granola');
 const jira = require('./jira');
 const auth = require('./auth');
 const P = require('./permissions');
+const plan = require('./plan');
 
 const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -142,6 +147,10 @@ async function route(req, res, user) {
     return send(res, 200, { audit: db.audit.filter(a => all || visible.has(a.target)).slice(0, 200) });
   }
 
+  if (req.method === 'GET' && (m = p.match(/^\/api\/plan\/([a-z0-9-]+)$/))) {
+    if (!P.canSeeProject(user.perms, m[1])) throw err(404, 'Project not found');
+    return send(res, 200, plan.get(m[1]));
+  }
   if (req.method === 'GET' && p === '/api/admin/catalog') { page(user, 'users'); return send(res, 200, { pages: P.PAGES, actions: P.ACTIONS, projects: P.PROJECTS }); }
   if (req.method === 'GET' && p === '/api/admin/users') { page(user, 'users'); return send(res, 200, { users: auth.users() }); }
   if (req.method === 'GET' && p === '/api/admin/roles') { page(user, 'users'); return send(res, 200, { roles: auth.roles() }); }
@@ -160,6 +169,17 @@ async function route(req, res, user) {
     throw err(404, 'Not found');
   }
 
+  if ((m = p.match(/^\/api\/plan\/([a-z0-9-]+)\/(tasks\/([\w-]+)(\/reset)?|milestone)$/))) {
+    action(user, 'edit_plan');
+    const project = m[1];
+    if (!P.canSeeProject(user.perms, project)) throw err(404, 'Project not found');
+    const log = (target, detail) => { store.audit(user.name, 'plan-edit', `${project}:${target}`, detail); store.save(); };
+    if (m[2] === 'milestone') { const ms = plan.editMilestone(project, body, user.name); log('milestone', JSON.stringify(ms)); return send(res, 200, { milestone: ms }); }
+    if (m[4]) { plan.resetTask(project, m[3], user.name); log(m[3], 'reset to original'); return send(res, 200, plan.get(project)); }
+    const r = plan.editTask(project, m[3], body.fields, body.before, user.name);
+    log(m[3], Object.keys(body.fields || {}).join(', '));
+    return send(res, 200, r);
+  }
   if (p === '/api/sync') { action(user, 'ingest'); return send(res, 200, await agent.syncGranola(user.name)); }
   if (p === '/api/meetings/import') {
     action(user, 'ingest');

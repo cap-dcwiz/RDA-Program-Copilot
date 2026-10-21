@@ -16,6 +16,7 @@ const PAGES = [
 const ACTIONS = [
   { id: 'approve', en: 'Approve, edit and reject to-dos (writes to Jira)', zh: '审批、编辑、驳回待办(写入 Jira)' },
   { id: 'ingest',  en: 'Sync Granola, import and re-analyse meetings',     zh: '同步 Granola、导入与重新分析会议' },
+  { id: 'edit_plan', en: 'Edit the project plan (Gantt titles, dates, owners, status)', zh: '编辑项目计划(甘特图的题目、日期、负责人、状态)' },
 ];
 const PROJECTS = [
   { id: 'dayone', en: 'DayOne NTP-E' }, { id: 'bdc', en: 'BDC MY2' }, { id: 'bdx', en: 'BDx SIN1' },
@@ -30,7 +31,7 @@ const DEFAULT_ROLES = [
   // Opens accounts and edits roles. Locked: always every permission, cannot be deleted.
   { id: 'admin', name: 'Super Admin', locked: true, ...ALL },
   // RDA managers: see everything, may approve to-dos into Jira.
-  { id: 'rda-manager', name: 'RDA Manager', pages: RDA_PAGES, actions: ['approve', 'ingest'], projects: ['*'] },
+  { id: 'rda-manager', name: 'RDA Manager', pages: RDA_PAGES, actions: ['approve', 'ingest', 'edit_plan'], projects: ['*'] },
   // RDA staff: see everything, can bring meetings in, cannot approve.
   { id: 'rda-member', name: 'RDA Member', pages: RDA_PAGES, actions: ['ingest'], projects: ['*'] },
   // Customers: only their own project, read-only.

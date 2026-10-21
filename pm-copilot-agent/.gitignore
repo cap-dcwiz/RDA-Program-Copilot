@@ -6,3 +6,4 @@ data/*.tmp
 data/roles.json
 data/sessions.json
 data/initial-passwords.txt
+data/plan.json

@@ -657,6 +657,35 @@ button.project-select{font-family:inherit;}
 .dr-tk .st-sig{font-size:11.5px;color:var(--text-dim);line-height:1.55;margin-top:6px;}
 
 
+/* ===== Gantt editing (action: edit_plan) ===== */
+.plan-hint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-dim);margin:0 0 10px;}
+.plan-hint b{color:var(--text);}
+.plan-hint .pf-chip{cursor:help;}
+.gantt-editable .gantt-left .gr[data-task],.gantt-editable .gantt-bar,.gantt-editable [data-task]{cursor:pointer;}
+.gantt-editable .gantt-left .gr[data-task]:hover{background:var(--purple-bg);}
+.gantt-editable .gantt-left .gr[data-task]:hover .gname::after{content:' ✎';color:var(--purple);font-weight:800;}
+.gantt-editable .gantt-bar:hover{outline:2px solid var(--purple);outline-offset:1px;}
+.gantt-left .gr.edited .gid::after,.gantt-bar.edited::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-left:4px;vertical-align:middle;}
+.gantt-bar.edited::before{margin:0 5px 0 0;}
+.pe-scrim{position:fixed;inset:0;background:rgba(4,6,14,.6);z-index:150;opacity:0;pointer-events:none;transition:opacity .15s;}
+.pe-scrim.show{opacity:1;pointer-events:auto;}
+.pe-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:151;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);overflow:auto;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.6);}
+.pe-modal[hidden]{display:none;}
+.pe-modal h3{margin:0 0 2px;font-size:17px;} .pe-sub{font-size:11.5px;color:var(--text-dimmer);margin-bottom:14px;}
+.pe-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;}
+.pe-grid label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--text-dim);}
+.pe-grid label.full{grid-column:1/-1;}
+.pe-grid input,.pe-grid select,.pe-grid textarea{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;}
+.pe-grid input:focus,.pe-grid select:focus,.pe-grid textarea:focus{outline:2px solid var(--purple);outline-offset:1px;}
+.pe-grid textarea{min-height:64px;resize:vertical;}
+.pe-grid .was{font-weight:600;color:var(--text-dimmer);font-size:10.5px;}
+.pe-err{font-size:12px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:8px 10px;margin-top:12px;}
+.pe-actions{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap;} .pe-actions .sp{flex:1;}
+.pe-hist{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-dim);}
+.pe-hist div{padding:3px 0;} .pe-hist b{color:var(--text);}
+@media (max-width:600px){ .pe-grid{grid-template-columns:1fr;} }
+
 /* ===== Sign-in gate + Users & Roles ===== */
 body.gated .app, body.gated .icon-rail{visibility:hidden;}
 body.gated{padding-left:0;}
@@ -1439,6 +1468,7 @@ body.gated{padding-left:0;}
     <div class="subview active" id="rm-gantt">
       <div class="rm-body">
         <div>
+          <div class="plan-hint" id="planHint" hidden></div>
           <div class="gantt-wrap">
             <div class="gantt-left">
               <div class="gh"><span>#</span><span><span data-i18n-en="Task / Task" data-i18n-zh="任务">Task / Task</span></span><span><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></span></div>
@@ -1729,6 +1759,8 @@ body.gated{padding-left:0;}
 
 <div id="toast"><div class="toast-title" id="toastTitle">Program updated</div><div class="toast-body" id="toastBody"></div></div>
 <div class="src-tip" id="srcTip" role="tooltip"></div>
+<div class="pe-scrim" id="peScrim" onclick="planClose()"></div>
+<div class="pe-modal" id="peModal" role="dialog" aria-modal="true" aria-labelledby="peTitle" hidden></div>
 <div class="pf-scrim" id="pfScrim" onclick="closeProjectDrawer()"></div>
 <aside class="pf-drawer" id="pfDrawer" aria-hidden="true" aria-label="Project snapshot"></aside>
 
@@ -2478,12 +2510,12 @@ function buildGantt(){
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else if(r.kind==='milestone'){
-      leftRows.innerHTML += `<div class="gr"><span class="gid">◆</span><span class="gname">${msName()}</span><span></span></div>`;
+      leftRows.innerHTML += `<div class="gr" data-task="__ms"><span class="gid">◆</span><span class="gname">${msName()}</span><span></span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else {
       const t=r.t;
-      leftRows.innerHTML += `<div class="gr"><span class="gid">${t.id}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
+      leftRows.innerHTML += `<div class="gr" data-task="${t.id}"><span class="gid">${t.id}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     }
@@ -2499,6 +2531,7 @@ function buildGantt(){
       const el = document.createElement('div');
       el.style.position='absolute'; el.style.left = `calc(${left}% - 6px)`; el.style.top = (r.top+8)+'px';
       el.innerHTML = `<span class="msdiamond" style="width:16px;height:16px;background:var(--purple)"></span>`;
+      el.dataset.task = '__ms'; el.style.zIndex = 6;
       rowsEl.appendChild(el);
       const tag=document.createElement('div');
       tag.style.position='absolute'; tag.style.left=`calc(${left}% + 14px)`; tag.style.top=(r.top+10)+'px';
@@ -2513,7 +2546,7 @@ function buildGantt(){
     const width = Math.max(rawWidth,1.2);
     const colorMap = {done:'var(--green)',inprogress:'var(--orange)',blocked:'var(--red)',overdue:'var(--red)',notstarted:'var(--gray)'};
     const bar = document.createElement('div');
-    bar.className='gantt-bar';
+    bar.className='gantt-bar'; bar.dataset.task = t.id;
     bar.style.left = left+'%'; bar.style.width = width+'%'; bar.style.top = (r.top+8)+'px';
     bar.style.background = colorMap[t.status]||'var(--gray)';
     bar.style.zIndex = 6;
@@ -2525,7 +2558,7 @@ function buildGantt(){
       ext.style.position='absolute'; ext.style.left = `calc(${left}% + ${width}% + 6px)`; ext.style.top = (r.top+8)+'px';
       ext.style.fontSize='10px'; ext.style.fontWeight='700'; ext.style.color='var(--text-dim)'; ext.style.whiteSpace='nowrap';
       ext.style.height='20px'; ext.style.display='flex'; ext.style.alignItems='center'; ext.style.zIndex=6;
-      ext.textContent = label;
+      ext.textContent = label; ext.dataset.task = t.id;
       rowsEl.appendChild(ext);
     } else {
       bar.textContent = label;
@@ -2534,6 +2567,7 @@ function buildGantt(){
   });
 
   rowsEl.style.height = y+'px';
+  if(typeof planMarkEditable==='function') planMarkEditable();
 
   // today line
   const todayOffset = pct(dayOffset(TODAY));
@@ -4496,6 +4530,7 @@ async function onSignedIn(){
   if(!first){ PMC.me = null; return showGate(T('Your account has no pages yet. Ask an admin to give you a role.','你的账号还没有可见页面,请联系管理员分配角色。')); }
   document.getElementById('authGate').hidden = true;
   document.body.classList.remove('gated');
+  planLoad();
   renderPortfolio(); renderProjMenu();
   const cur = activePageId();
   goPage(pageAllowed(cur) ? cur : first);
@@ -4691,6 +4726,131 @@ async function uaSaveRoles(){
   }catch(e){ showToast(T('Could not save roles','无法保存角色'), e.message); }
 }
 window.addEventListener('beforeunload', e=>{ if(UA.dirty){ e.preventDefault(); e.returnValue=''; } });
+
+
+/* ===================== GANTT EDITING =====================
+   Roles with the edit_plan action (RDA Manager, Super Admin by default) can click a task or its
+   bar to change title, dates, owner, status, progress and next step. Edits are stored by the agent
+   (data/plan.json), checked against the role there, and applied to every viewer after sign-in. */
+const PLAN = { project:'dayone', history:[], edited:new Set(), editing:null };
+const canEditPlan = () => typeof can==='function' && can('edit_plan') && typeof pageAllowed==='function' && pageAllowed('roadmap');
+const isoDue = t => { if(!t.due || t.due==='—') return t.ge; const [m,d] = t.due.split('/'); const y = (t.ge||'2026').slice(0,4); return `${y}-${m}-${d}`; };
+function planApply(data){
+  PLAN.history = data.history || []; PLAN.edited = new Set(Object.keys(data.tasks||{}));
+  // The agent is the source of truth for plan fields: start from the shipped plan, then apply its edits,
+  // so a reset or another manager's change is not masked by an older copy cached in this browser.
+  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next'];
+  TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; }); });
+  Object.entries(data.tasks||{}).forEach(([id, f])=>{
+    const t = TASKS_BY_ID[id]; if(!t) return;
+    const c = Object.assign({}, f);
+    if(c.due){ c.due = c.due.slice(5).replace('-','/'); }
+    Object.assign(t, c);
+  });
+  if(data.milestone){ if(data.milestone.date){ MILESTONE.date = data.milestone.date; MILESTONE.due = data.milestone.date.slice(5).replace('-','/'); } if(data.milestone.name){ MILESTONE.name = data.milestone.name; MILESTONE.en = data.milestone.name; } }
+}
+async function planLoad(){
+  if(!(typeof pageAllowed==='function' && DAYONE_PAGES.some(pageAllowed))) return;
+  try{ planApply(await pmcApi('GET',`/api/plan/${PLAN.project}`)); render(); renderList(); buildGantt(); }
+  catch(e){ showToast(T('Could not load plan edits','无法加载计划修改'), e.message); }
+}
+function planMarkEditable(){
+  const wrap = document.querySelector('.gantt-wrap'); if(!wrap) return;
+  const on = canEditPlan();
+  wrap.classList.toggle('gantt-editable', on);
+  document.querySelectorAll('.gantt-wrap [data-task]').forEach(el=>{
+    const id = el.dataset.task;
+    el.classList.toggle('edited', PLAN.edited.has(id) && (el.classList.contains('gr') || el.classList.contains('gantt-bar')));
+    if(on) el.title = T('Click to edit','点击编辑');
+  });
+  const hint = document.getElementById('planHint');
+  if(hint){
+    hint.hidden = !(on || PLAN.history.length);
+    const last = PLAN.history[0];
+    hint.innerHTML = (on ? `<span>✎ <b>${T('Click a task or its bar to edit it.','点击任务名或任务条即可编辑。')}</b></span>` : '') +
+      (last ? `<span class="pf-chip">${T('Last edit','最近修改')}: ${esc(last.by)} · ${esc(fmtDT(last.at))} · ${esc(last.taskId==='milestone'?msName():taskName(TASKS_BY_ID[last.taskId])||last.taskId)}</span>` : '') +
+      (PLAN.edited.size ? `<span class="pf-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:5px"></span>${PLAN.edited.size} ${T('tasks changed from the original plan','个任务已改动(相对原计划)')}</span>` : '');
+  }
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest('.gantt-wrap [data-task]'); if(!el || !canEditPlan()) return;
+  planOpen(el.dataset.task);
+});
+function planOpen(id){
+  PLAN.editing = id;
+  const m = document.getElementById('peModal'), err = '';
+  const hist = PLAN.history.filter(h=>h.taskId===id).slice(0,5);
+  const histHTML = hist.length ? `<div class="pe-hist">${hist.map(h=>`<div><b>${esc(h.by)}</b> · ${esc(fmtDT(h.at))} · ${esc(Object.keys(h.changes).map(k=>({name:T('title','题目'),nameZh:T('Chinese title','中文题目'),gs:T('start','开始'),ge:T('end','结束'),due:T('target date','目标日期'),owner:T('owner','负责人'),status:T('status','状态'),progress:T('progress','进度'),next:T('next step','下一步'),date:T('date','日期'),reset:T('reset','恢复原计划')}[k]||k)).join(', '))}</div>`).join('')}</div>` : '';
+  if(id==='__ms'){
+    m.innerHTML = `<h3 id="peTitle">${T('Edit milestone','编辑里程碑')}</h3><div class="pe-sub">◆ ${esc(MILESTONE.id)} · DayOne NTP-E</div>
+      <div class="pe-grid"><label class="full">${T('Name','名称')}<input id="pe_msname" value="${esc(MILESTONE.name)}"></label>
+      <label>${T('Date','日期')}<input id="pe_msdate" type="date" value="${esc(MILESTONE.date)}"></label></div>
+      <div class="pe-err" id="peErr" hidden></div>
+      <div class="pe-actions"><span class="sp"></span><button class="btn-ghost" onclick="planClose()">${T('Cancel','取消')}</button><button class="btn-primary" onclick="planSaveMs()">${T('Save','保存')}</button></div>${histHTML}`;
+  } else {
+    const t = TASKS_BY_ID[id]; if(!t) return;
+    const base = TASK_BASELINE[id] || {};
+    const was = (k, v) => (PLAN.edited.has(id) && base[k]!==undefined && String(base[k])!==String(v)) ? ` <span class="was">(${T('was','原')} ${esc(k==='due'?base[k]:base[k])})</span>` : '';
+    const opt = Object.keys(STATUS_META).map(k=>`<option value="${k}" ${t.status===k?'selected':''}>${esc(tr(STATUS_META[k].label))}</option>`).join('');
+    m.innerHTML = `<h3 id="peTitle">${T('Edit task','编辑任务')} ${esc(t.id)}</h3><div class="pe-sub">${esc(phaseLabel(t.month))}</div>
+      <div class="pe-grid">
+        <label class="full">${T('Title (EN)','题目(英文)')}${was('name',t.name)}<input id="pe_name" value="${esc(t.name)}"></label>
+        <label class="full">${T('Title (中文)','题目(中文)')}${was('nameZh',t.nameZh)}<input id="pe_nameZh" value="${esc(t.nameZh||'')}"></label>
+        <label>${T('Start','开始')}${was('gs',t.gs)}<input id="pe_gs" type="date" value="${esc(t.gs)}"></label>
+        <label>${T('End','结束')}${was('ge',t.ge)}<input id="pe_ge" type="date" value="${esc(t.ge)}"></label>
+        <label>${T('Target date','目标日期')}${was('due',t.due)}<input id="pe_due" type="date" value="${esc(isoDue(t))}"></label>
+        <label>${T('Owner','负责人')}${was('owner',t.owner)}<input id="pe_owner" value="${esc(t.owner)}"></label>
+        <label>${T('Status','状态')}<select id="pe_status">${opt}</select></label>
+        <label>${T('Progress %','进度 %')}<input id="pe_progress" type="number" min="0" max="100" step="5" value="${esc(t.progress)}"></label>
+        <label class="full">${T('Next step','下一步')}<textarea id="pe_next">${esc(t.next==='—'?'':t.next)}</textarea></label>
+      </div>
+      <div class="pe-err" id="peErr" hidden></div>
+      <div class="pe-actions">${PLAN.edited.has(id)?`<button class="btn-withdraw" onclick="planReset('${id}')">${T('Restore original plan','恢复原计划')}</button>`:''}<span class="sp"></span>
+        <button class="btn-ghost" onclick="planClose()">${T('Cancel','取消')}</button><button class="btn-primary" onclick="planSave('${id}')">${T('Save','保存')}</button></div>${histHTML}`;
+  }
+  m.hidden = false; document.getElementById('peScrim').classList.add('show');
+  hideSrcTip(true);
+  setTimeout(()=>{ const f = m.querySelector('input'); if(f) f.focus(); }, 30);
+}
+function planClose(){ document.getElementById('peModal').hidden = true; document.getElementById('peScrim').classList.remove('show'); PLAN.editing = null; }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && PLAN.editing) planClose(); });
+function planErr(msg){ const e = document.getElementById('peErr'); e.textContent = msg; e.hidden = !msg; }
+function planRerender(){ render(); renderList(); buildGantt(); applyLiveBadges && applyLiveBadges(); }
+async function planSave(id){
+  const t = TASKS_BY_ID[id]; const v = k => document.getElementById('pe_'+k).value;
+  const next = { name:v('name').trim(), nameZh:v('nameZh').trim(), gs:v('gs'), ge:v('ge'), due:v('due'), owner:v('owner').trim(), status:v('status'), progress:Number(v('progress')), next:v('next').trim()||'—' };
+  if(!next.name) return planErr(T('The title cannot be empty.','题目不能为空。'));
+  if(!next.gs || !next.ge) return planErr(T('Pick a start and an end date.','请选择开始和结束日期。'));
+  if(next.gs > next.ge) return planErr(T('The end date is before the start date.','结束日期早于开始日期。'));
+  const cur = { name:t.name, nameZh:t.nameZh||'', gs:t.gs, ge:t.ge, due:isoDue(t), owner:t.owner, status:t.status, progress:t.progress, next:t.next };
+  const fields = {}, before = {};
+  Object.keys(next).forEach(k=>{ if(String(next[k])!==String(cur[k]) && !(k==='nameZh' && !next[k])){ fields[k] = next[k]; before[k] = cur[k]; } });
+  if(!Object.keys(fields).length) return planClose();
+  try{
+    await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}`, {fields, before});
+    const local = Object.assign({}, fields); if(local.due) local.due = local.due.slice(5).replace('-','/');
+    Object.assign(t, local);
+    const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; PLAN.edited = new Set(Object.keys(d.tasks||{}));
+    planClose(); planRerender();
+    showToast(T('Plan updated','计划已更新'), `${t.id} · ${taskName(t)}`);
+  }catch(e){ planErr(e.message); }
+}
+async function planSaveMs(){
+  const name = document.getElementById('pe_msname').value.trim(), date = document.getElementById('pe_msdate').value;
+  const body = {}; if(name && name!==MILESTONE.name) body.name = name; if(date && date!==MILESTONE.date) body.date = date;
+  if(!Object.keys(body).length) return planClose();
+  try{ const r = await pmcApi('POST',`/api/plan/${PLAN.project}/milestone`, body); const ms = r.milestone||{}; if(ms.date){ MILESTONE.date = ms.date; MILESTONE.due = ms.date.slice(5).replace('-','/'); } if(ms.name){ MILESTONE.name = ms.name; MILESTONE.en = ms.name; }
+       const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; planClose(); planRerender(); showToast(T('Milestone updated','里程碑已更新'), msName()); }
+  catch(e){ planErr(e.message); }
+}
+async function planReset(id){
+  try{
+    const d = await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}/reset`);
+    Object.assign(TASKS_BY_ID[id], TASK_BASELINE[id]);
+    PLAN.history = d.history||[]; PLAN.edited = new Set(Object.keys(d.tasks||{}));
+    planClose(); planRerender(); showToast(T('Restored','已恢复'), T('Task is back to the original plan.','任务已恢复为原计划。'));
+  }catch(e){ planErr(e.message); }
+}
 
 renderPortfolio();
 goPage('portfolio');
