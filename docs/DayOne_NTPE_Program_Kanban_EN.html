@@ -2752,7 +2752,7 @@ function confBadge(c){
   if(c==='inferred') return `<span class="conf-badge inferred">🟡 ${tr('Inferred')}</span>`;
   return `<span class="conf-badge unknown">⚪ ${tr('Unknown')}</span>`;
 }
-function nowLabel(){ return '2026-08-19'; }
+function nowLabel(){ return new Date(Date.now()+8*3600e3).toISOString().slice(0,10); }
 
 /* Approving writes into program data, so withdrawing has to put it back exactly. Each apply
    records what it touched — the field's previous value, the ACTIONS rows it created and its
@@ -2792,6 +2792,7 @@ function applyProposal(p){
 function withdrawProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status==='pending') return;
+  if(typeof mtRemote==='function' && mtRemote([id], 'withdraw')) return;
   const wasApproved = p.status==='approved';
   const j = p._applied;
   let clash = '';
@@ -2825,6 +2826,7 @@ function withdrawProposal(id){
 function approveProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status!=='pending') return;
+  if(typeof mtRemote==='function' && mtRemote([id], 'approved')) return;
   applyProposal(p);
   render();
   const body = p.entityType==='task'
@@ -2835,6 +2837,7 @@ function approveProposal(id){
 function rejectProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status!=='pending') return;
+  if(typeof mtRemote==='function' && mtRemote([id], 'rejected')) return;
   p.status = 'rejected';
   render();
   showToast(tr('Update Rejected'), tr('This Change Proposal will not be written to project data — the original record is unchanged'));
@@ -2842,6 +2845,7 @@ function rejectProposal(id){
 function approveAllConfirmed(){
   const targets = PROPOSALS.filter(p=>p.meetingId===currentMeetingId && p.status==='pending' && p.confidence==='confirmed');
   if(targets.length===0){ showToast(tr('Nothing to batch-approve'), tr('No pending 🟢 Confirmed proposals for this meeting')); return; }
+  if(typeof mtRemote==='function' && mtRemote(targets.map(p=>p.id), 'approved')) return;
   targets.forEach(applyProposal);
   render();
   showToast(`${targets.length} ${tr('Confirmed updates applied')}`, tr('Health / KPIs / Blocker Map / Roadmap recalculated automatically'));
@@ -3420,7 +3424,8 @@ function renderProposalList(){
     const diffHtml = p.entityType==='task'
       ? `<div class="prop-diff"><span class="old">${formatFieldVal(p.field,p.oldValue)}</span>→<span class="new">${p.confidence==='unknown' ? tr('Pending confirmation (not guessed)') : formatFieldVal(p.field,p.newValue)}</span></div>`
       : `<div class="prop-diff"><span class="new">${tr('New:')} ${p.newValue.title} (${p.newValue.owner} · ${p.newValue.due||'—'})</span></div>`;
-    const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}</span>` : '';
+    const who = p._srv ? ` <span style="font-weight:500;opacity:.8">· ${p._srv.by} · ${typeof fmtDT==='function' ? fmtDT(p._srv.at) : p._srv.at}</span>` : '';
+    const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}${who}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}${who}</span>` : '';
     const actionsHtml = p.status==='pending'
       ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ ${tr('Approve')}</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ ${tr('Reject')}</button></div>`
       : `<div class="prop-actions" style="align-items:center;">${statusTag}<button class="btn-withdraw" onclick="withdrawProposal('${p.id}')">↩ ${tr('Withdraw')}</button></div>`;
@@ -4780,8 +4785,9 @@ function planApply(data){
   PLAN.history = data.history || []; PLAN.edits = data.tasks || {}; PLAN.edited = new Set(Object.keys(PLAN.edits));
   // The agent is the source of truth for plan fields: start from the shipped plan, then apply its edits,
   // so a reset or another manager's change is not masked by an older copy cached in this browser.
-  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next'];
-  TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; }); });
+  if(Array.isArray(data.decisions)) mtReconcile(data.decisions);
+  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next','targetOriginal'];
+  TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; else if(k==='targetOriginal') delete t[k]; }); });
   // 2) Jira (nightly sync): status, owner and target date of linked tasks; Jira-only tickets become tasks.
   const J = data.jira; PLAN.jira = J || null;
   TASKS.forEach(t=>{ delete t.jira; });
@@ -4958,7 +4964,7 @@ const DS_KIND = {
 const DS_NOTE = {
   jira:   ['Read from Jira by the nightly sync (Mon–Fri 24:00 SGT) or "Sync Jira now". Change it in Jira.','由夜间同步(周一至周五 24:00)或「立即同步 Jira」从 Jira 读取,请在 Jira 中修改。'],
   edit:   ['Changed on the Roadmap Gantt by an RDA Manager; saved on the server for everyone.','由 RDA 管理员在路线图甘特图上修改,保存在服务器,所有人可见。'],
-  meeting:['Proposed from uploaded meeting minutes and approved on the Meetings page. Kept in this browser only.','由上传的会议纪要提取、在 Meetings 页批准。只保存在本浏览器。'],
+  meeting:['Proposed from uploaded meeting minutes and approved on the Meetings page by an RDA Manager; saved on the server for everyone.','由上传的会议纪要提取,由 RDA 管理员在 Meetings 页批准,保存在服务器,所有人可见。'],
   plan:   ['Entered when this dashboard was built, from the DayOne delivery timeline and the weekly meetings up to 21 Aug 2026. Not updated automatically, so it may be out of date.','建看板时录入,来自 DayOne 交付时间线和截至 2026-08-21 的周会。不会自动更新,可能已过时。'],
   calc:   ['Worked out by the page from the task data; it changes when the inputs change.','由页面根据任务数据计算,输入变化时随之变化。'],
   static: ['Text written into the page on 21 Aug 2026. Not updated automatically, so it may be out of date.','2026-08-21 写进页面的文字,不会自动更新,可能已过时。'],
@@ -4987,6 +4993,7 @@ function dsField(t, f){
   const e = PLAN.edits && PLAN.edits[t.id];
   if(PLAN.edited.has(t.id) && e && f in e){
     const h = (PLAN.history||[]).find(x=>x.taskId===t.id && x.changes && x.changes[f]);
+    if(h && h.source && h.source.kind==='meeting') return {k:'meeting', d:`${h.source.title||''} · ${h.source.date||''} · ${T('approved by','批准人')} ${h.by} · ${fmtDT(h.at)}`};
     return {k:'edit', d: h ? `${h.by} · ${fmtDT(h.at)}` : ''};
   }
   const ap = PROPOSALS.filter(p=>p.status==='approved' && p.entityType==='task' && p.entityId===t.id && p.field===f);
@@ -5096,6 +5103,7 @@ function dsStripHTML(pid){
   const linked = TASKS.filter(t=>t.jira), extra = linked.filter(t=>/^BA-/.test(t.id)).length;
   const edited = TASKS.filter(t=>PLAN.edited.has(t.id)).length, plan = TASKS.length - linked.length;
   const appr = PROPOSALS.filter(p=>p.status==='approved').length, pend = PROPOSALS.filter(p=>p.status==='pending').length;
+  const mtFields = TASKS.reduce((n,t)=>n + DS_FIELDS.filter(([f])=>dsField(t,f).k==='meeting').length, 0);
   const J = PLAN.jira;
   const parts = [];
   if(pid==='luna'){ parts.push(dsKindTag('sample', T('Sample · whole page is a preview','示例 · 整页为预览'))); }
@@ -5106,7 +5114,7 @@ function dsStripHTML(pid){
     parts.push(dsKindTag('jira', J ? T(`Jira · ${linked.length} tasks${extra ? ` (${extra} only in Jira)` : ''} · synced ${fmtDT(J.syncedAt)}`,`Jira · ${linked.length} 个任务${extra ? `(${extra} 个仅在 Jira)` : ''} · 同步于 ${fmtDT(J.syncedAt)}`)
                                     : T('Jira · not synced yet','Jira · 尚未同步')));
     if(edited) parts.push(dsKindTag('edit', T(`Manual edits · ${edited} tasks`,`手动修改 · ${edited} 个任务`)));
-    if(appr) parts.push(dsKindTag('meeting', T(`Meeting minutes · ${appr} approved changes`,`会议纪要 · ${appr} 条已批准修改`)));
+    if(mtFields) parts.push(dsKindTag('meeting', T(`Meeting minutes · ${mtFields} fields from approved changes`,`会议纪要 · ${mtFields} 个字段来自已批准修改`)));
     parts.push(dsKindTag('plan', T(`Original plan · ${plan} tasks not in Jira · as of 21 Aug 2026`,`原始计划 · ${plan} 个任务未关联 Jira · 截至 2026-08-21`)));
     parts.push(dsKindTag('calc', T('Calculated · counts, Blocked / Overdue','系统计算 · 统计数、阻塞/逾期')));
     if(pid==='overview' || pid==='blocker') parts.push(dsKindTag('static', T('Fixed text · notes, brief, recommendation','固定文字 · 说明、简报、建议')));
@@ -5240,6 +5248,84 @@ function dsPhaseNote(){
 function dsJiraDates(J){
   return [J.created && T(`created ${J.created}`,`创建 ${J.created}`), J.updated && T(`updated ${J.updated}`,`更新 ${J.updated}`),
           T(`due ${J.due||'not set'}`,`截止 ${J.due||'未设置'}`), J.resolved && T(`resolved ${J.resolved}`,`解决 ${J.resolved}`)].filter(Boolean).join(' · ');
+}
+/* ---------- Meetings page ↔ server ----------
+   When signed in, Approve / Reject / Withdraw are saved on the agent (plan.decide / withdraw), so every
+   viewer sees the same decisions and approved task changes become plan edits tagged with the meeting.
+   Proposals match across browsers by content (meeting date + title + what they change), not by id. */
+let MT_LOCAL = false;
+function mtSig(p){ const m = MEETINGS.find(x=>x.id===p.meetingId) || {}; return [m.date||'', m.title||'', p.entityType, p.entityId, p.field||'', JSON.stringify(p.newValue==null?null:p.newValue)].join('|'); }
+function mtValue(p){
+  if(p.entityType!=='task' || p.confidence==='unknown' || p.newValue==null) return null;
+  if(p.field==='due' && /^\d{2}\/\d{2}$/.test(p.newValue)){ const t = TASKS_BY_ID[p.entityId]; return `${((t && t.ge) || '2026').slice(0,4)}-${p.newValue.replace('/','-')}`; }
+  return p.newValue;
+}
+function mtRemote(ids, decision){
+  if(MT_LOCAL || !PMC.token) return false;
+  if(!canEditPlan()){ showToast(T('Not allowed','没有权限'), T('Only RDA Managers can approve or reject meeting changes.','只有 RDA 管理员可以批准或驳回会议纪要的修改。')); return true; }
+  (async ()=>{
+    const done = [];
+    for(const id of ids){
+      const p = PROPOSALS.find(x=>x.id===id); if(!p) continue;
+      const m = MEETINGS.find(x=>x.id===p.meetingId) || {};
+      try{
+        if(decision==='withdraw') await pmcApi('POST', `/api/plan/${PLAN.project}/proposals/withdraw`, {sig: mtSig(p)});
+        else {
+          const value = decision==='approved' ? mtValue(p) : null, t = TASKS_BY_ID[p.entityId];
+          await pmcApi('POST', `/api/plan/${PLAN.project}/proposals/decide`, {sig: mtSig(p), decision,
+            proposal:{meetingTitle:m.title, meetingDate:m.date, meetingSummary:m.summary, entityType:p.entityType, entityId:p.entityId, field:p.field, oldValue:p.oldValue,
+                      newValue:p.newValue, confidence:p.confidence, evidence:p.evidence, reason:p.reason, followupTitle:p.followupTitle, followupOwner:p.followupOwner},
+            taskId: p.entityType==='task' && value!=null ? p.entityId : null, field: p.field, value, before: t ? {[p.field]: t[p.field]} : undefined});
+        }
+        done.push(id);
+      }catch(e){ showToast(T('Not saved','未保存'), `${p.entityId}${p.field ? ' · '+fieldLabel(p.field) : ''}: ${e.message}`); }
+    }
+    MT_LOCAL = true;
+    try{
+      if(ids.length > 1 && decision==='approved'){ done.forEach(id=>{ const p = PROPOSALS.find(x=>x.id===id); if(p && p.status==='pending') applyProposal(p); }); render();
+        if(done.length) showToast(`${done.length} ${tr('Confirmed updates applied')}`, T('Saved for everyone','已保存，所有人可见')); }
+      else done.forEach(id=>({approved:approveProposal, rejected:rejectProposal, withdraw:withdrawProposal})[decision](id));
+    } finally { MT_LOCAL = false; }
+    await planLoad();
+  })();
+  return true;
+}
+/* Bring this browser's proposals in line with the decisions on the server (called from planApply,
+   before plan fields are reset and re-applied). */
+function mtLocalRevert(p){
+  const j = p._applied;
+  if(j){
+    if(j.taskId && j.field && TASKS_BY_ID[j.taskId]) TASKS_BY_ID[j.taskId][j.field] = j.prevValue;
+    (j.actionIds||[]).forEach(id=>{ const i = ACTIONS.findIndex(a=>a.id===id); if(i>=0) ACTIONS.splice(i,1); });
+    (j.logIds||[]).forEach(id=>{ const i = CHANGELOG.findIndex(c=>c._id===id); if(i>=0) CHANGELOG.splice(i,1); });
+    delete p._applied;
+  }
+  p.status = 'pending'; delete p._srv;
+}
+function mtReconcile(decisions){
+  const bySig = new Map(decisions.map(d=>[d.sig, d]));
+  const seen = new Set();
+  PROPOSALS.forEach(p=>{
+    const sig = mtSig(p), d = bySig.get(sig); seen.add(sig);
+    if(d){
+      p._srv = {by:d.by, at:d.at};
+      if(p.status===d.status) return;
+      if(p.status!=='pending') mtLocalRevert(p);
+      if(d.status==='approved') applyProposal(p); else p.status = 'rejected';
+      p._srv = {by:d.by, at:d.at};
+    } else { if(p.status!=='pending') mtLocalRevert(p); delete p._srv; }
+  });
+  // Decisions on meetings imported in another browser: show them here too, with their evidence.
+  decisions.filter(d=>!seen.has(d.sig) && d.proposal).forEach(d=>{
+    const pr = d.proposal;
+    let m = MEETINGS.find(x=>x.title===pr.meetingTitle && x.date===pr.meetingDate);
+    if(!m){ m = {id:'srv-m-'+d.key, title:pr.meetingTitle||T('Meeting','会议'), date:pr.meetingDate||'', summary:pr.meetingSummary||''}; MEETINGS.push(m); }
+    const p = {id:'srv-'+d.key, meetingId:m.id, entityType:pr.entityType, entityId:pr.entityId, field:pr.field, oldValue:pr.oldValue, newValue:pr.newValue,
+      confidence:pr.confidence, evidence:pr.evidence||'', reason:pr.reason||'', followupTitle:pr.followupTitle, followupOwner:pr.followupOwner, status:'pending'};
+    PROPOSALS.push(p);
+    if(d.status==='approved') applyProposal(p); else p.status = 'rejected';
+    p._srv = {by:d.by, at:d.at};
+  });
 }
 function dsActionTag(a){
   if(a.source){ const m = MEETINGS.find(x=>x.id===a.source); return `<span class="ds-tag k-meeting" data-ds="meeting" data-ds-note="${esc(m ? m.title+' · '+m.date : '')}"><i></i>${esc(dsK('meeting'))}</span>`; }

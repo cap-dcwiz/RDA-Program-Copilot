@@ -18,6 +18,8 @@
    POST /api/plan/:project/tasks/:id        {fields, before}   action: edit_plan
    POST /api/plan/:project/tasks/:id/reset                     action: edit_plan
    POST /api/plan/:project/milestone        {date, name}       action: edit_plan
+   POST /api/plan/:project/proposals/decide {sig, decision, proposal, taskId, field, value}  action: edit_plan
+   POST /api/plan/:project/proposals/withdraw {sig}            action: edit_plan
    POST /api/jira/sync                      run the Jira read sync now                    action: edit_plan
    Users & Roles (page: users)
    GET  /api/admin/catalog                  pages, actions, projects that roles can grant
@@ -189,6 +191,19 @@ async function route(req, res, user) {
     const r = plan.editTask(project, m[3], body.fields, body.before, user.name);
     log(m[3], Object.keys(body.fields || {}).join(', '));
     return send(res, 200, r);
+  }
+  if ((m = p.match(/^\/api\/plan\/([a-z0-9-]+)\/proposals\/(decide|withdraw)$/))) {
+    action(user, 'edit_plan');
+    const project = m[1];
+    if (!P.canSeeProject(user.perms, project)) throw err(404, 'Project not found');
+    if (m[2] === 'withdraw') { const r = plan.withdraw(project, body.sig, user.name); store.audit(user.name, 'meeting-withdraw', `${project}:proposal`, String(body.sig || '').slice(0, 120)); store.save(); return send(res, 200, r); }
+    if (body.decision === 'approved' && body.taskId && body.field && project === 'dayone' && ['status', 'owner', 'due'].includes(body.field)) {
+      const jd = jirasync.readDayone(); const linked = jd && (jd.tasks[body.taskId] || (jd.extra || []).find(x => x.key === body.taskId));
+      if (linked) throw err(400, `${body.field} of ${body.taskId} comes from Jira ${linked.key}; change it in Jira`);
+    }
+    const d = plan.decide(project, body, user.name);
+    store.audit(user.name, 'meeting-' + d.status, `${project}:${body.taskId || 'action'}`, `${(d.proposal.meetingTitle || '')} ${d.proposal.meetingDate || ''} · ${body.field || (d.proposal.newValue && d.proposal.newValue.title) || ''}`); store.save();
+    return send(res, 200, { decision: d, plan: plan.get(project) });
   }
   if (p === '/api/jira/sync') { action(user, 'edit_plan'); return send(res, 200, await jirasync.runAll(user.name)); }
   if (p === '/api/sync') { action(user, 'ingest'); return send(res, 200, await agent.syncGranola(user.name)); }

@@ -95,11 +95,22 @@ changed what), validated on the server, and applied for everyone after sign-in. 
 cyan dot; **Restore original plan** in the editor drops a task's edits. Every change is also in the
 decision log.
 
+## Meeting-minutes changes
+
+On DayOne → Meetings, Approve / Reject / Withdraw are saved on the agent (`data/plan.json`,
+`decisions`), so every viewer sees the same review state. Only roles with `edit_plan` can decide. An
+approved task change becomes a plan edit tagged with the meeting (shown as "Meeting minutes" in the
+data-source tags); Withdraw puts the field back unless someone changed it since. Status, owner and
+target date of Jira-linked tasks cannot be changed from a meeting; change them in Jira. Proposals
+match across browsers by content (meeting date + title + what they change).
+
 ## Nightly Jira sync
 
 Monday to Friday at 24:00 Singapore time (00:00 Tue–Sat), the agent reads Jira with
 `JIRA_EMAIL` + `JIRA_API_TOKEN` (read only; `JIRA_DRY_RUN` does not affect it) and refreshes:
 
+- **DayOne phase**: the "Current Phase: … Month 2 → Month 3" line in the epic (BA-2380) description
+  drives the phase card and phase KPIs.
 - **DayOne plan** (`DAYONE_JQL`, default: children of epic BA-2380 plus `[DayOne-NTPE]` tickets).
   Tasks linked in `data/dayone-jira-map.json` take **status, owner and target date** from Jira, plus
   the latest comment; those fields are read-only on the Gantt (change them in Jira). Title, dates,
