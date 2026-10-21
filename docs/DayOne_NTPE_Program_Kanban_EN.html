@@ -620,6 +620,35 @@ button.project-select{font-family:inherit;}
   border-radius:12px;padding:12px 14px;box-shadow:0 16px 48px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .12s;
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
 .src-tip.show{opacity:1;pointer-events:auto;}
+/* ===== DayOne data-source tags ===== */
+.ds-tag{display:inline-flex;align-items:center;gap:4px;height:17px;padding:0 7px;border-radius:999px;font-size:9.5px;font-weight:700;letter-spacing:.2px;
+  white-space:nowrap;vertical-align:middle;cursor:help;border:1px solid color-mix(in srgb,currentColor 45%,transparent);background:color-mix(in srgb,currentColor 9%,transparent);
+  line-height:1;text-transform:none;font-style:normal;}
+.ds-tag i{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.ds-tag i.p{margin-left:1px;}
+.k-jira{color:var(--cyan);} .k-edit{color:var(--violet);} .k-meeting{color:var(--orange);} .k-plan{color:var(--gray);}
+.k-calc{color:var(--blue);} .k-static{color:var(--gray);} .k-sample{color:var(--red);}
+.ds-tag.k-static,.ds-tag.k-sample{border-style:dashed;}
+.ds-tag i.p.k-edit{background:var(--violet);} .ds-tag i.p.k-meeting{background:var(--orange);}
+.ds-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:-6px 0 16px;font-size:11.5px;color:var(--text-dimmer);}
+.ds-strip .ds-tag{height:21px;font-size:10.5px;padding:0 9px;}
+.ds-strip .ds-lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-right:2px;}
+.ds-strip .ds-hint{margin-left:auto;font-size:11px;}
+.stat-card .ds-foot{margin-top:8px;}
+.ds-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:middle;flex-shrink:0;}
+.ds-static{border-left:2px dashed color-mix(in srgb,var(--gray) 55%,transparent);padding-left:8px;cursor:help;}
+.panel-title .ds-own,.banner-title .ds-own,.side-card h3 .ds-own,.reco-card h4 .ds-own{margin-left:8px;}
+.fc-badges .ds-tag,.mc-badges .ds-tag{margin-left:auto;}
+.fc-badges,.mc-badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.gantt-left .gr .gid{white-space:nowrap;overflow:visible;}
+.gantt-left .gr.jira .gid::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cyan);margin-right:3px;vertical-align:middle;}
+.src-tip .ds-row{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:3px 8px;align-items:baseline;padding:6px 0;border-top:1px dashed var(--border);font-size:11.5px;}
+.src-tip .ds-row:first-of-type{border-top:none;}
+.src-tip .ds-f{color:var(--text-dimmer);font-size:11px;}
+.src-tip .ds-v{color:var(--text);font-weight:600;overflow-wrap:anywhere;}
+.src-tip .ds-d{grid-column:2 / 4;font-size:10.5px;color:var(--text-dimmer);}
+.src-tip .ds-legend{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text-dimmer);line-height:1.5;display:flex;flex-direction:column;gap:5px;}
+
 .src-tip .st-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;letter-spacing:.4px;
   text-transform:uppercase;color:var(--text-dimmer);margin-bottom:6px;}
 .src-tip .st-note{font-size:11.5px;color:var(--text-dim);line-height:1.5;margin-bottom:6px;}
@@ -665,7 +694,7 @@ button.project-select{font-family:inherit;}
 .gantt-editable .gantt-left .gr[data-task]:hover{background:var(--purple-bg);}
 .gantt-editable .gantt-left .gr[data-task]:hover .gname::after{content:' ✎';color:var(--purple);font-weight:800;}
 .gantt-editable .gantt-bar:hover{outline:2px solid var(--purple);outline-offset:1px;}
-.gantt-left .gr.edited .gid::after,.gantt-bar.edited::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-left:4px;vertical-align:middle;}
+.gantt-left .gr.edited .gid::after,.gantt-bar.edited::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-left:4px;vertical-align:middle;}
 .gantt-bar.edited::before{margin:0 5px 0 0;}
 .pe-scrim{position:fixed;inset:0;background:rgba(4,6,14,.6);z-index:150;opacity:0;pointer-events:none;transition:opacity .15s;}
 .pe-scrim.show{opacity:1;pointer-events:auto;}
@@ -1491,6 +1520,8 @@ body.gated{padding-left:0;}
             <span class="legend-item"><span class="dot" style="color:var(--orange)"></span><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span>
             <span class="legend-item"><span class="dot" style="color:var(--gray)"></span><span data-i18n-en="Not Started" data-i18n-zh="未开始">Not Started</span></span>
             <span class="legend-item"><span class="msdiamond"></span>&nbsp;<span data-i18n-en="Milestone" data-i18n-zh="里程碑">Milestone</span></span>
+            <span class="legend-item"><span class="ds-dot k-jira"></span><span data-i18n-en="Linked to Jira" data-i18n-zh="已关联 Jira">Linked to Jira</span></span>
+            <span class="legend-item"><span class="ds-dot k-edit"></span><span data-i18n-en="Edited on the Gantt" data-i18n-zh="在甘特图上修改过">Edited on the Gantt</span></span>
             <span class="legend-item">┈→ <span data-i18n-en="Dependency" data-i18n-zh="依赖关系">Dependency</span></span>
           </div>
         </div>
@@ -2152,7 +2183,7 @@ function computeKPIs(){
     if(t.status!=='inprogress' || isOverdue(t) || isEffectivelyBlocked(t.id)) return false;
     const d = parseDue(t.due); if(!d) return false;
     const diff = Math.round((d-TODAY)/86400000);
-    return diff>=0 && diff<=3;
+    return diff>=0 && diff<=7;
   });
   const blockerSourceIds = new Set(TASKS.filter(t=>(t.status==='blocked'||isOverdue(t)) && EDGES.some(e=>e.from===t.id)).map(t=>t.id));
   const msImpacted = EDGES.some(e=>e.to==='MS2' && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]))) ? 1 : 0;
@@ -2204,6 +2235,7 @@ function goPage(id){
   if((id==='todo' || id==='history') && typeof pmcRefresh==='function') pmcRefresh();
   if(id==='users' && typeof uaLoad==='function') uaLoad();
   if(typeof hideSrcTip==='function') hideSrcTip(true);
+  if(!ALL_SCOPE.includes(id) && typeof applyDataSources==='function') applyDataSources();
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
 
@@ -2447,7 +2479,7 @@ function renderList(){
     const barColor = t.progress>=75?'var(--green)':t.progress>=50?'var(--orange)':t.progress>=25?'var(--red)':'var(--gray)';
     body.innerHTML += `<tr>
       <td>${t.id}</td>
-      <td class="name-cell">${taskName(t)}<span class="en">${t.en}</span></td>
+      <td class="name-cell">${taskName(t)} ${typeof dsTaskTag==='function' ? dsTaskTag(t.id) : ''}<span class="en">${t.en}</span></td>
       <td>${monthWord(t.month)}</td>
       <td>${t.owner}</td>
       <td>${badge(t.status)}</td>
@@ -2615,7 +2647,7 @@ function renderActionsTables(){
   const sorted = [...ACTIONS].sort((a,b)=>(pr[a.priority]??1)-(pr[b.priority]??1));
   const top5Body = document.getElementById('top5ActionsBody');
   if(top5Body){
-    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${actionTitle(a)}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
+    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${actionTitle(a)} ${typeof dsActionTag==='function' ? dsActionTag(a) : ''}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
   }
   const recoveryBody = document.getElementById('recoveryActionsBody');
   if(recoveryBody){
@@ -2623,7 +2655,7 @@ function renderActionsTables(){
     recoveryBody.innerHTML = recovery.map((a,i)=>{
       const rt = a.relatedTask ? TASKS_BY_ID[a.relatedTask] : null;
       const impact = rt ? `→ ${taskName(rt)}${rt.ms==='MS2' ? ' → MS2' : ''}` : '—';
-      return `<tr><td>${i+1}</td><td>${actionTitle(a)}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${impact}</td><td>${actionStatusBadge(a.status)}</td></tr>`;
+      return `<tr><td>${i+1}</td><td>${actionTitle(a)} ${typeof dsActionTag==='function' ? dsActionTag(a) : ''}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${impact}</td><td>${actionStatusBadge(a.status)}</td></tr>`;
     }).join('');
   }
 }
@@ -3469,6 +3501,7 @@ function renderMeetingsPage(){
   updatePendingBadge();
   updateLunaButton();
   if(document.getElementById('mt-history').classList.contains('active')) renderHistory();
+  if(typeof applyDataSources==='function') applyDataSources();
 }
 function updatePendingBadge(){
   const pendingCount = PROPOSALS.filter(p=>p.status==='pending').length;
@@ -3710,6 +3743,7 @@ function render(){
   if(document.getElementById('page-dependency').classList.contains('active')) drawDepConnectors();
   updatePendingBadge();
   if(document.getElementById('page-meetings').classList.contains('active')) renderMeetingsPage();
+  if(typeof applyDataSources==='function') applyDataSources();
   saveState();
 }
 // Restore the previous session before the first paint, so a refresh keeps imported meetings and
@@ -4062,6 +4096,7 @@ function srcRowsHTML(keys){
   }).join('');
 }
 function showSrcTip(el, x, y){
+  if(el.hasAttribute('data-ds') && !el.hasAttribute('data-src')){ const h = dsTipHTML(el); if(!h) return; tip.innerHTML = h; return placeSrcTip(x, y); }
   const keys = (el.getAttribute('data-src')||'').split(',').map(s=>s.trim()).filter(Boolean);
   if(!keys.length) return;
   const jiraN = keys.filter(k=>k!=='MTG').length, hasM = keys.includes('MTG');
@@ -4071,6 +4106,9 @@ function showSrcTip(el, x, y){
   tip.innerHTML = `<div class="st-h"><span>${T('Data source','数据来源')}</span><span>${esc(head)}</span></div>` +
     (note?`<div class="st-note">${esc(note)}</div>`:'') + srcRowsHTML(shown) +
     (more>0?`<div class="st-row" style="font-size:11px;color:var(--text-dimmer)">+ ${more} ${T('more','个')}</div>`:'');
+  placeSrcTip(x, y);
+}
+function placeSrcTip(x, y){
   tip.classList.add('show');
   const r = tip.getBoundingClientRect(), pad = 12;
   let left = x + 16, top = y + 16;
@@ -4085,7 +4123,7 @@ function hideSrcTip(now){
 }
 document.addEventListener('mouseover', e=>{
   if(tip.contains(e.target)){ clearTimeout(_tipTimer); return; }
-  const el = e.target.closest('[data-src]');
+  const el = e.target.closest('[data-src],[data-ds]');
   if(!el){ if(_tipFor) hideSrcTip(); return; }
   if(el === _tipFor){ clearTimeout(_tipTimer); return; }
   clearTimeout(_tipTimer);
@@ -4093,7 +4131,7 @@ document.addEventListener('mouseover', e=>{
   showSrcTip(el, e.clientX, e.clientY);
 });
 document.addEventListener('focusin', e=>{
-  const el = e.target.closest && e.target.closest('[data-src]');
+  const el = e.target.closest && e.target.closest('[data-src],[data-ds]');
   if(el && !tip.contains(el)){ const r = el.getBoundingClientRect(); _tipFor = el; showSrcTip(el, r.left, r.bottom - 8); }
 });
 document.addEventListener('focusout', e=>{ if(_tipFor && e.target===_tipFor) hideSrcTip(); });
@@ -4738,11 +4776,11 @@ window.addEventListener('beforeunload', e=>{ if(UA.dirty){ e.preventDefault(); e
    Roles with the edit_plan action (RDA Manager, Super Admin by default) can click a task or its
    bar to change title, dates, owner, status, progress and next step. Edits are stored by the agent
    (data/plan.json), checked against the role there, and applied to every viewer after sign-in. */
-const PLAN = { project:'dayone', history:[], edited:new Set(), editing:null };
+const PLAN = { project:'dayone', history:[], edits:{}, edited:new Set(), editing:null };
 const canEditPlan = () => typeof can==='function' && can('edit_plan') && typeof pageAllowed==='function' && pageAllowed('roadmap');
 const isoDue = t => { if(!t.due || t.due==='—') return t.ge; const [m,d] = t.due.split('/'); const y = (t.ge||'2026').slice(0,4); return `${y}-${m}-${d}`; };
 function planApply(data){
-  PLAN.history = data.history || []; PLAN.edited = new Set(Object.keys(data.tasks||{}));
+  PLAN.history = data.history || []; PLAN.edits = data.tasks || {}; PLAN.edited = new Set(Object.keys(PLAN.edits));
   // The agent is the source of truth for plan fields: start from the shipped plan, then apply its edits,
   // so a reset or another manager's change is not masked by an older copy cached in this browser.
   const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next'];
@@ -4792,8 +4830,10 @@ function planMarkEditable(){
     const id = el.dataset.task;
     el.classList.toggle('edited', PLAN.edited.has(id) && (el.classList.contains('gr') || el.classList.contains('gantt-bar')));
     const t = TASKS_BY_ID[id];
-    const jt = t && t.jira ? `Jira ${t.jira.key} · ${t.jira.statusName||''}${t.jira.lastComment ? ' · ' + t.jira.lastComment.text.split('\n')[0].slice(0,140) : ''}` : '';
-    el.title = [jt, on ? T('Click to edit','点击编辑') : ''].filter(Boolean).join('\n');
+    el.classList.toggle('jira', !!(t && t.jira) && el.classList.contains('gr') && !/^BA-/.test(id));
+    el.removeAttribute('title');
+    if(id==='milestone' || id==='MS2') el.setAttribute('data-ds','ms:MS2'); else if(t) el.setAttribute('data-ds','task:'+id);
+    if(on) el.setAttribute('data-ds-note', T('Click to edit','点击编辑')); else el.removeAttribute('data-ds-note');
   });
   const hint = document.getElementById('planHint');
   if(hint){
@@ -4804,7 +4844,7 @@ function planMarkEditable(){
       (PLAN.jira ? `<span class="pf-chip">Jira: ${T('synced','同步于')} ${esc(fmtDT(PLAN.jira.syncedAt))} · ${Object.keys(PLAN.jira.tasks||{}).length + (PLAN.jira.extra||[]).length} ${T('tasks linked','个任务已关联')}${PMC.health && PMC.health.nextJiraSync ? ` · ${T('next','下次')} ${esc(fmtDT(PMC.health.nextJiraSync))}` : ''}</span>`
         : `<span class="pf-chip">${T('Not synced with Jira yet','尚未与 Jira 同步')}</span>`) +
       (on ? `<button class="btn-ghost" id="jiraSyncBtn" onclick="planJiraSync()">${T('Sync Jira now','立即同步 Jira')}</button>` : '') +
-      (PLAN.edited.size ? `<span class="pf-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:5px"></span>${PLAN.edited.size} ${T('tasks changed from the original plan','个任务已改动(相对原计划)')}</span>` : '');
+      (PLAN.edited.size ? `<span class="pf-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-right:5px"></span>${PLAN.edited.size} ${T('tasks changed from the original plan','个任务已改动(相对原计划)')}</span>` : '');
   }
 }
 document.addEventListener('click', e=>{
@@ -4869,7 +4909,7 @@ async function planSave(id){
     await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}`, {fields, before});
     const local = Object.assign({}, fields); if(local.due) local.due = local.due.slice(5).replace('-','/');
     Object.assign(t, local);
-    const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; PLAN.edited = new Set(Object.keys(d.tasks||{}));
+    const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; PLAN.edits = d.tasks||{}; PLAN.edited = new Set(Object.keys(PLAN.edits));
     planClose(); planRerender();
     showToast(T('Plan updated','计划已更新'), `${t.id} · ${taskName(t)}`);
   }catch(e){ planErr(e.message); }
@@ -4898,14 +4938,281 @@ async function planReset(id){
   try{
     const d = await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}/reset`);
     Object.assign(TASKS_BY_ID[id], TASK_BASELINE[id]);
-    PLAN.history = d.history||[]; PLAN.edited = new Set(Object.keys(d.tasks||{}));
+    PLAN.history = d.history||[]; PLAN.edits = d.tasks||{}; PLAN.edited = new Set(Object.keys(PLAN.edits));
     planClose(); planRerender(); showToast(T('Restored','已恢复'), T('Task is back to the original plan.','任务已恢复为原计划。'));
   }catch(e){ planErr(e.message); }
+}
+
+/* ===================== DATA SOURCES (DayOne project view) =====================
+   Every value on the DayOne pages says where it came from. Per task field, the order of
+   precedence is: Jira (linked tasks: status, owner, target date; Jira-only tickets: everything)
+   → a manual Gantt edit → an approved meeting-minutes change → the original plan entered on
+   21 Aug 2026. Numbers the page works out are "Calculated"; text written into the page is
+   "Fixed text"; preview panels are "Sample". Hover any tag, card or row to see the detail. */
+const DS_KIND = {
+  jira:   ['Jira','Jira'],
+  edit:   ['Manual edit','手动修改'],
+  meeting:['Meeting minutes','会议纪要'],
+  plan:   ['Original plan','原始计划'],
+  calc:   ['Calculated','系统计算'],
+  static: ['Fixed text','固定文字'],
+  sample: ['Sample, not live','示例,非真实数据'],
+};
+const DS_NOTE = {
+  jira:   ['Read from Jira by the nightly sync (Mon–Fri 24:00 SGT) or "Sync Jira now". Change it in Jira.','由夜间同步(周一至周五 24:00)或「立即同步 Jira」从 Jira 读取,请在 Jira 中修改。'],
+  edit:   ['Changed on the Roadmap Gantt by an RDA Manager; saved on the server for everyone.','由 RDA 管理员在路线图甘特图上修改,保存在服务器,所有人可见。'],
+  meeting:['Proposed from uploaded meeting minutes and approved on the Meetings page. Kept in this browser only.','由上传的会议纪要提取、在 Meetings 页批准。只保存在本浏览器。'],
+  plan:   ['Entered when this dashboard was built, from the DayOne delivery timeline and the weekly meetings up to 21 Aug 2026. Not updated automatically, so it may be out of date.','建看板时录入,来自 DayOne 交付时间线和截至 2026-08-21 的周会。不会自动更新,可能已过时。'],
+  calc:   ['Worked out by the page from the task data; it changes when the inputs change.','由页面根据任务数据计算,输入变化时随之变化。'],
+  static: ['Text written into the page on 21 Aug 2026. Not updated automatically, so it may be out of date.','2026-08-21 写进页面的文字,不会自动更新,可能已过时。'],
+  sample: ['Placeholder for a feature that is not connected yet. Not real project data.','尚未接通功能的占位内容,不是真实项目数据。'],
+};
+const DS_PAGES = ['overview','blocker','dependency','roadmap','meetings','luna'];
+const DS_FIELDS = [['status','Status','状态'],['owner','Owner','负责人'],['due','Target date','目标日期'],['gs','Start','开始'],['ge','End','结束'],
+  ['progress','Progress','进度'],['next','Next step','下一步'],['health','Health','健康度']];
+const dsK = k => T(DS_KIND[k][0], DS_KIND[k][1]);
+const dsAsOf = () => T('as of 21 Aug 2026','截至 2026-08-21');
+
+function dsField(t, f){
+  const J = t && t.jira, syncAt = PLAN.jira && PLAN.jira.syncedAt;
+  const jira = d => ({k:'jira', d:[J.key, d, T('synced','同步于')+' '+fmtDT(syncAt)].filter(Boolean).join(' · ')});
+  if(J && /^BA-/.test(t.id)){   // a DayOne ticket that is not in the original plan
+    if(f==='next' || f==='health') return {k:'calc', d:T('not tracked for tickets outside the plan','原计划外的工单不跟踪此项')};
+    return jira({gs:T('created','创建日期'), ge:T('due, resolved or last-updated date','截止、解决或最近更新日期'), due:T('due, resolved or last-updated date','截止、解决或最近更新日期'),
+      progress:T('done → 100%, otherwise 0%','完成为 100%,否则 0%'), owner:T('assignee','经办人'), status:J.statusName}[f]);
+  }
+  if(J){
+    if(f==='status') return jira(J.statusName);
+    if(f==='owner' && J.owner) return jira(T('assignee','经办人'));
+    if(f==='due' && J.due) return jira(T('due date','截止日期'));
+    if(f==='progress' && J.status==='done') return jira(T('done in Jira → 100%','Jira 已完成 → 100%'));
+  }
+  const e = PLAN.edits && PLAN.edits[t.id];
+  if(PLAN.edited.has(t.id) && e && f in e){
+    const h = (PLAN.history||[]).find(x=>x.taskId===t.id && x.changes && x.changes[f]);
+    return {k:'edit', d: h ? `${h.by} · ${fmtDT(h.at)}` : ''};
+  }
+  const ap = PROPOSALS.filter(p=>p.status==='approved' && p.entityType==='task' && p.entityId===t.id && p.field===f);
+  const p = ap[ap.length-1];
+  if(p && t[f]!=null && String(t[f])===String(p.newValue)){
+    const m = MEETINGS.find(x=>x.id===p.meetingId);
+    return {k:'meeting', d: m ? `${m.title} · ${m.date}` : ''};
+  }
+  return {k:'plan', d: dsAsOf()};
+}
+function dsMsField(){
+  const h = (PLAN.history||[]).find(x=>x.taskId==='milestone');
+  return h ? {k:'edit', d:`${h.by} · ${fmtDT(h.at)}`} : {k:'plan', d:dsAsOf()};
+}
+function dsTaskLabel(t){
+  const ks = new Set(DS_FIELDS.map(([f])=>dsField(t,f).k));
+  if(t.jira) return {k:'jira', label:`Jira ${t.jira.key}`, plus: ks.has('edit') ? 'edit' : (ks.has('meeting') ? 'meeting' : null)};
+  if(ks.has('edit')) return {k:'edit', label:T('Edited','已修改'), plus: ks.has('meeting') ? 'meeting' : null};
+  if(ks.has('meeting')) return {k:'meeting', label:T('Meeting','会议')};
+  return {k:'plan', label:T('Plan · 21 Aug','计划 · 8/21')};
+}
+function dsTag(spec, k, label, plus){
+  return `<span class="ds-tag k-${k}"${spec ? ` data-ds="${esc(spec)}"` : ''}><i></i>${esc(label)}${plus ? `<i class="p k-${plus}"></i>` : ''}</span>`;
+}
+function dsTaskTag(id, fields){
+  const t = TASKS_BY_ID[id]; if(!t) return '';
+  if(fields){   // tag for a few fields only (e.g. an action row: next step / owner / target date)
+    const ks = fields.split(',').map(f=>dsField(t,f).k); const k = ks.includes('jira') ? 'jira' : ks.includes('edit') ? 'edit' : ks.includes('meeting') ? 'meeting' : 'plan';
+    return dsTag(`task:${id}:${fields}`, k, k==='jira' ? `Jira ${t.jira.key}` : k==='plan' ? T('Plan · 21 Aug','计划 · 8/21') : dsK(k));
+  }
+  const l = dsTaskLabel(t); return dsTag('task:'+id, l.k, l.label, l.plus);
+}
+function dsKindTag(k, label){ return dsTag(k, k, label || dsK(k)); }
+
+function dsFieldVal(t, f){
+  const v = t[f];
+  if(f==='status') return STATUS_META[v] ? tr(STATUS_META[v].label) : (v||'—');
+  if(f==='progress') return (v==null ? '—' : v+'%');
+  if(f==='health') return HEALTH_META[v] ? tr(HEALTH_META[v].label) : '—';
+  const s = v==null || v==='' ? '—' : String(v);
+  return s.length > 110 ? s.slice(0,108)+'…' : s;
+}
+function dsRow(label, value, src){
+  return `<div class="ds-row"><span class="ds-f">${esc(label)}</span><span class="ds-v">${esc(value)}</span>${dsTag('', src.k, dsK(src.k))}${src.d ? `<span class="ds-d">${esc(src.d)}</span>` : ''}</div>`;
+}
+function dsLegend(kinds){ return `<div class="ds-legend">${[...new Set(kinds)].map(k=>`<div>${dsTag('', k, dsK(k))} ${esc(T(DS_NOTE[k][0], DS_NOTE[k][1]))}</div>`).join('')}</div>`; }
+
+const DS_KPI = {
+  blocked:      ['Tasks held up by an unfinished upstream dependency (see Dependency View), or blocked in their own status.','被未完成的上游依赖卡住(见依赖视图),或本身状态为阻塞的任务。'],
+  atrisk:       ['Tasks whose status is In Progress.','状态为进行中的任务。'],
+  overdue:      ['Tasks past their target date and not done (blocked ones are counted under Blocked).','已过目标日期且未完成的任务(被阻塞的计入「已阻塞」)。'],
+  duesoon:      ['In-progress tasks whose target date is in the next 7 days.','目标日期在未来 7 天内的进行中任务。'],
+  blockersources:['Blocked or overdue tasks that other tasks depend on.','被其他任务依赖、且自身阻塞或逾期的任务。'],
+  msimpacted:   ['Milestones with a blocked or overdue input.','有输入任务阻塞或逾期的里程碑。'],
+  depblockers:  ['Blocked or overdue tasks that other tasks depend on.','被其他任务依赖、且自身阻塞或逾期的任务。'],
+  depmsimpacted:['Milestones with a blocked or overdue input.','有输入任务阻塞或逾期的里程碑。'],
+  harddeps:     ['Hard dependency links. The links themselves are from the original plan.','硬依赖条数。依赖关系本身来自原始计划。'],
+  softdeps:     ['Soft dependency links. The links themselves are from the original plan.','软依赖条数。依赖关系本身来自原始计划。'],
+  monthtasks:   ['Tasks in Month 2. The page treats Month 2 as the current phase (original plan).','第 2 月的任务。页面把第 2 月当作当前阶段(原始计划)。'],
+  monthdone:    ['Month 2 tasks that are done.','第 2 月中已完成的任务。'],
+  monthprog:    ['Month 2 tasks that are in progress.','第 2 月中进行中的任务。'],
+  snap:         ['Average progress of the tasks listed in this month.','本月所列任务的平均进度。'],
+};
+function dsInputsLine(){
+  const n = TASKS.length, j = TASKS.filter(t=>t.jira).length;
+  return T(`Inputs: ${n} tasks — status of ${j} from Jira, ${n-j} from the original plan or manual edits.`,
+           `输入:${n} 个任务 —— 其中 ${j} 个的状态来自 Jira,${n-j} 个来自原始计划或手动修改。`);
+}
+function dsTipHTML(el){
+  const spec = el.getAttribute('data-ds') || '', note = el.getAttribute('data-ds-note');
+  const [type, a, b] = spec.split(':');
+  const head = (right) => `<div class="st-h"><span>${T('Data source','数据来源')}</span><span>${esc(right||'')}</span></div>` + (note ? `<div class="st-note">${esc(note)}</div>` : '');
+  if(type==='task'){
+    const t = TASKS_BY_ID[a]; if(!t) return '';
+    const fields = b ? DS_FIELDS.filter(([f])=>b.split(',').includes(f)) : DS_FIELDS;
+    const kinds = [];
+    let rows = fields.map(([f,en,zh])=>{ const s = dsField(t,f); kinds.push(s.k); return dsRow(T(en,zh), f==='due' ? (t.due||'—') : dsFieldVal(t,f), s); }).join('');
+    const blocked = isEffectivelyBlocked(t.id), od = isOverdue(t);
+    if(blocked || od){ kinds.push('calc');
+      const up = EDGES.filter(e=>e.to===t.id && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]||{}))).map(e=>e.from);
+      rows += dsRow(T('Shown as','显示为'), [blocked ? tr('Blocked') : '', od ? tr('Overdue') : ''].filter(Boolean).join(' · '),
+        {k:'calc', d: blocked && up.length ? T(`upstream ${up.join(', ')} not finished`,`上游 ${up.join('、')} 未完成`) : T('target date has passed','已过目标日期')}); }
+    if(t.jira && t.jira.lastComment){ const c = t.jira.lastComment;
+      rows += `<div class="ds-row"><span class="ds-f">${T('Latest Jira comment','Jira 最新评论')}</span><span class="ds-v" style="grid-column:2/4;font-weight:500">${esc(c.text.split('\n')[0].slice(0,160))}</span><span class="ds-d">${esc(c.by||'')} · ${esc(fmtDT(c.at))}</span></div>`; }
+    return head(`${t.id} ${taskName(t)}`) + rows + dsLegend(kinds);
+  }
+  if(type==='ms'){
+    const s = dsMsField();
+    return head(`◆ ${MILESTONE.id} ${msName()}`) + dsRow(T('Date','日期'), MILESTONE.date, s) + dsRow(T('Owner','负责人'), MILESTONE.owner, {k:'plan', d:dsAsOf()}) +
+      dsRow(T('Shown status','显示状态'), T('from its input tasks','由输入任务决定'), {k:'calc', d:''}) + dsLegend([s.k,'plan','calc']);
+  }
+  if(type==='kpi'){
+    const x = DS_KPI[a] || ['',''];
+    return head(dsK('calc')) + `<div class="st-note">${esc(T(x[0],x[1]))}</div><div class="st-note">${esc(dsInputsLine())}</div>` +
+      (b==='illus' ? `<div class="st-note" style="color:var(--orange)">${esc(T('The trend line and any "vs. last week / month" text on this card are fixed illustrations: no history is stored yet.','卡片上的趋势线和「较上周/上月」文字是固定示意,目前没有保存历史数据。'))}</div>` : '') + dsLegend(['calc']);
+  }
+  if(DS_KIND[type]) return head(dsK(type)) + `<div class="st-note">${esc(T(DS_NOTE[type][0], DS_NOTE[type][1]))}</div>`;
+  return '';
+}
+
+function dsStripHTML(pid){
+  const linked = TASKS.filter(t=>t.jira), extra = linked.filter(t=>/^BA-/.test(t.id)).length;
+  const edited = TASKS.filter(t=>PLAN.edited.has(t.id)).length, plan = TASKS.length - linked.length;
+  const appr = PROPOSALS.filter(p=>p.status==='approved').length, pend = PROPOSALS.filter(p=>p.status==='pending').length;
+  const J = PLAN.jira;
+  const parts = [];
+  if(pid==='luna'){ parts.push(dsKindTag('sample', T('Sample · whole page is a preview','示例 · 整页为预览'))); }
+  else if(pid==='meetings'){
+    parts.push(dsKindTag('meeting', T(`Meeting minutes · ${MEETINGS.length} meetings · ${appr} changes approved, ${pend} waiting`,`会议纪要 · ${MEETINGS.length} 场会议 · 已批准 ${appr} 条,待审 ${pend} 条`)));
+    parts.push(dsKindTag('plan', T('Current values: original plan / Jira','当前值:原始计划 / Jira')));
+  } else {
+    parts.push(dsKindTag('jira', J ? T(`Jira · ${linked.length} tasks${extra ? ` (${extra} only in Jira)` : ''} · synced ${fmtDT(J.syncedAt)}`,`Jira · ${linked.length} 个任务${extra ? `(${extra} 个仅在 Jira)` : ''} · 同步于 ${fmtDT(J.syncedAt)}`)
+                                    : T('Jira · not synced yet','Jira · 尚未同步')));
+    if(edited) parts.push(dsKindTag('edit', T(`Manual edits · ${edited} tasks`,`手动修改 · ${edited} 个任务`)));
+    if(appr) parts.push(dsKindTag('meeting', T(`Meeting minutes · ${appr} approved changes`,`会议纪要 · ${appr} 条已批准修改`)));
+    parts.push(dsKindTag('plan', T(`Original plan · ${plan} tasks not in Jira · as of 21 Aug 2026`,`原始计划 · ${plan} 个任务未关联 Jira · 截至 2026-08-21`)));
+    parts.push(dsKindTag('calc', T('Calculated · counts, Blocked / Overdue','系统计算 · 统计数、阻塞/逾期')));
+    if(pid==='overview' || pid==='blocker') parts.push(dsKindTag('static', T('Fixed text · notes, brief, recommendation','固定文字 · 说明、简报、建议')));
+    if(pid==='overview') parts.push(dsKindTag('sample', T('Sample · Luna Queue, Internal Delivery','示例 · Luna 队列、内部交付')));
+  }
+  return `<span class="ds-lbl">${T('Data sources','数据来源')}</span>${parts.join('')}<span class="ds-hint">${T('Hover a tag, card or row for the source of each field','悬停标签、卡片或行可查看每个字段的来源')}</span>`;
+}
+
+function dsMark(el, spec, k, label, where){
+  if(!el) return;
+  el.setAttribute('data-ds', spec);
+  let tag = el.querySelector(':scope > .ds-tag.ds-own, :scope .ds-own');
+  const html = `<span class="ds-tag ds-own k-${k}"><i></i>${esc(label || dsK(k))}</span>`;
+  if(tag){ tag.outerHTML = html; return; }
+  (where ? (el.querySelector(where) || el) : el).insertAdjacentHTML('beforeend', html);
+}
+function dsIsoDue(t){ if(!t.due || t.due==='—') return t.ge || '—'; const [m,d] = t.due.split('/'); return `${(t.ge||'2026').slice(0,4)}-${m}-${d}`; }
+
+function applyDataSources(){
+  // Page strips
+  DS_PAGES.forEach(pid=>{
+    const pg = document.getElementById('page-'+pid); if(!pg) return;
+    let s = pg.querySelector(':scope > .ds-strip');
+    if(!s){ s = document.createElement('div'); s.className = 'ds-strip'; const head = pg.querySelector(':scope > .page-head'); if(head) head.after(s); else pg.prepend(s); }
+    s.innerHTML = dsStripHTML(pid);
+  });
+  // KPI cards
+  DS_PAGES.forEach(pid=>{
+    document.querySelectorAll(`#page-${pid} .stat-card`).forEach(card=>{
+      const kpi = card.querySelector('[data-kpi]:not([data-kpi$="-sub"])');
+      const illus = card.querySelector('.stat-spark') || /vs\.? last|较上/.test(card.textContent) ? ':illus' : '';
+      let spec, k, label;
+      if(pid==='luna'){ spec = 'sample'; k = 'sample'; }
+      else if(kpi){ spec = `kpi:${kpi.dataset.kpi}${illus}`; k = 'calc'; }
+      else if(/MS2|milestone|里程碑/i.test(card.textContent)){ const s = dsMsField(); spec = 'ms:MS2'; k = s.k; }
+      else { spec = 'plan'; k = 'plan'; label = T('Plan · 21 Aug','计划 · 8/21'); }
+      card.setAttribute('data-ds', spec);
+      let foot = card.querySelector('.ds-foot'); if(!foot){ foot = document.createElement('div'); foot.className = 'ds-foot'; card.appendChild(foot); }
+      foot.innerHTML = `<span class="ds-tag k-${k}"><i></i>${esc(label || dsK(k))}</span>`;
+    });
+  });
+  // Task cards on the Blocker Impact Map, Dependency View and Overview: meta from live data + tag
+  document.querySelectorAll('.flow-card[data-node], .mini-card[data-node]').forEach(c=>{
+    const id = c.dataset.node, isMs = id==='MS2', t = isMs ? null : TASKS_BY_ID[id];
+    if(!isMs && !t) return;
+    const meta = c.querySelector('.fc-meta, .mc-meta');
+    if(meta){
+      const owner = isMs ? MILESTONE.owner : t.owner, iso = isMs ? MILESTONE.date : dsIsoDue(t), mmdd = isMs ? MILESTONE.due : (t.due||'—');
+      meta.innerHTML = meta.classList.contains('fc-meta') ? `👤 ${esc(owner)} &nbsp;·&nbsp; 📅 ${T('Due','截止')}: ${esc(iso)}` : `👤 ${esc(owner)} &nbsp; 📅 ${esc(mmdd)}`;
+    }
+    c.setAttribute('data-ds', isMs ? 'ms:MS2' : 'task:'+id);
+    const bd = c.querySelector('.fc-badges, .mc-badges');
+    if(bd && !bd.querySelector('.ds-tag')){
+      if(isMs){ const s = dsMsField(); bd.insertAdjacentHTML('beforeend', dsTag('ms:MS2', s.k, s.k==='plan' ? T('Plan · 21 Aug','计划 · 8/21') : dsK(s.k))); }
+      else bd.insertAdjacentHTML('beforeend', dsTaskTag(id));
+    }
+    c.querySelectorAll('.fc-desc, .mc-desc').forEach(d=>{ d.setAttribute('data-ds','static'); d.classList.add('ds-static'); });
+  });
+  // Overview roadmap snapshot: per-item tooltip + live month completion
+  document.querySelectorAll('.snap-item').forEach(it=>{
+    const s = it.querySelector('.badge-slot[data-node]'); if(!s) return;
+    const id = s.dataset.node; it.setAttribute('data-ds', id==='MS2' ? 'ms:MS2' : 'task:'+id);
+    const t = TASKS_BY_ID[id], k = id==='MS2' ? dsMsField().k : (t ? dsTaskLabel(t).k : 'plan');
+    let dot = it.querySelector('.ds-dot'); if(!dot){ it.querySelector('.lbl')?.insertAdjacentHTML('afterbegin','<span class="ds-dot"></span>'); dot = it.querySelector('.ds-dot'); }
+    if(dot) dot.className = 'ds-dot k-'+k;
+  });
+  document.querySelectorAll('.snap-col').forEach(col=>{
+    const ids = [...col.querySelectorAll('.badge-slot[data-node]')].map(s=>s.dataset.node).filter(id=>TASKS_BY_ID[id]);
+    const pw = col.querySelector('.progress-wrap'); if(!pw || !ids.length) return;
+    const avg = Math.round(ids.reduce((a,id)=>a+(+TASKS_BY_ID[id].progress||0),0)/ids.length);
+    const fill = pw.querySelector('.progress-fill'); if(fill) fill.style.width = avg+'%';
+    const lab = pw.querySelector('.progress-label'); if(lab) lab.innerHTML = `${T('Completion','完成度')} ${avg}% <span class="ds-tag k-calc"><i></i>${esc(dsK('calc'))}</span>`;
+    pw.setAttribute('data-ds','kpi:snap');
+  });
+  // Fixed text and preview panels
+  const ov = document.getElementById('page-overview');
+  if(ov){
+    const brief = ov.querySelector('.banner'); if(brief) dsMark(brief, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), '.banner-title');
+    ov.querySelectorAll('.panel').forEach(p=>{
+      const title = p.querySelector('.panel-title'); if(!title) return;
+      const tx = title.textContent;
+      if(/Luna|Internal Delivery|内部交付/.test(tx)) dsMark(p, 'sample', 'sample', null, '.panel-title');
+      else if(/Actions to Follow|待跟进/.test(tx)) title.setAttribute('data-ds-skip','1');
+    });
+  }
+  const reco = document.querySelector('#page-blocker .reco-card'); if(reco) dsMark(reco, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h4');
+  const luna = document.getElementById('page-luna');
+  if(luna) luna.querySelectorAll('.panel-title').forEach(pt=>dsMark(pt, 'sample', 'sample'));
+  // Roadmap side cards
+  document.querySelectorAll('.side-card').forEach(sc=>{
+    const h = sc.querySelector('h3'); if(!h) return; const tx = h.textContent;
+    if(/Current Phase Focus|当前阶段重点/.test(tx)) dsMark(sc, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h3');
+    else if(/Upcoming Milestones|即将到来的里程碑/.test(tx)) dsMark(sc, 'plan', 'plan', T('Plan · 21 Aug','计划 · 8/21'), 'h3');
+    else if(/Project Information|项目信息/.test(tx)) dsMark(sc, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h3');
+  });
+  // Meetings page
+  document.querySelectorAll('#meetList .meet-item').forEach(m=>{ if(!m.querySelector('.ds-tag')) m.querySelector('b')?.insertAdjacentHTML('afterend', ` ${dsTag('meeting','meeting',T('Minutes','纪要'))}`); });
+  document.querySelectorAll('#proposalList .proposal-card').forEach(c=>{ const ev = c.querySelector('.prop-evidence'); if(ev && !ev.querySelector('.ds-tag')) ev.insertAdjacentHTML('afterbegin', dsTag('meeting','meeting',dsK('meeting'))+' '); });
+}
+function dsActionTag(a){
+  if(a.source){ const m = MEETINGS.find(x=>x.id===a.source); return `<span class="ds-tag k-meeting" data-ds="meeting" data-ds-note="${esc(m ? m.title+' · '+m.date : '')}"><i></i>${esc(dsK('meeting'))}</span>`; }
+  return a.relatedTask ? dsTaskTag(a.relatedTask, 'next,owner,due') : '';
 }
 
 renderPortfolio();
 goPage('portfolio');
 authBoot();
+applyDataSources();
 
 </script>
 </body>
