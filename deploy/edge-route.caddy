@@ -1,0 +1,11 @@
+# Delivery Copilot (RDA-Program-Copilot): the DayOne NTPE Program Kanban, a single
+# self-contained static page. Served by HOST nginx on :8091 — not a container — so the
+# upstream is the docker bridge gateway rather than a Docker DNS name.
+# The page knows nothing about the prefix (it is one file with relative/CDN URLs only),
+# so the prefix is stripped and the bare path must redirect to the trailing-slash form.
+# Managed via ~/edge/edgectl set delivery-copilot; see deploy/README.md.
+handle /DeliveryCopilot* {
+	redir /DeliveryCopilot /DeliveryCopilot/ 301
+	uri strip_prefix /DeliveryCopilot
+	reverse_proxy 172.23.0.1:8091
+}
