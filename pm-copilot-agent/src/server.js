@@ -17,6 +17,7 @@
    GET  /api/audit                          page: history
    POST /api/suggestions/:id/approve|reject|edit     action: approve
    POST /api/sync, /api/meetings/import, /api/meetings/:id/reanalyse   action: ingest
+   GET  /api/program/:project               the project's plan data (phases, tasks, dependencies)
    GET  /api/plan/:project                  plan edits (Gantt) for a project the user may see
    POST /api/plan/:project/tasks/:id        {fields, before}   action: edit_plan
    POST /api/plan/:project/tasks/:id/reset                     action: edit_plan
@@ -152,6 +153,18 @@ async function route(req, res, user) {
     const visible = new Set(db.suggestions.filter(s => P.canSeeProject(user.perms, s.project)).map(s => s.id));
     const all = user.perms.projects.includes('*');
     return send(res, 200, { audit: db.audit.filter(a => all || visible.has(a.target)).slice(0, 200) });
+  }
+
+  /* The program data the DayOne pages draw from. It used to be baked into the dashboard HTML,
+     where anyone who could load the page could read it; served here it sits behind the same role
+     check as everything else, so an unauthenticated visitor gets the sign-in screen and nothing
+     else. 404 rather than 403 for a project they may not see, matching /api/plan: telling someone
+     a project exists is itself something to decide, not a default. */
+  if (req.method === 'GET' && (m = p.match(/^\/api\/program\/([a-z0-9-]+)$/))) {
+    if (!P.canSeeProject(user.perms, m[1])) throw err(404, 'Project not found');
+    const file = path.join(cfg.DATA_DIR, `${m[1]}-program.json`);
+    if (!fs.existsSync(file)) throw err(404, 'Project not found');
+    return send(res, 200, JSON.parse(fs.readFileSync(file, 'utf8')));
   }
 
   if (req.method === 'GET' && (m = p.match(/^\/api\/plan\/([a-z0-9-]+)$/))) {

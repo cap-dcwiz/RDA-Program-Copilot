@@ -1823,61 +1823,14 @@ if(typeof pdfjsLib !== 'undefined'){
 // Roadmap View all read titles from here so phase names can never drift out of sync
 // between views. Months 1-4 also carry real, granular TASKS[] entries; Months 5-9 have
 // no granular backlog yet, so their `items` (below) are the slide's own checklist bullets.
-const PHASES = [
-  {month:1, title:'Project Kick-Off', titleZh:'项目启动', dateLabel:'Jul 2026',
-   badges:[{label:'VPN ON',color:'green'}],
-   items:['Data connectivity established','Cooling system topology mapped','Control policy & tenant SLA alignment']},
-  {month:2, title:'Digital Twin Construction', titleZh:'数字孪生构建', dateLabel:'Aug 2026',
-   badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
-   items:['Digital twin calibrated to real system','Energy baseline model created','Simulation environment ready']},
-  {month:3, title:'AI Optimization Training', titleZh:'AI 优化训练', dateLabel:'Sep 2026',
-   badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
-   items:['AI optimization policy trained','Energy savings validated in simulation','Safety guardrails established']},
-  {month:4, title:'Optimization Deployment (Human-in-Loop)', titleZh:'优化部署(人机协同)', dateLabel:'Oct 2026',
-   badges:[{label:'BMS read',color:'blue'},{label:'VPN ON',color:'green'}],
-   items:['Optimization recommendations live','Operators follow AI suggestions','First real energy reduction observed']},
-  {month:5, title:'Optimization Validation & Auto-Control Build', titleZh:'优化验证与自动控制搭建', dateLabel:'Nov 2026',
-   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN ON → OFF',color:'violet'}],
-   items:['Optimization validation & fine-tuning','Auto-control engine building','Control accuracy evaluation','Operator feedback incorporated']},
-  {month:6, title:'Stable Energy Savings', titleZh:'稳定节能', dateLabel:'Dec 2026',
-   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
-   items:['Sustained energy savings demonstrated','Auto-control model shadowing started','System ready for operational trials']},
-  {month:7, title:'Controlled Auto-Control Trials', titleZh:'受控自动控制试运行', dateLabel:'Jan 2027',
-   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
-   items:['Controlled auto-control activation','Safety guardrails verified','No SLA violations']},
-  {month:8, title:'Optimization Refinement', titleZh:'优化调优', dateLabel:'Feb 2027',
-   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
-   items:['Optimization policy refined','Additional energy savings realized','Operator training conducted']},
-  {month:9, title:'Final Validation & Project Completion', titleZh:'最终验证与项目收尾', dateLabel:'Mar 2027',
-   badges:[{label:'BMS read',color:'blue'},{label:'BMS write',color:'orange'},{label:'VPN OFF',color:'gray'}],
-   items:['Energy savings verified','Operational handover completed','Replication roadmap prepared']},
-];
-const PHASES_BY_MONTH = {}; PHASES.forEach(p=>{ PHASES_BY_MONTH[p.month]=p; });
+let PHASES = [];
+const PHASES_BY_MONTH = {};   // filled by initProgram()
 function phaseTitle(month){ const p=PHASES_BY_MONTH[month]; if(!p) return `Month ${month}`; return (LANG==='zh' && p.titleZh) ? p.titleZh : p.title; }
 function phaseLabel(month){ const p=PHASES_BY_MONTH[month]; if(!p) return monthWord(month); const t=(LANG==='zh' && p.titleZh)?p.titleZh:p.title; return LANG==='zh' ? `第 ${p.month} 月 · ${p.dateLabel} · ${t}` : `Month ${p.month} · ${p.dateLabel} · ${t}`; }
 function miniBadge(b){ return `<span class="badge ${b.color}" style="padding:2px 7px;font-size:9.5px;">${b.label}</span>`; }
 
-const TASKS = [
- {id:'00',name:'VPN / VM Access',nameZh:'VPN／虚拟机接入',en:'Access & connectivity setup',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'Istofa',status:'done',health:'good',progress:100,next:'—',due:'07/18',ms:'—',gs:'2026-07-15',ge:'2026-07-18'},
- {id:'01',name:'Technical Alignment Session',nameZh:'技术对齐会议',en:'Cooling topology & data-point confirmation',month:1,monthLabel:'Month 1 · Jul 2026 · Project Kick-Off',owner:'RDA + DayOne On-site Team',status:'unconfirmed',health:'none',progress:0,next:'Confirm whether the 08/14 alignment session has been completed',due:'08/14',ms:'—',gs:'2026-08-12',ge:'2026-08-14'},
- {id:'02',name:'Data Point / API Integration',nameZh:'数据点／API 集成',en:'Real-time BMS point exposure',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Anurag / Istofa',status:'inprogress',health:'fine',progress:65,next:'Complete remaining API endpoint integration',due:'08/21',ms:'MS2',gs:'2026-08-12',ge:'2026-09-05'},
- {id:'03',name:'Historical BMS Data',nameZh:'历史 BMS 数据',en:'6-month historical extraction',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Hong Qing / Justin',status:'inprogress',health:'risk',progress:50,next:'Continue providing remaining historical data (Justin, target 21 Aug)',due:'08/21',ms:'MS2',gs:'2026-07-31',ge:'2026-08-21',targetOriginal:'2026-08-14'},
- {id:'04',name:'Digital Twin Framework',nameZh:'数字孪生框架',en:'Data Hall, Chiller & Cooling Tower loops',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:70,next:'Complete remaining module integration; calibration depends on historical data',due:'08/21',ms:'MS2',gs:'2026-08-26',ge:'2026-09-15'},
- {id:'05',name:'Single Data Hall Pilot',nameZh:'单机房试点',en:'First validation scope',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Mingchen / Valdy',status:'inprogress',health:'risk',progress:40,next:'Start calibration for the first Data Hall using available historical data',due:'08/20',ms:'MS2',gs:'2026-08-17',ge:'2026-08-28',targetOriginal:'2026-08-17'},
- {id:'06',name:'Model Calibration Prep',nameZh:'模型标定准备',en:'To start after the Technical Alignment Session',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'RDA Modelling Team',status:'notstarted',health:'none',progress:0,next:'Use confirmed topology and available BMS data to prepare for fine-tuning and calibration',due:'08/25',ms:'MS2',gs:'2026-09-01',ge:'2026-09-05'},
- {id:'07',name:'Leakage Detection Definition',nameZh:'泄漏检测定义',en:'Refrigerant-leak detection rules',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:55,next:'Confirm detection rules and thresholds',due:'08/25',ms:'MS2',gs:'2026-09-06',ge:'2026-09-20'},
- {id:'08',name:'Chiller Plant Modelling (E+)',nameZh:'冷机房建模(E+)',en:'3D visualization model',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'risk',progress:55,next:'Fix chiller plant model geometry (currently flagged as not correct)',due:'08/25',ms:'MS2',gs:'2026-09-05',ge:'2026-10-15'},
- {id:'09',name:'DCWiz Demo Preparation',nameZh:'DCWiz 演示准备',en:'dcwiz.experimental.rda.ai',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:45,next:'Prepare demo script and data',due:'08/26',ms:'—',gs:'2026-10-01',ge:'2026-10-20'},
- {id:'31',name:'Baseline Energy Model',nameZh:'能耗基线模型',en:'Snapshot/historical-data-driven',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Mingchen',status:'inprogress',health:'fine',progress:80,next:'Confirm baseline model correctness with Justin / DayOne',due:'09/30',ms:'—',gs:'2026-08-20',ge:'2026-09-25'},
- {id:'32',name:'InfluxDB Continuous Ingestion',nameZh:'InfluxDB 持续接入',en:'Feeds the prototype AI+energy model',month:2,monthLabel:'Month 2 · Aug 2026 · Digital Twin Construction',owner:'Valdy',status:'inprogress',health:'fine',progress:30,next:'Configure alerting and monitoring (ingestion outage would block prototype model improvement)',due:'09/05',ms:'—',gs:'2026-08-20',ge:'2026-09-10'},
- {id:'10',name:'AI Optimization Training',nameZh:'AI 优化训练',en:'EnergyPlus 9.5.0 prototype model',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Collect training dataset',due:'09/10',ms:'—',gs:'2026-10-20',ge:'2026-12-10'},
- {id:'11',name:'Simulation Savings Validation',nameZh:'仿真节能验证',en:'Energy savings validated in simulation',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Define validation plan',due:'09/15',ms:'—',gs:'2026-12-10',ge:'2027-01-10'},
- {id:'12',name:'Safety Guardrail Definition',nameZh:'安全护栏定义',en:'Safety guardrails established',month:3,monthLabel:'Month 3 · Sep 2026 · AI Optimization Training',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Define limits and alerting policy',due:'09/20',ms:'—',gs:'2027-01-10',ge:'2027-02-15'},
- {id:'13',name:'DCVerse/DCWiz Integration',nameZh:'DCVerse/DCWiz 集成',en:'Full-stack deployment',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Complete system integration testing',due:'10/05',ms:'—',gs:'2026-10-05',ge:'2026-10-20'},
- {id:'14',name:'Human-in-the-Loop Rollout',nameZh:'人机协同上线',en:'Operators follow AI suggestions',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Phased rollout and monitoring',due:'10/15',ms:'—',gs:'2026-10-15',ge:'2026-11-01'},
- {id:'15',name:'DCWiz Telemetry & What-if Validation',nameZh:'DCWiz 遥测与假设分析验证',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
-];
-const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',nameZh:'数字孪生标定完成',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28',month:2};
+let TASKS = [];
+let MILESTONE = {};
 const TODAY = new Date(new Date(Date.now()+8*3600e3).toISOString().slice(0,10));   // today, Singapore
 
 /* ===================== i18n (EN / ZH switch) =====================
@@ -2018,8 +1971,7 @@ function healthBadge(h){ const m=HEALTH_META[h]||HEALTH_META.none; if(h==='none'
    TASKS[] above holds RAW authoritative fields (writable only via approved
    Change Proposals in the Meetings tab). Everything below is DERIVED —
    computed fresh every render, never stored/overwritten directly. */
-const TASKS_BY_ID = {};
-TASKS.forEach(t=>{ TASKS_BY_ID[t.id]=t; });
+const TASKS_BY_ID = {};       // filled by initProgram()
 
 function parseDue(mmdd){ if(!mmdd || mmdd==='—') return null; const [m,d]=mmdd.split('/').map(Number); return new Date(2026,m-1,d); }
 
@@ -2044,26 +1996,7 @@ function isOverdue(t){
 // 05 (Single Data Hall Pilot) is literally a scoped-down slice of 03's work (the pilot
 // validates on one Data Hall using the historical data 03 is delivering), so it mirrors
 // 03's blocked/overdue state directly rather than being a separate downstream consumer.
-const EDGES = [
-  {from:'02',to:'04',type:'soft'},
-  {from:'03',to:'04',type:'hard'}, {from:'03',to:'05',type:'subset'},
-  // 05->06 is drawn as a solid "hand-off" arrow (05 feeds into calibration prep once
-  // available), but kept 'soft' for status purposes: 06 genuinely hasn't started yet,
-  // so it shouldn't be forced into a derived "Blocked" state just because 05 is overdue.
-  {from:'05',to:'06',type:'soft',solid:true},
-  {from:'01',to:'06',type:'hard'}, {from:'01',to:'08',type:'soft'},
-  {from:'04',to:'07',type:'hard'}, {from:'04',to:'31',type:'hard'},
-  // 32 is fed directly by 03 (not via 04): 03 is the raw-overdue root, so this is what
-  // actually drives 32 into a genuine "Blocked" state; 31 only derives from 04 (which
-  // is itself merely delayed, not raw-blocked), so 31 correctly stays "In Progress".
-  // Hidden from the Dependency View's own drawing (it would have to cut across the
-  // whole "Current Work" column to get there) but still counted for status + shown as
-  // part of the root-cause fan in the Blocker Impact Map.
-  {from:'03',to:'32',type:'hard',hideInDepView:true},
-  {from:'07',to:'MS2',type:'hard'},
-  {from:'31',to:'MS2',type:'hard'}, {from:'32',to:'MS2',type:'hard'},
-  {from:'06',to:'10',type:'soft'}, {from:'08',to:'10',type:'soft'},
-];
+let EDGES = [];
 
 // Derived dependency-health of a node: 'blocking' | 'pending' | 'satisfied' | 'na'
 function deriveDependencyHealth(id){
@@ -2668,83 +2601,12 @@ function renderActionsTables(){
    (Digital Twin Sharing Session 12 Aug 2026, DayOne Weekly Meeting 14 Aug 2026).
    Nothing here writes to TASKS directly — every field change flows through
    approveProposal() so raw project data only ever changes via human approval. */
-const MEETINGS = [
-  {id:'m3', title:'DayOne Weekly Meeting', date:'2026-08-21', summary:'One-Data-Hall historical extraction, TH sensor mapping, and the historical-data insight run are all confirmed done on schedule; Data Point/API alignment continues with its target pushed to 08/28; the Single Data Hall Pilot now moves into validation using the delivered data; cold-aisle thermal analysis shows a healthy SLA margin plus a CRAH setpoint-tuning opportunity to investigate.'},
-  {id:'m2', title:'DayOne Weekly Meeting', date:'2026-08-14', summary:'Digital Twin calibration takes priority over AI control; historical data can be provided in batches; BMS/PMS API and control points still to be aligned'},
-  {id:'m1', title:'Digital Twin Sharing Session', date:'2026-08-12', summary:'Cooling topology, BMS data sharing, and the calibration path: Recommendation → Human Monitoring → Auto-Control'},
-];
-let currentMeetingId = MEETINGS[0].id;
+let MEETINGS = [];
+let currentMeetingId = null;   // set by initProgram() once the meetings have arrived
 
-const PROPOSALS = [
-  {id:'p1', meetingId:'m2', entityType:'task', entityId:'03', field:'progress', oldValue:20, newValue:50, confidence:'confirmed',
-   evidence:'Justin has already shared approximately half of the historical data for the first Data Hall, allowing RDA to begin calibration.',
-   reason:'The minutes state historical data is already ~50% shared — grounds for raising Historical BMS Data\'s completion progress.', status:'pending'},
-  {id:'p2', meetingId:'m2', entityType:'task', entityId:'03', field:'next', oldValue:'Continue providing remaining historical data (Justin, target 21 Aug)', newValue:'Provide remaining historical data for the first Data Hall (Justin, target 21 Aug)', confidence:'confirmed',
-   evidence:'Provide the remaining historical data for the first Data Hall — Justin — In Progress — Target: 21 Aug 2026',
-   reason:'The Next Actions table names the owner and target date explicitly.', status:'pending'},
-  {id:'p3', meetingId:'m2', entityType:'action', entityId:'05', newValue:{title:'Start calibration for the first Data Hall (using available historical data)', owner:'Mingchen / Valdy', status:'Ready to Start', due:'08/17', priority:'high'}, confidence:'confirmed',
-   evidence:'Start calibration for the first Data Hall using the available historical data — Mingchen / Valdy — 🟡 Ready to Start — 17 Aug 2026',
-   reason:'A concrete Next Actions item that directly unblocks the Single Data Hall Pilot.', status:'pending'},
-  {id:'p4', meetingId:'m2', entityType:'action', entityId:'03', newValue:{title:'Verify T/H sensor locations against the Data Hall layout', owner:'Mingchen / Valdy', status:'In Progress', due:'08/18', priority:'medium'}, confidence:'confirmed',
-   evidence:'Verify the exact T/H sensor locations against the Data Hall layout — Mingchen / Valdy (Justin to support) — 🟡 In Progress — 18 Aug 2026',
-   reason:'A concrete Next Actions item for calibration and safety validation.', status:'pending'},
-  {id:'p5', meetingId:'m2', entityType:'task', entityId:'06', field:'next', oldValue:'Use confirmed topology and available BMS data to prepare for fine-tuning and calibration', newValue:'Sync calibration prep with T/H sensor-location verification once complete', confidence:'inferred',
-   evidence:'RDA needs to verify the exact location of each T/H sensor in the Data Hall layout for calibration and safety validation.',
-   reason:'The minutes don\'t name Model Calibration Prep directly, but sensor-location verification is clearly related — marked as inferred, not confirmed.', status:'pending'},
-  {id:'p6', meetingId:'m2', entityType:'action', entityId:'02', newValue:{title:'Prepare the required Monitoring / Read / Control Point List', owner:'Mingchen / Valdy', status:'To Prepare', due:'08/18', priority:'medium'}, confidence:'confirmed',
-   evidence:'Prepare the required Monitoring / Read / Control Point List — Mingchen / Valdy — 🟡 To Prepare — 18 Aug 2026',
-   reason:'Preparation item ahead of BMS/PMS API alignment.', status:'pending'},
-  {id:'p7', meetingId:'m2', entityType:'action', entityId:'02', newValue:{title:'Arrange the BMS/PMS Vendor API & Data Point Alignment Meeting', owner:'Istofa', status:'To Schedule', due:'08/20', priority:'medium'}, confidence:'confirmed',
-   evidence:'Arrange the BMS/PMS Vendor API & Data Point Alignment Meeting — Istofa — 🟡 To Schedule — Target: 20 Aug 2026',
-   reason:'A concrete Next Actions item.', status:'pending'},
-  {id:'p8', meetingId:'m2', entityType:'action', entityId:'02', newValue:{title:'Align read/write point requirements with the BMS/PMS vendors', owner:'Anurag / Istofa', status:'In Progress', due:'08/21', priority:'medium'}, confidence:'confirmed',
-   evidence:'Align API requirements and required read/write points with the BMS/PMS vendors — Anurag / Istofa — 🟡 In Progress — Target: 21 Aug 2026',
-   reason:'A concrete Next Actions item.', status:'pending'},
-  {id:'p9', meetingId:'m1', entityType:'task', entityId:'03', field:'calibrationTarget', oldValue:null, newValue:null, confidence:'unknown',
-   evidence:'A lower error range was discussed during the meeting, but no formal acceptance threshold was agreed.',
-   reason:'The minutes explicitly state the calibration accuracy acceptance threshold has not been formally agreed — no number is guessed; marked for confirmation with an auto-created follow-up action.',
-   followupTitle:'Confirm calibration accuracy acceptance threshold', followupOwner:'RDA / DayOne', status:'pending'},
-  {id:'p10', meetingId:'m2', entityType:'action', entityId:'31', newValue:{title:'Align on the Energy Baseline / Benchmark methodology', owner:'Mingchen / Valdy', status:'To Align', due:'08/28', priority:'low'}, confidence:'confirmed',
-   evidence:'Align on the Energy Baseline / Benchmark methodology — Mingchen / Valdy — 🟡 To Align — Target: 28 Aug 2026',
-   reason:'A concrete Next Actions item, related to Baseline Energy Model.', status:'pending'},
+let PROPOSALS = [];
 
-  // --- DayOne Weekly Meeting, 21 Aug 2026 (m3) — extracted from the weekly progress email ---
-  {id:'p11', meetingId:'m3', entityType:'task', entityId:'03', field:'progress', oldValue:50, newValue:70, confidence:'confirmed',
-   evidence:'Weekly Progress — "Historical BMS Data – One Data Hall": Done (Expected Completion 2026/08/21, Justin); "TH Sensor Location": Done; "Insight of Historical Data": Done (RDA ran the model and concluded the insight of the historical data).',
-   reason:'All three prep items behind the first Data Hall\'s historical dataset are now confirmed done — a real jump from the prior 50%.', status:'pending'},
-  {id:'p12', meetingId:'m3', entityType:'task', entityId:'03', field:'due', oldValue:'08/21', newValue:'08/28', confidence:'confirmed',
-   evidence:'Next Week — "Historical BMS Data": Continue historical data extraction and confirm availability of the first usable batch — Expected Completion 2026/08/28, Justin.',
-   reason:'The 08/21 milestone (first Data Hall) was met on time; the team has now set the next target for the remaining extraction.', status:'pending'},
-  {id:'p13', meetingId:'m3', entityType:'task', entityId:'03', field:'ge', oldValue:'2026-08-21', newValue:'2026-08-28', confidence:'confirmed',
-   evidence:'Same Next Week row as above — new target date 2026/08/28.',
-   reason:'Keeps the Roadmap Gantt bar in sync with the updated target date.', status:'pending'},
-  {id:'p14', meetingId:'m3', entityType:'task', entityId:'03', field:'targetOriginal', oldValue:'2026-08-14', newValue:'2026-08-28', confidence:'confirmed',
-   evidence:'The original 08/14 target was already missed once; the 08/21 milestone that replaced it was met on schedule, and the email sets a fresh 08/28 target for what remains.',
-   reason:'Carrying the stale 08/14 date forward would keep flagging this task Overdue even though the interim milestone was delivered on time — resolves the Overdue badge against the new, confirmed date.', status:'pending'},
-  {id:'p15', meetingId:'m3', entityType:'task', entityId:'03', field:'next', oldValue:'Continue providing remaining historical data (Justin, target 21 Aug)', newValue:'Continue full-site historical data extraction and confirm the next usable batch (Justin, target 28 Aug) — one Data Hall dataset already delivered', confidence:'confirmed',
-   evidence:'Next Week — "Historical BMS Data": Continue historical data extraction and confirm availability of the first usable batch — Justin — Expected Completion 2026/08/28.',
-   reason:'Keeps the task description in sync with the newly confirmed target and what has already been delivered.', status:'pending'},
-  {id:'p16', meetingId:'m3', entityType:'task', entityId:'02', field:'due', oldValue:'08/21', newValue:'08/28', confidence:'confirmed',
-   evidence:'Weekly Progress — "Data Point / API": In Progress, Expected Completion TBC, Istofa. Next Week — same item, Expected Completion 2026/08/28, Istofa.',
-   reason:'The team has now committed to a concrete 08/28 date after the completion date was previously unconfirmed (TBC).', status:'pending'},
-  {id:'p17', meetingId:'m3', entityType:'task', entityId:'02', field:'next', oldValue:'Complete remaining API endpoint integration', newValue:'Istofa Rifqy to follow up with the PMS/BMS contractor to expose the required API data points for live RDA connectivity (target 08/28)', confidence:'confirmed',
-   evidence:'Next Steps: "@Istofa Rifqy will follow up on the Data Point API." / "Follow up with the PMS/BMS contractor to expose the required API data points for future live data connectivity to RDA."',
-   reason:'Names the explicit owner and next step directly from the meeting email.', status:'pending'},
-  {id:'p18', meetingId:'m3', entityType:'task', entityId:'05', field:'due', oldValue:'08/20', newValue:'08/28', confidence:'confirmed',
-   evidence:'Next Week — "Single Data Hall Pilot": Select one Data Hall as the first validation scope and verify data and simulation logic before scaling to the full site — Expected Completion 2026/08/28, RDA.',
-   reason:'The pilot can now proceed since its input (the first Data Hall historical dataset) is confirmed delivered; the team has set 08/28 as the validation target.', status:'pending'},
-  {id:'p19', meetingId:'m3', entityType:'task', entityId:'05', field:'targetOriginal', oldValue:'2026-08-17', newValue:'2026-08-28', confidence:'confirmed',
-   evidence:'Next Steps: "By using the historical data, RDA will verify and simulate the logic for one data hall as a pilot." Next Week row target: 2026/08/28.',
-   reason:'Resolves the Overdue flag now that a new, confirmed target has been set and the blocking historical-data dependency has been delivered.', status:'pending'},
-  {id:'p20', meetingId:'m3', entityType:'action', entityId:'06', newValue:{title:'Assess how safely CRAH setpoints can be adjusted per cold-aisle row (Aisle 5 runs cooler; middle rows peak hottest)', owner:'RDA', status:'To Assess', due:'TBC', priority:'medium'}, confidence:'confirmed',
-   evidence:'"Different cold aisle rows respond differently to CRAH supply-air changes. Further analysis will assess how safely CRAH setpoints can be adjusted." Cold aisle max recorded 22.4°C, a 1.6°C margin against the 24°C SLA ceiling; Cold Aisle 5 runs consistently cooler — an optimization opportunity.',
-   reason:'A concrete follow-up analysis raised in the meeting email, closest to the calibration/optimization work already tracked under Model Calibration Prep.', status:'pending'},
-];
-
-const CHANGELOG = [
-  {date:'2026-08-14', text:'<b>03 Historical BMS Data</b> missed its original 08/14 target date; latest forecast has slipped to 08/21 (source: DayOne Weekly Meeting).'},
-  {date:'2026-08-12', text:'Confirmed rollout path: <b>Recommendation → Human Monitoring / Validation → Auto-Control</b> (source: Digital Twin Sharing Session).'},
-];
+let CHANGELOG = [];
 
 function fieldLabel(f){ return {progress:'Progress',next:'Next Step',status:'Status',due:'Target Date',health:'Health',calibrationTarget:'Calibration Accuracy Acceptance Threshold',targetOriginal:'Original Target Date',ge:'Gantt End Date'}[f] || f; }
 /* Returns HTML (the "pending" span is markup), so a caller cannot escape the result — values
@@ -3000,26 +2862,7 @@ try{ LUNA_ENDPOINT = localStorage.getItem('dc_luna_endpoint') || LUNA_ENDPOINT_D
 // Extraction-only vocabulary: how each task tends to be *named in the minutes*, which is rarely
 // the exact task title. Kept beside the extractor rather than on TASKS[] because this is parser
 // tuning, not program data.
-const TASK_ALIASES = {
-  '00': ['vpn','vm access','virtual machine','虚拟机'],
-  '01': ['technical alignment','alignment session','alignment meeting','技术对齐'],
-  '02': ['data point','api integration','api data point','bms/pms api','pms/bms','data point api','数据点','api 集成'],
-  '03': ['historical bms data','historical data','historical extraction','bms data','历史数据','历史 bms'],
-  '04': ['digital twin framework','twin framework','framework component','数字孪生框架'],
-  '05': ['single data hall pilot','data hall pilot','one data hall','first data hall','单机房','试点'],
-  '06': ['model calibration prep','calibration prep','calibration preparation','sensor location','标定准备','模型标定'],
-  '07': ['leakage detection','refrigerant leak','leak detection','泄漏检测'],
-  '08': ['chiller plant model','chiller plant','chiller model','plant geometry','冷机房','冷水机'],
-  '09': ['dcwiz demo','demo preparation','demo script','演示准备'],
-  '31': ['baseline energy model','energy baseline','baseline model','benchmark methodology','能耗基线','基线模型'],
-  '32': ['influxdb','continuous ingestion','data ingestion','持续接入','数据接入'],
-  '10': ['ai optimization training','optimization training','training dataset','ai 优化训练'],
-  '11': ['simulation savings','savings validation','simulation validation','仿真节能','节能验证'],
-  '12': ['safety guardrail','guardrail','safety limit','安全护栏'],
-  '13': ['dcverse','dcwiz integration','full-stack deployment','集成部署'],
-  '14': ['human-in-the-loop','human in the loop','operator follow','人机协同'],
-  '15': ['telemetry','what-if','what if analysis','遥测','假设分析'],
-};
+let TASK_ALIASES = {};
 const KNOWN_OWNERS = ['Hong Qing','Mingchen','Anurag','Istofa','Justin','Valdy','Selena','Sherry','RDA Modelling Team','RDA','DayOne'];
 
 function _mx(s){ return (s||'').replace(/\s+/g,' ').trim(); }
@@ -3688,7 +3531,7 @@ document.getElementById('snapHintOff').addEventListener('click', e => {
    Storage is per-browser and per-file. Someone else opening the same file sees the original data,
    which is the right default for a file that gets emailed around. */
 const STATE_KEY = 'dc_state_v1';
-const TASK_BASELINE = {}; TASKS.forEach(t=>{ TASK_BASELINE[t.id] = Object.assign({}, t); });
+const TASK_BASELINE = {};     // filled by initProgram()
 let _stateWarned = false;
 
 function _taskOverrides(){
@@ -3755,13 +3598,36 @@ function render(){
   if(typeof applyDataSources==='function') applyDataSources();
   saveState();
 }
-// Restore the previous session before the first paint, so a refresh keeps imported meetings and
-// review decisions instead of silently reverting to the file's built-in data.
-loadState();
-render();
-renderList();
-buildGantt();
-renderMeetingsPage();
+/* The DayOne program data is no longer in this file — it is served by the agent to people whose
+   role may see the project (GET /api/program/dayone), so an unauthenticated visitor gets a sign-in
+   screen and nothing else. That makes the first paint depend on the network, so everything that
+   used to run here now runs in initProgram(), called from onSignedIn(). */
+function initProgram(data){
+  PHASES = data.PHASES || []; TASKS = data.TASKS || []; MILESTONE = data.MILESTONE || {};
+  EDGES = data.EDGES || []; TASK_ALIASES = data.TASK_ALIASES || {};
+  CHANGELOG = data.CHANGELOG || []; MEETINGS = data.MEETINGS || []; PROPOSALS = data.PROPOSALS || [];
+
+  // Derived indexes: rebuilt from scratch, never patched, so a re-init cannot leave stale rows.
+  for (const k of Object.keys(PHASES_BY_MONTH)) delete PHASES_BY_MONTH[k];
+  PHASES.forEach(p=>{ PHASES_BY_MONTH[p.month]=p; });
+  for (const k of Object.keys(TASKS_BY_ID)) delete TASKS_BY_ID[k];
+  TASKS.forEach(t=>{ TASKS_BY_ID[t.id]=t; });
+  // The baseline is what "Restore original plan" and the state diff compare against, so it has to
+  // be a copy taken before any local override is applied.
+  for (const k of Object.keys(TASK_BASELINE)) delete TASK_BASELINE[k];
+  TASKS.forEach(t=>{ TASK_BASELINE[t.id] = Object.assign({}, t); });
+
+  // Restore this browser's session (imported meetings, review decisions) on top of the server's
+  // data — same order as before, just later.
+  currentMeetingId = (MEETINGS[0] || {}).id || null;
+
+  loadState();
+  render();
+  renderList();
+  buildGantt();
+  renderMeetingsPage();
+  applyDataSources();   // reads PROPOSALS, so it waits for them too
+}
 
 /* ===================== i18n: static HTML switch + language toggle ===================== */
 // Walks every element marked with data-i18n-en/zh (added by a build-time pass over the
@@ -4582,6 +4448,14 @@ async function authLogin(ev){
   btn.disabled = false;
 }
 async function onSignedIn(){
+  // The program data gates every DayOne page, so a failure here is fatal to them: say so and stay
+  // on the sign-in screen rather than rendering a convincingly empty plan.
+  try{
+    initProgram(await pmcApi('GET','/api/program/dayone'));
+  }catch(e){
+    if(e.status === 403){ initProgram({}); }   // their role cannot see DayOne; other pages still work
+    else { PMC.me = null; return showGate(T(`Could not load the program data: ${e.message}`, `无法加载项目数据: ${e.message}`)); }
+  }
   try{ pfLoad(await pmcApi('GET','/api/portfolio')); }catch(e){ showToast(T('Could not load the portfolio','无法加载项目组合'), e.message); }
   AUTH_READY = true;
   applyProjectScope(PMC.me.perms);
@@ -5362,7 +5236,6 @@ function dsActionTag(a){
 renderPortfolio();
 goPage('portfolio');
 authBoot();
-applyDataSources();
 
 </script>
 </body>
