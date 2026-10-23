@@ -1,13 +1,16 @@
 /* PM Copilot agent HTTP API + dashboard host. No framework; every route below is the whole surface.
 
+   Identity is the AI-factory Product Center's (productcenter.js): its JWT is the bearer token
+   here, and passwords are never seen by this server. Roles & Access maps its roles onto this
+   dashboard's own permissions.
+
    Public
    GET  /                                   the dashboard (docs/DayOne_NTPE_Program_Kanban_EN.html)
    GET  /api/health                         config status (no secrets)
-   POST /api/login {username,password}      → {token, user}
+   POST /api/login {username,password}      → {token, user}   (proxied to Product Center)
    Signed in
    POST /api/logout
    GET  /api/me                             user + effective permissions
-   POST /api/me/password {current,password} change your own password (required after an admin sets one)
    GET  /api/portfolio                      portfolio data, filtered to the role's projects
    GET  /api/suggestions?status=            page: todo      (only projects the user may see)
    GET  /api/meetings, /api/meetings/:id    page: history
@@ -21,13 +24,11 @@
    POST /api/plan/:project/proposals/decide {sig, decision, proposal, taskId, field, value}  action: edit_plan
    POST /api/plan/:project/proposals/withdraw {sig}            action: edit_plan
    POST /api/jira/sync                      run the Jira read sync now                    action: edit_plan
-   Users & Roles (page: users)
+   Roles & Access (page: users)
    GET  /api/admin/catalog                  pages, actions, projects that roles can grant
-   GET  /api/admin/users | POST /api/admin/users
-   POST /api/admin/users/:id                {roles, displayName, email, disabled}
-   POST /api/admin/users/:id/password       {password}
-   POST /api/admin/users/:id/delete
-   GET  /api/admin/roles | POST /api/admin/roles   {roles:[...]} replaces the matrix */
+   GET  /api/admin/roles  | POST /api/admin/roles   {roles:[...]} replaces the matrix
+   GET  /api/admin/access | POST /api/admin/access  {byRole,byUser} Product Center -> these roles
+   Accounts themselves are added, disabled and reset in the Product Center, not here. */
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -90,6 +91,7 @@ async function route(req, res, user) {
   if (req.method === 'GET' && p === '/api/health') {
     const db = store.load();
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
+      signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url },
       jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), lastGranolaSync: db.sync.lastGranolaSync,
       lastJiraSync: db.sync.lastJiraSync ? { at: db.sync.lastJiraSync.at, ok: db.sync.lastJiraSync.ok, error: db.sync.lastJiraSync.error || null } : null,
       nextJiraSync: db.sync.nextJiraSync || null });
@@ -97,21 +99,20 @@ async function route(req, res, user) {
   if (req.method === 'POST' && p === '/api/login') {
     const body = await readBody(req);
     const fail = throttle(`${String(body.username || '').toLowerCase()}|${req.socket.remoteAddress}`);
-    try { const r = auth.login(body.username, body.password); store.audit(r.user.displayName, 'login', r.user.id); store.save(); return send(res, 200, r); }
-    catch (e) { fail(); throw e; }
+    try { const r = await auth.login(body.username, body.password); store.audit(r.user.displayName, 'login', r.user.id); store.save(); return send(res, 200, r); }
+    catch (e) {
+      // Only a rejected credential counts against the throttle. A Product Center outage (503) or
+      // a person with no access yet (403) is not a guess, and locking them out would hide the
+      // real problem behind a second, wrong one.
+      if (e.status === 401) fail();
+      throw e;
+    }
   }
 
   signedIn(user);
   const db = store.load();
   if (req.method === 'POST' && p === '/api/logout') { auth.logout(user.token); return send(res, 200, { ok: true }); }
   if (req.method === 'GET' && p === '/api/me') { const { token, ...u } = user; return send(res, 200, u); }
-  if (req.method === 'POST' && p === '/api/me/password') {
-    const body = await readBody(req);
-    const r = auth.changeOwnPassword(user.id, body.current, body.password);
-    store.audit(user.name, 'password-change', user.id); store.save();
-    return send(res, 200, r);
-  }
-  if (user.mustChangePassword) throw err(403, 'Set a new password first');
 
   if (req.method === 'GET' && p === '/api/portfolio') {
     // Each role receives only its projects. Without the Portfolio page you get the project list
@@ -160,8 +161,16 @@ async function route(req, res, user) {
     return send(res, 200, out);
   }
   if (req.method === 'GET' && p === '/api/admin/catalog') { page(user, 'users'); return send(res, 200, { pages: P.PAGES, actions: P.ACTIONS, projects: P.PROJECTS }); }
-  if (req.method === 'GET' && p === '/api/admin/users') { page(user, 'users'); return send(res, 200, { users: auth.users() }); }
   if (req.method === 'GET' && p === '/api/admin/roles') { page(user, 'users'); return send(res, 200, { roles: auth.roles() }); }
+  if (req.method === 'GET' && p === '/api/admin/access') {
+    page(user, 'users');
+    // Every Product Center role we know of: its own dictionary, plus anything already mapped (so a
+    // role it has since renamed or dropped still shows, rather than vanishing with its mapping).
+    const a = auth.access();
+    const names = Object.assign({}, user.pcRoleNames || {});
+    for (const k of Object.keys(a.byRole)) if (!(k in names)) names[k] = k;
+    return send(res, 200, { access: a, pcRoles: names, signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url } });
+  }
 
   if (req.method !== 'POST') throw err(404, 'Not found');
   const body = await readBody(req);
@@ -169,11 +178,13 @@ async function route(req, res, user) {
   if (p.startsWith('/api/admin/')) {
     page(user, 'users');
     const log = (a, t, d) => { store.audit(user.name, a, t, d); store.save(); };
-    if (p === '/api/admin/users') { const u = auth.createUser(body); log('user-create', u.id, `${u.username} · ${u.roles.join(',')}`); return send(res, 200, u); }
     if (p === '/api/admin/roles') { const r = auth.saveRoles(body.roles || []); log('roles-save', 'roles', r.map(x => x.name).join(', ')); return send(res, 200, { roles: r }); }
-    if ((m = p.match(/^\/api\/admin\/users\/([\w-]+)\/password$/))) { auth.setPassword(m[1], body.password); log('user-password', m[1]); return send(res, 200, { ok: true }); }
-    if ((m = p.match(/^\/api\/admin\/users\/([\w-]+)\/delete$/))) { auth.deleteUser(m[1], user.id); log('user-delete', m[1]); return send(res, 200, { ok: true }); }
-    if ((m = p.match(/^\/api\/admin\/users\/([\w-]+)$/))) { const u = auth.updateUser(m[1], body, user.id); log('user-update', u.id, `${u.username} · ${u.roles.join(',')}`); return send(res, 200, u); }
+    if (p === '/api/admin/access') {
+      const a = auth.saveAccess(body);
+      const n = Object.keys(a.byUser).length;
+      log('access-save', 'access', Object.entries(a.byRole).map(([k, v]) => `${k}→${v.join('/') || '—'}`).join(', ') + (n ? ` · ${n} named` : ''));
+      return send(res, 200, { access: a });
+    }
     throw err(404, 'Not found');
   }
 
@@ -233,15 +244,15 @@ async function route(req, res, user) {
 const server = http.createServer(async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-  try { await route(req, res, auth.whoIs(req)); }
+  try { await route(req, res, await auth.whoIs(req)); }
   catch (e) { if (!e.status) console.error(e); if (!res.headersSent) send(res, e.status || 500, { error: e.message }); }
 });
 
 if (require.main === module) {
-  const first = auth.bootstrap();
+  auth.roles(); auth.access();   // write the default matrix and mapping on first start
   server.listen(cfg.port, () => {
     console.log(`PM Copilot agent on :${cfg.port} · dashboard at / · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
-    if (first) console.log(`\nFirst start: created ${first.created.map(c => c[0]).join(', ')}.\nTemporary passwords are in ${first.file} — hand them out privately, then delete the file.\n`);
+    console.log(`Sign-in: ${cfg.productCenter.label} at ${cfg.productCenter.url} — accounts and passwords live there`);
     const nj = jirasync.schedule();
     console.log(nj ? `Jira sync: next run ${nj.toISOString()} (Mon–Fri 24:00 SGT)${jira.hasCreds() ? '' : ' — needs JIRA_EMAIL and JIRA_API_TOKEN'}` : 'Jira sync: off');
     if (granola.configured() && cfg.granola.syncMinutes > 0) {

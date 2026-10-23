@@ -27,15 +27,14 @@ Granola notes ──► PM Copilot agent ──► Claude (summary + suggestions
 
 ```bash
 cd pm-copilot-agent
-cp .env.example .env        # fill in the keys below, incl. SEED_ADMINS
+cp .env.example .env        # fill in the keys below
 npm start                   # dashboard + API on http://<host>:8790
 ```
 
-Node 18+, no npm dependencies. On first start each address in `SEED_ADMINS` gets its own Super
-Admin account; temporary passwords are written to `data/initial-passwords.txt` (hand them out,
-then delete the file). Everyone sets a new password at first sign-in. Super Admins add everyone
-else on **Users & Roles**. (If the dashboard is still served from another port, put the agent address
-under **Server address** on the sign-in screen and add that origin to `ALLOWED_ORIGINS`.)
+Node 18+, no npm dependencies. Sign in with your **AI-factory Product Center** account — this
+agent stores no passwords and creates no accounts (see below). On first start it writes the
+default role matrix and access mapping to `data/`; a Product Center admin lands on **Roles &
+Access** and maps everyone else from there.
 
 | `.env` | Where to get it |
 |---|---|
@@ -43,23 +42,53 @@ under **Server address** on the sign-in screen and add that origin to `ALLOWED_O
 | `GRANOLA_API_KEY` | Granola desktop → Settings → Connectors → API keys (Business/Enterprise plan). Optional `GRANOLA_FOLDER_ID` limits it to one folder. |
 | `JIRA_EMAIL`, `JIRA_API_TOKEN` | A Jira service account and an API token from id.atlassian.com → Security → API tokens. Needs browse, comment, edit and create in `BA`. |
 | `JIRA_DRY_RUN` | Starts as `true`: approvals are recorded and the exact Jira request is shown, but nothing is sent. Set `false` once you have checked a few. |
-| `SEED_ADMINS` | Emails that become Super Admins on first start, e.g. `selena.zhang@rda.ai,wenqian.yuan@rda.ai,zhaomeng.zhu@rda.ai`. Give admin rights to named people rather than sharing one login, so the decision log shows who did what. |
-| `ADMIN_PASSWORD` | Only if `SEED_ADMINS` is empty: password for a single `admin` account. |
+| `PRODUCT_CENTER_URL` | Where sign-in goes. Origin only. Default `http://127.0.0.1` — the Product Center's own nginx on this VM, which a host process reaches without joining `ai-factory-net`. |
+| `PRODUCT_CENTER_CACHE_SECONDS` | How long a verified token is trusted before re-checking (default 60). It is also how long someone keeps access here after being disabled there. |
 | `ALLOWED_ORIGINS` | Other origins allowed to call the API, if the dashboard is not served by the agent. |
 
-## Users, roles and permissions
+## Sign-in, roles and permissions
 
-Everything sits behind sign-in. A role grants three things; a user with several roles gets the union.
+Everything sits behind sign-in, and sign-in is the **AI-factory Product Center's** — the same
+account people use at `ai-factory.demo.rda.ai`. One account, one password, one place to revoke it.
+
+The split is deliberate:
+
+| | Where | What it answers |
+|---|---|---|
+| **Authentication** | Product Center (`productcenter.js`) | *Who is this?* |
+| **Authorization** | here (`permissions.js`, Roles & Access) | *What may they do in this dashboard?* |
+
+This agent holds **no passwords, no accounts and no sessions**. It passes the credentials
+straight through to Product Center and then verifies the JWT that comes back by asking Product
+Center (`GET /api/me`), rather than keeping a copy of its signing secret: nothing to rotate in
+two places, and a disabled account stops working here within `PRODUCT_CENTER_CACHE_SECONDS`.
+Add, disable and reset people **in the Product Center**.
+
+What a Product Center identity may do here comes from the mapping on **Roles & Access**:
+
+| Product Center role | Gets here, by default |
+|---|---|
+| `admin` | Super Admin |
+| `operator` (Engineering) | RDA Manager |
+| `viewer` (Solution) | RDA Member |
+| `ntu`, `customer` | nothing until granted |
+
+`customer` grants nothing on purpose: Product Center has a single customer role and cannot say
+*which* client, so each client contact is named individually under **Named people**, which
+overrides their role. Someone who maps to nothing is told so at sign-in instead of being shown
+an empty dashboard. From the command line: `npm run grant -- <email|role:NAME> <role,role>`.
+
+A role grants three things; a user with several roles gets the union.
 
 | Grant | Meaning | Enforced |
 |---|---|---|
-| **Pages** | Which menu entries show: Portfolio, Meeting To-dos, Meeting History, the DayOne project pages, Users & Roles | API routes check the page (`todo` → suggestions, `history` → meetings and audit, `users` → admin routes) |
+| **Pages** | Which menu entries show: Portfolio, Meeting To-dos, Meeting History, the DayOne project pages, Roles & Access | API routes check the page (`todo` → suggestions, `history` → meetings and audit, `users` → admin routes) |
 | **Can do** | `approve` — approve, edit, reject to-dos (writes to Jira) · `ingest` — sync Granola, import, re-analyse · `edit_plan` — edit the DayOne Gantt (title, dates, target date, owner, status, progress, next step, milestone) | every write route |
 | **Projects** | Whose data the role sees, or all projects | suggestions, meetings and the decision log are filtered per project; full meeting notes only for all-projects roles |
 
 Starting roles:
 
-| Role | Sees | Approves to Jira | Edits the plan (Gantt) | Users & Roles |
+| Role | Sees | Approves to Jira | Edits the plan (Gantt) | Roles & Access |
 |---|---|---|---|---|
 | **Super Admin** (locked) | everything | yes | yes | yes |
 | **RDA Manager** | every page and project | yes | yes | no |
@@ -67,25 +96,18 @@ Starting roles:
 | **Customer · DayOne** | DayOne overview and roadmap only | no | no | no |
 
 Add a `Customer · <client>` role per client as their project views are built.
-Edit them on Users & Roles → *Role → what it can see and do* and click **Save**.
+Edit them on Roles & Access → *Role → what it can see and do* and click **Save**.
 
-Passwords are scrypt-hashed; sessions are random tokens stored as hashes and last 7 days.
-Changing someone's password or disabling them signs them out everywhere. Eight wrong passwords
-in 15 minutes locks that username from that address for 15 minutes. You cannot delete yourself or
-remove the last person who can manage users. Files: `data/users.json`, `data/roles.json`,
-`data/sessions.json` (git-ignored).
-
-`npm run add-user -- <username> <password> [role,role] ["Display name"] [email]` adds a user from
-the command line (for scripts or recovery).
+Password rules, lockouts and session lifetime are the Product Center's. Here, eight rejected
+sign-ins per username+address in 15 minutes are throttled (an unreachable Product Center is not
+counted, so an outage cannot lock people out), and the mapping refuses to save if it would leave
+nobody with access to Roles & Access. Files: `data/roles.json`, `data/access.json` (git-ignored).
 
 Portfolio data (`data/portfolio.json`) is served by `/api/portfolio` and filtered per role, so it
 is not in the HTML at all. **Remaining limit:** the DayOne project view's own data is still baked
 into the HTML file, so anyone who can load the page can read DayOne's program data from its
 source. Move it behind the API before giving accounts to clients other than DayOne, or to anyone
 who should not see DayOne.
-
-Accounts an admin creates, or whose password an admin resets, must set a new password at next
-sign-in. People change their own password from the header.
 
 ## Editing the plan
 
@@ -134,7 +156,8 @@ src/granola.js   Granola public API (list + get note with transcript)
 src/claude.js    Prompt, tool schema and guard rails for one meeting
 src/jira.js      Open-ticket read (live or data/jira.snapshot.json) and approved writes
 src/agent.js     ingest → analyse → store; approve / reject / edit
-src/auth.js      users, password login, sessions, roles
+src/productcenter.js  sign-in and token checks against the AI-factory Product Center
+src/auth.js      role matrix, Product Center identity -> roles here, who-is-calling
 src/permissions.js  the pages / actions / projects a role can grant, and the starting roles
 src/jirasync.js  nightly Jira → DayOne plan + portfolio sync, and its schedule
 src/plan.js      Gantt edits per project, with validation and history
@@ -147,4 +170,8 @@ src/server.js    HTTP routes
 - Status transitions are posted as comments; moving a ticket's workflow status needs the BA
   workflow's transition ids.
 - An approved write to Jira cannot be withdrawn from the dashboard; fix it in Jira.
-- Sign-in is username + password. Swap `auth.js` for SSO (Microsoft Entra) when needed.
+- The dashboard's own HTML still carries DayOne's program data (see the note above), so anyone who
+  can load the page can read it. Move it behind `/api/` before giving accounts to clients other
+  than DayOne.
+- Product Center is asked to verify each token, cached for a minute. If that ever shows up as
+  latency, verifying its JWT locally is the alternative — at the cost of sharing its signing secret.

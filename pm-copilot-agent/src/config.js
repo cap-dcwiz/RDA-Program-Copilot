@@ -55,6 +55,18 @@ module.exports = {
     dayoneJql: env('DAYONE_JQL', 'project = BA AND (parent = BA-2380 OR summary ~ "DayOne-NTPE") ORDER BY key ASC'),
   },
   CLIENT_OPTIONS,
+  /* Sign-in is delegated to the AI-factory Product Center; this agent never stores a password.
+     Default is the Product Center's own nginx on this VM's port 80, which proxies /api/ to it —
+     reachable from a host process without joining ai-factory-net. Note it is the ORIGIN only:
+     /api/login and /api/me are appended. */
+  productCenter: {
+    url: env('PRODUCT_CENTER_URL', 'http://127.0.0.1').replace(/\/$/, ''),
+    // How long a verified token is trusted before Product Center is asked again. Short, because
+    // it is also how long someone stays signed in here after being disabled there.
+    cacheSeconds: Number(env('PRODUCT_CENTER_CACHE_SECONDS', '60')),
+    // Shown on the sign-in screen so people know which account to use.
+    label: env('PRODUCT_CENTER_LABEL', 'AI-factory Product Center'),
+  },
   port: Number(env('PORT', '8790')),
   allowedOrigins: env('ALLOWED_ORIGINS', '*').split(',').map(s => s.trim()).filter(Boolean),
 };

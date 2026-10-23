@@ -27,3 +27,24 @@ assert.ok(e.actions.includes('approve') && e.actions.includes('edit_plan') && !e
 e = P.effective(roles, ['rda-member', 'customer-dayone']); assert.deepEqual(e.projects, ['*']);
 e = P.effective(roles, ['admin']); assert.ok(e.pages.includes('users') && e.actions.includes('approve'));
 console.log('permissions ok');
+
+/* ---- Product Center identity -> this dashboard's roles ---- */
+const acc = P.DEFAULT_ACCESS;
+const map = (id) => P.rolesFor(acc, id, roles);
+assert.deepEqual(map({ username: 'a', email: 'a@rda.ai', pcRoles: ['admin'] }), ['admin']);
+assert.deepEqual(map({ username: 'b', email: 'b@rda.ai', pcRoles: ['operator'] }), ['rda-manager']);
+assert.deepEqual(map({ username: 'c', email: 'c@rda.ai', pcRoles: ['viewer'] }), ['rda-member']);
+// A Product Center role nobody has mapped grants nothing here — never a default to all projects.
+assert.deepEqual(map({ username: 'd', email: 'd@client.com', pcRoles: ['customer'] }), []);
+assert.deepEqual(map({ username: 'e', email: 'e@rda.ai', pcRoles: ['nonexistent'] }), []);
+// Several Product Center roles union, as roles do everywhere else.
+assert.deepEqual(map({ username: 'f', email: 'f@rda.ai', pcRoles: ['operator', 'viewer'] }).sort(), ['rda-manager', 'rda-member']);
+// Naming a person overrides their role, and is matched case-insensitively on email or username.
+const pinned = { byRole: acc.byRole, byUser: { 'd@client.com': ['customer-dayone'] } };
+assert.deepEqual(P.rolesFor(pinned, { username: 'd', email: 'D@Client.com', pcRoles: ['customer'] }, roles), ['customer-dayone']);
+// An override naming a role this dashboard does not have must not leak through.
+assert.deepEqual(P.rolesFor({ byRole: {}, byUser: { 'x@rda.ai': ['no-such-role'] } }, { username: 'x', email: 'x@rda.ai', pcRoles: [] }, roles), []);
+// A customer pinned to one project stays confined to it.
+assert.deepEqual(P.effective(roles, map({ username: 'g', email: 'g@rda.ai', pcRoles: ['viewer'] })).projects, ['*']);
+assert.deepEqual(P.effective(roles, ['customer-dayone']).projects, ['dayone']);
+console.log('product-center role mapping ok');

@@ -1,6 +1,12 @@
-/* Permission catalog — the single list the server enforces and the Users & Roles page renders.
+/* Permission catalog — the single list the server enforces and the Access page renders.
    A role grants: pages (what shows in the menu), actions (what it may change), projects (whose
-   data it may see; '*' = all). A user with several roles gets the union. */
+   data it may see; '*' = all). A user with several roles gets the union.
+
+   Who someone *is* comes from the AI-factory Product Center (productcenter.js). What they may do
+   here is decided by the roles below, reached through the mapping at the bottom of this file:
+   Product Center role (or a named person) -> this dashboard's roles. The two role sets are kept
+   apart on purpose, because they answer different questions — Product Center's `operator` says
+   "an RDA engineer", not "may approve a to-do into Jira". */
 const PAGES = [
   { id: 'portfolio',  group: 'all',    en: 'Portfolio',            zh: '项目组合' },
   { id: 'todo',       group: 'all',    en: 'Meeting To-dos',       zh: '会议待办' },
@@ -11,7 +17,7 @@ const PAGES = [
   { id: 'roadmap',    group: 'dayone', en: 'DayOne / Roadmap View',       zh: 'DayOne / 路线图' },
   { id: 'meetings',   group: 'dayone', en: 'DayOne / Meetings',           zh: 'DayOne / 会议' },
   { id: 'luna',       group: 'dayone', en: 'DayOne / Luna Queue',         zh: 'DayOne / Luna 队列' },
-  { id: 'users',      group: 'admin',  en: 'Users & Roles',        zh: '用户与角色' },
+  { id: 'users',      group: 'admin',  en: 'Roles & Access',       zh: '角色与访问' },
 ];
 const ACTIONS = [
   { id: 'approve', en: 'Approve, edit and reject to-dos (writes to Jira)', zh: '审批、编辑、驳回待办(写入 Jira)' },
@@ -38,6 +44,31 @@ const DEFAULT_ROLES = [
   { id: 'customer-dayone', name: 'Customer · DayOne', pages: ['overview', 'roadmap'], actions: [], projects: ['dayone'] },
 ];
 
+/* Product Center role -> this dashboard's roles. `byUser` (username or email) overrides it for
+   one person, which is how a specific customer is pinned: Product Center's single `customer`
+   role cannot say *which* client, so naming the person is the only honest way to decide.
+   Someone who maps to nothing can sign in and is told they have no access yet — deliberately
+   not a silent empty dashboard. */
+const DEFAULT_ACCESS = {
+  byRole: {
+    admin: ['admin'],            // Product Center admins administer this too
+    operator: ['rda-manager'],   // "Engineering" — may approve to-dos into Jira and edit the plan
+    viewer: ['rda-member'],      // "Solution" — sees everything, may bring meetings in
+    ntu: [],                     // external research partner: no program data until asked for
+    customer: [],                // pin each client's people in byUser; see above
+  },
+  byUser: {},
+};
+
+/* Resolve one Product Center identity to this dashboard's role ids. */
+function rolesFor(access, identity, roleList) {
+  const ids = new Set(roleList.map(r => r.id));
+  const byUser = access.byUser || {};
+  const named = byUser[(identity.email || '').toLowerCase()] || byUser[(identity.username || '').toLowerCase()];
+  const from = named || [].concat(...(identity.pcRoles || []).map(r => (access.byRole || {})[r] || []));
+  return [...new Set(from)].filter(x => ids.has(x));
+}
+
 function effective(roles, roleIds) {
   const mine = roles.filter(r => (roleIds || []).includes(r.id));
   const out = { pages: new Set(), actions: new Set(), projects: new Set() };
@@ -51,4 +82,4 @@ function effective(roles, roleIds) {
 
 const canSeeProject = (perms, project) => perms.projects.includes('*') || perms.projects.includes(project);
 
-module.exports = { PAGES, ACTIONS, PROJECTS, DEFAULT_ROLES, effective, canSeeProject };
+module.exports = { PAGES, ACTIONS, PROJECTS, DEFAULT_ROLES, DEFAULT_ACCESS, rolesFor, effective, canSeeProject };

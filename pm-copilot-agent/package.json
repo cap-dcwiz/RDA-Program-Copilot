@@ -1,16 +1,18 @@
 {
   "name": "pm-copilot-agent",
   "version": "0.1.0",
-  "description": "PM Copilot agent: reads meeting notes from Granola, asks Claude for Jira suggestions, and writes them to Jira once an admin approves",
+  "description": "PM Copilot agent: reads meeting notes from Granola, asks Claude for Jira suggestions, and writes them to Jira once an admin approves. Sign-in is the AI-factory Product Center's.",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
-    "add-user": "node scripts/add-user.js",
+    "grant": "node scripts/grant-access.js",
     "sync": "node scripts/sync-once.js",
     "test": "node test/smoke.js"
   },
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "license": "UNLICENSED",
   "private": true
 }

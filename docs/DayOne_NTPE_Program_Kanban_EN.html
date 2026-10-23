@@ -720,7 +720,7 @@ button.project-select{font-family:inherit;}
 .pe-hist div{padding:3px 0;} .pe-hist b{color:var(--text);}
 @media (max-width:600px){ .pe-grid{grid-template-columns:1fr;} }
 
-/* ===== Sign-in gate + Users & Roles ===== */
+/* ===== Sign-in gate + Roles & Access ===== */
 body.gated .app, body.gated .icon-rail{visibility:hidden;}
 body.gated{padding-left:0;}
 .perm-hidden{display:none!important;}
@@ -759,6 +759,9 @@ body.gated{padding-left:0;}
 .ua-del:hover{border-color:rgba(239,68,68,.4);} .ua-del.armed{background:var(--red-bg);border-color:rgba(239,68,68,.5);}
 .ua-add{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
 .ua-add-h{font-size:12.5px;font-weight:800;margin-bottom:8px;}
+.ua-sec-h{font-size:12.5px;font-weight:800;color:var(--text);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.ag-hint{font-size:11.5px;color:var(--text-dimmer);margin:8px 0 0;line-height:1.6;}
+.ag-adv small{display:block;font-size:11px;color:var(--text-dimmer);margin-top:6px;line-height:1.55;}
 .ua-add-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;} .ua-add-row input{width:150px;}
 .rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
 .rc-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;} .rc-actions .btn-primary:disabled{opacity:.5;cursor:default;}
@@ -862,18 +865,16 @@ body.gated{padding-left:0;}
   <form class="ag-card" onsubmit="authLogin(event)" autocomplete="on">
     <div class="ag-brand"><div class="logo">D</div><div><b>Delivery Copilot</b><span>RDA</span></div></div>
     <h1><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></h1>
-    <p><span data-i18n-en="Use the account your admin gave you. What you see depends on your role." data-i18n-zh="请使用管理员为你开通的账号。可见内容取决于你的角色。">Use the account your admin gave you. What you see depends on your role.</span></p>
+    <p><span data-i18n-en="Sign in with your AI-factory Product Center account — the same one you use at ai-factory.demo.rda.ai. What you see here depends on your role." data-i18n-zh="使用你的 AI-factory Product Center 账号登录 — 与 ai-factory.demo.rda.ai 相同。此处可见内容取决于你的角色。">Sign in with your AI-factory Product Center account — the same one you use at ai-factory.demo.rda.ai. What you see here depends on your role.</span></p>
     <label><span data-i18n-en="Username" data-i18n-zh="用户名">Username</span><input id="agUser" name="username" autocomplete="username" required></label>
     <label><span data-i18n-en="Password" data-i18n-zh="密码">Password</span><input id="agPass" name="password" type="password" autocomplete="current-password" required></label>
     <div class="ag-err" id="agErr" role="alert" hidden></div>
     <button class="btn-primary" id="agBtn" type="submit"><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></button>
-    <div class="ag-pw" id="agPwBox" hidden>
-      <p><span data-i18n-en="Set a new password before you continue (at least 8 characters)." data-i18n-zh="继续前请设置新密码(至少 8 位)。">Set a new password before you continue (at least 8 characters).</span></p>
-      <label><span data-i18n-en="New password" data-i18n-zh="新密码">New password</span><input id="agNew1" type="password" autocomplete="new-password"></label>
-      <label><span data-i18n-en="Repeat new password" data-i18n-zh="再次输入新密码">Repeat new password</span><input id="agNew2" type="password" autocomplete="new-password"></label>
-      <button class="btn-primary" type="button" onclick="authChangePassword()"><span data-i18n-en="Save password" data-i18n-zh="保存密码">Save password</span></button>
-    </div>
-    <details class="ag-adv"><summary><span data-i18n-en="Server address" data-i18n-zh="服务器地址">Server address</span></summary><input id="agUrl" placeholder="http://host:8790"></details>
+    <p class="ag-hint"><span data-i18n-en="Forgot your password, or need an account? Both are managed in the Product Center, not here." data-i18n-zh="忘记密码或需要开通账号?请在 Product Center 处理,本页不管理账号。">Forgot your password, or need an account? Both are managed in the Product Center, not here.</span></p>
+    <details class="ag-adv"><summary><span data-i18n-en="Server address" data-i18n-zh="服务器地址">Server address</span></summary>
+      <input id="agUrl" placeholder="https://ai-factory.demo.rda.ai/DeliveryCopilot">
+      <small data-i18n-en="Normally left alone — it is filled in from this page's own address. Include the /DeliveryCopilot path: the bare domain is the Product Center, not this dashboard." data-i18n-zh="通常无需填写 — 会根据本页地址自动推导。若要填,须带 /DeliveryCopilot 路径:裸域名是 Product Center,不是本看板。">Normally left alone — it is filled in from this page's own address. Include the /DeliveryCopilot path: the bare domain is the Product Center, not this dashboard.</small>
+    </details>
   </form>
 </div>
 <!-- ===== LEFT ICON RAIL (global nav) ===== -->
@@ -889,7 +890,7 @@ body.gated{padding-left:0;}
   <div class="rail-icon" data-page="meetings" title="Meetings" onclick="goPage('meetings')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
   <div class="rail-icon" data-page="luna" title="Luna Queue" onclick="goPage('luna')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="rail-dot" id="railLunaDot"></span></div>
   <div class="rail-spacer"></div>
-  <div class="rail-icon" data-page="users" title="Users &amp; Roles" onclick="goPage('users')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  <div class="rail-icon" data-page="users" title="Roles &amp; Access" onclick="goPage('users')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
   <div class="rail-avatar" id="railAvatar" title="">··</div>
 </div>
 <div class="app">
@@ -944,7 +945,7 @@ body.gated{padding-left:0;}
         <button class="tab active" data-page="portfolio" data-scope="all"><span data-i18n-en="Portfolio" data-i18n-zh="项目组合">Portfolio</span></button>
         <button class="tab" data-page="todo" data-scope="all"><span data-i18n-en="Meeting To-dos" data-i18n-zh="会议待办">Meeting To-dos</span><span id="pmcTodoBadge" class="tab-count" style="display:none"></span></button>
         <button class="tab" data-page="history" data-scope="all"><span data-i18n-en="Meeting History" data-i18n-zh="会议记录">Meeting History</span></button>
-        <button class="tab" data-page="users" data-scope="all"><span data-i18n-en="Users &amp; Roles" data-i18n-zh="用户与角色">Users &amp; Roles</span></button>
+        <button class="tab" data-page="users" data-scope="all"><span data-i18n-en="Roles &amp; Access" data-i18n-zh="角色与访问">Roles &amp; Access</span></button>
         <button class="tab" data-page="overview" data-scope="project"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
         <button class="tab" data-page="blocker" data-scope="project"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
         <button class="tab" data-page="dependency" data-scope="project"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
@@ -1039,8 +1040,8 @@ body.gated{padding-left:0;}
 
   <div class="page" id="page-users">
     <div class="page-head">
-      <h1><span data-i18n-en="Users &amp; Roles" data-i18n-zh="用户与角色">Users &amp; Roles</span></h1>
-      <p><span data-i18n-en="Who can sign in, which pages they see, which projects' data they see, and who may approve to-dos into Jira." data-i18n-zh="谁可以登录、能看到哪些页面和哪些项目的数据,以及谁可以把待办审批写入 Jira。">Who can sign in, which pages they see, which projects' data they see, and who may approve to-dos into Jira.</span></p>
+      <h1><span data-i18n-en="Roles &amp; Access" data-i18n-zh="角色与访问">Roles &amp; Access</span></h1>
+      <p><span data-i18n-en="Sign-in is the AI-factory Product Center's — accounts are added and disabled there. Here you decide which pages and projects each of its roles sees, and who may approve to-dos into Jira." data-i18n-zh="登录由 AI-factory Product Center 负责 — 账号的新增与停用在那里完成。本页决定它的每个角色在此可见哪些页面和项目,以及谁可以把待办审批写入 Jira。">Sign-in is the AI-factory Product Center's — accounts are added and disabled there. Here you decide which pages and projects each of its roles sees, and who may approve to-dos into Jira.</span></p>
     </div>
     <div class="panel" id="uaUsers" style="margin-bottom:18px;"></div>
     <div class="panel" id="uaRoles"></div>
@@ -1808,6 +1809,10 @@ body.gated{padding-left:0;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
+/* Escape anything that came from outside this file — meeting minutes, Jira, the agent's API —
+   before it goes into innerHTML. Declared here, above every renderer that uses it. */
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
 if(typeof pdfjsLib !== 'undefined'){
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
 }
@@ -2742,10 +2747,12 @@ const CHANGELOG = [
 ];
 
 function fieldLabel(f){ return {progress:'Progress',next:'Next Step',status:'Status',due:'Target Date',health:'Health',calibrationTarget:'Calibration Accuracy Acceptance Threshold',targetOriginal:'Original Target Date',ge:'Gantt End Date'}[f] || f; }
+/* Returns HTML (the "pending" span is markup), so a caller cannot escape the result — values
+   coming from meeting minutes are escaped here instead. */
 function formatFieldVal(field, v){
   if(v===null || v===undefined) return `<span style="color:var(--text-dimmer)">${tr('Pending Confirmation')}</span>`;
-  if(field==='progress') return v+'%';
-  return String(v);
+  if(field==='progress') return esc(v)+'%';
+  return esc(v);
 }
 function confBadge(c){
   if(c==='confirmed') return `<span class="conf-badge confirmed">🟢 ${tr('Confirmed')}</span>`;
@@ -3420,11 +3427,11 @@ function renderProposalList(){
     chipsEl.innerHTML = `<span class="badge green">🟢 ${confirmedCount} ${tr('Confirmed')}</span><span class="badge orange">🟡 ${inferredCount} ${tr('Inferred')}</span><span class="badge gray">⚪ ${unknownCount} ${tr('Unknown')}</span><span class="badge violet">${pending.length} ${tr('Pending Review')}</span>`;
   }
   listEl.innerHTML = props.map(p=>{
-    const entityLabel = p.entityType==='task' ? `${p.entityId} ${taskName(TASKS_BY_ID[p.entityId])||''}` : (p.newValue?.title||tr('New action'));
+    const entityLabel = p.entityType==='task' ? esc(`${p.entityId} ${taskName(TASKS_BY_ID[p.entityId])||''}`) : esc(p.newValue?.title||tr('New action'));
     const diffHtml = p.entityType==='task'
       ? `<div class="prop-diff"><span class="old">${formatFieldVal(p.field,p.oldValue)}</span>→<span class="new">${p.confidence==='unknown' ? tr('Pending confirmation (not guessed)') : formatFieldVal(p.field,p.newValue)}</span></div>`
-      : `<div class="prop-diff"><span class="new">${tr('New:')} ${p.newValue.title} (${p.newValue.owner} · ${p.newValue.due||'—'})</span></div>`;
-    const who = p._srv ? ` <span style="font-weight:500;opacity:.8">· ${p._srv.by} · ${typeof fmtDT==='function' ? fmtDT(p._srv.at) : p._srv.at}</span>` : '';
+      : `<div class="prop-diff"><span class="new">${tr('New:')} ${esc(p.newValue.title)} (${esc(p.newValue.owner)} · ${esc(p.newValue.due||'—')})</span></div>`;
+    const who = p._srv ? ` <span style="font-weight:500;opacity:.8">· ${esc(p._srv.by)} · ${esc(typeof fmtDT==='function' ? fmtDT(p._srv.at) : p._srv.at)}</span>` : '';
     const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}${who}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}${who}</span>` : '';
     const actionsHtml = p.status==='pending'
       ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ ${tr('Approve')}</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ ${tr('Reject')}</button></div>`
@@ -3435,8 +3442,8 @@ function renderProposalList(){
         ${confBadge(p.confidence)}
       </div>
       ${diffHtml}
-      <div class="prop-evidence"><b>${tr('Evidence')} (${meeting?meeting.title:''}):</b> "${p.evidence}"</div>
-      <div class="prop-reason">${p.reason}</div>
+      <div class="prop-evidence"><b>${tr('Evidence')} (${esc(meeting?meeting.title:'')}):</b> "${esc(p.evidence)}"</div>
+      <div class="prop-reason">${esc(p.reason)}</div>
       ${actionsHtml}
     </div>`;
   }).join('') || emptyProposalState();
@@ -3879,7 +3886,6 @@ const PF_EVENTS_EXTRA = [];   // filled after sign-in from the agent (GET /api/p
 
 /* ---------- helpers ---------- */
 const L = o => (o == null) ? '' : (typeof o === 'string' ? o : ((LANG==='zh' && o.zh) ? o.zh : o.en));
-const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pfDays = (a,b) => Math.round((new Date(b+'T00:00:00+08:00') - new Date(a+'T00:00:00+08:00'))/86400000);
 const PF_TODAY = new Date(Date.now()+8*3600e3).toISOString().slice(0,10);   // today, Singapore
 const ageDays = t => pfDays(t.updated, PF_TODAY);
@@ -4244,10 +4250,20 @@ document.addEventListener('click', e=>{ if(projMenu.classList.contains('open') &
    browser only. Roles are enforced by the agent; the disabled buttons here are a courtesy. */
 const PMC = { url:'', token:'', me:null, health:null, suggestions:[], meetings:[], audit:[], error:null,
   filter:{status:'pending', project:'all', meeting:null}, editing:null, rejecting:null, notes:{}, busy:false };
+/* The agent serves this page, so its API is on the same origin under the same path prefix:
+   https://host/DeliveryCopilot/api/... behind the shared edge, http://host:8790/api/... when the
+   agent is hit directly. Deriving that beats guessing a port — :8790 is not open to the internet,
+   and the bare domain is worse than useless, because there /api/login belongs to the AI-factory
+   Product Center shell, not to this agent: sign-in would silently talk to the wrong service. */
+function pmcDefaultUrl(){
+  if(!location.protocol.startsWith('http')) return 'http://localhost:8790';  // opened as a file://
+  const dir = location.pathname.replace(/\/[^/]*$/, '');                     // drop index.html
+  return location.origin + (dir === '/' ? '' : dir);
+}
 try{
-  PMC.url = localStorage.getItem('dc_pmc_url') || (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:8790` : 'http://localhost:8790');
+  PMC.url = localStorage.getItem('dc_pmc_url') || pmcDefaultUrl();
   PMC.token = localStorage.getItem('dc_pmc_token') || '';
-}catch(e){ PMC.url = 'http://localhost:8790'; }
+}catch(e){ PMC.url = pmcDefaultUrl(); }
 
 async function pmcApi(method, path, body){
   const res = await fetch(PMC.url.replace(/\/$/,'') + path, { method,
@@ -4556,24 +4572,23 @@ async function authLogin(ev){
   const btn = document.getElementById('agBtn'); btn.disabled = true;
   try{
     const r = await pmcApi('POST','/api/login', {username:document.getElementById('agUser').value, password:document.getElementById('agPass').value});
-    PMC.token = r.token; PMC.me = r.user; _pwCurrent = document.getElementById('agPass').value;
+    PMC.token = r.token; PMC.me = r.user;
     try{ localStorage.setItem('dc_pmc_url', PMC.url); localStorage.setItem('dc_pmc_token', PMC.token); }catch(e){}
     document.getElementById('agPass').value = '';
     onSignedIn();
   }catch(e){
-    showGate(e.status ? e.message : T(`Cannot reach the agent at ${PMC.url}. Check the address and that the service is running.`, `无法连接 ${PMC.url},请检查地址和服务是否运行。`));
+    showGate(e.status ? e.message : T(`Cannot reach the dashboard service at ${PMC.url}. Check the address and that the service is running.`, `无法连接 ${PMC.url},请检查地址和服务是否运行。`));
   }
   btn.disabled = false;
 }
 async function onSignedIn(){
-  if(PMC.me.mustChangePassword) return showPwChange();
   try{ pfLoad(await pmcApi('GET','/api/portfolio')); }catch(e){ showToast(T('Could not load the portfolio','无法加载项目组合'), e.message); }
   AUTH_READY = true;
   applyProjectScope(PMC.me.perms);
   applyPagePerms();
   renderUserChip();
   const first = firstAllowedPage();
-  if(!first){ PMC.me = null; return showGate(T('Your account has no pages yet. Ask an admin to give you a role.','你的账号还没有可见页面,请联系管理员分配角色。')); }
+  if(!first){ PMC.me = null; return showGate(T('Your Product Center account has no pages here yet. Ask an admin to grant it a role on Roles & Access.','你的 Product Center 账号在本看板还没有可见页面,请让管理员在「角色与访问」中授予角色。')); }
   document.getElementById('authGate').hidden = true;
   document.body.classList.remove('gated');
   planLoad();
@@ -4582,26 +4597,8 @@ async function onSignedIn(){
   goPage(pageAllowed(cur) ? cur : first);
   pmcRefresh();
 }
-let _pwCurrent = '';
-function showPwChange(){
-  showGate();
-  document.getElementById('agPwBox').hidden = false;
-  ['agUser','agPass','agBtn'].forEach(id=>{ const el = document.getElementById(id); (el.closest('label')||el).hidden = true; });
-  setTimeout(()=>document.getElementById('agNew1').focus(), 50);
-}
-async function authChangePassword(){
-  const a = document.getElementById('agNew1').value, b = document.getElementById('agNew2').value;
-  const e = document.getElementById('agErr');
-  if(a !== b){ e.textContent = T('The two passwords do not match.','两次输入的密码不一致。'); e.hidden = false; return; }
-  try{
-    const r = await pmcApi('POST','/api/me/password', {current:_pwCurrent, password:a});
-    PMC.token = r.token; PMC.me = r.user; _pwCurrent = '';
-    try{ localStorage.setItem('dc_pmc_token', PMC.token); }catch(x){}
-    document.getElementById('agPwBox').hidden = true; e.hidden = true;
-    ['agUser','agPass','agBtn'].forEach(id=>{ const el = document.getElementById(id); (el.closest('label')||el).hidden = false; });
-    onSignedIn();
-  }catch(x){ e.textContent = x.message; e.hidden = false; }
-}
+/* Passwords are the Product Center's business: there is no change-password flow here, and this
+   page never keeps the one that was typed. */
 async function authSignOut(expired){
   if(!expired){ try{ await pmcApi('POST','/api/logout'); }catch(e){} }
   try{ localStorage.removeItem('dc_pmc_token'); }catch(e){}
@@ -4613,63 +4610,79 @@ async function authBoot(){
   try{ PMC.me = await pmcApi('GET','/api/me'); onSignedIn(); }
   catch(e){
     if(e.status===401){ try{ localStorage.removeItem('dc_pmc_token'); }catch(x){} PMC.token=''; return showGate(T('Your session has ended. Please sign in again.','登录已过期,请重新登录。')); }
-    showGate(T(`Cannot reach the agent at ${PMC.url}.`, `无法连接 ${PMC.url}。`));
+    showGate(T(`Cannot reach the dashboard service at ${PMC.url}.`, `无法连接 ${PMC.url}。`));
   }
 }
 
-/* Change your own password: the current one is asked for in the page, never via prompt(). */
+/* The password belongs to the Product Center account, so changing it happens there. Saying so and
+   handing over the link beats a form here that cannot work. */
 function uaSelfPassword(){
-  const chip = document.getElementById('userChip');
-  chip.innerHTML = `<input type="password" id="spCur" placeholder="${T('Current password','当前密码')}" class="sp-in"><input type="password" id="spNew" placeholder="${T('New password (8+)','新密码(8 位以上)')}" class="sp-in">
-    <button class="btn-primary" onclick="uaSelfPasswordSave()">${T('Save','保存')}</button><button class="btn-withdraw" onclick="renderUserChip()">${T('Cancel','取消')}</button>`;
-  document.getElementById('spCur').focus();
-}
-async function uaSelfPasswordSave(){
-  try{
-    const r = await pmcApi('POST','/api/me/password', {current:document.getElementById('spCur').value, password:document.getElementById('spNew').value});
-    PMC.token = r.token; try{ localStorage.setItem('dc_pmc_token', PMC.token); }catch(x){}
-    showToast(T('Password changed','密码已修改'), T('Other sessions were signed out.','其他会话已退出。')); renderUserChip();
-  }catch(e){ showToast(T('Could not change password','无法修改密码'), e.message); }
+  const where = (PMC.health && PMC.health.signIn && PMC.health.signIn.provider) || 'AI-factory Product Center';
+  showToast(T('Your password lives in the Product Center','密码在 Product Center 中管理'),
+    T(`Sign in to ${where} to change it — this dashboard never stores it.`, `请到 ${where} 修改密码 — 本看板不保存密码。`));
 }
 
-/* ---------- Users & Roles page ---------- */
-const UA = { catalog:null, users:[], roles:[], draft:null, dirty:false, armed:null, newRoles:[], renaming:null };
+/* ---------- Roles & Access page ---------- */
+const UA = { catalog:null, roles:[], draft:null, dirty:false, renaming:null,
+  /* Accounts live in the Product Center; what this page owns is the mapping from its identities
+     onto the roles below. */
+  access:{byRole:{},byUser:{}}, accessDirty:false, pcRoles:{}, signIn:null, newRoles:[] };
 async function uaLoad(){
   try{
-    const [c,u,r] = await Promise.all([pmcApi('GET','/api/admin/catalog'), pmcApi('GET','/api/admin/users'), pmcApi('GET','/api/admin/roles')]);
-    UA.catalog = c; UA.users = u.users; UA.roles = r.roles;
+    const [c,a,r] = await Promise.all([pmcApi('GET','/api/admin/catalog'), pmcApi('GET','/api/admin/access'), pmcApi('GET','/api/admin/roles')]);
+    UA.catalog = c; UA.roles = r.roles; UA.pcRoles = a.pcRoles || {}; UA.signIn = a.signIn || null;
+    if(!UA.accessDirty) UA.access = JSON.parse(JSON.stringify(a.access));
     if(!UA.dirty) UA.draft = JSON.parse(JSON.stringify(r.roles));
-  }catch(e){ showToast(T('Could not load users','无法加载用户'), e.message); }
+  }catch(e){ showToast(T('Could not load access settings','无法加载访问设置'), e.message); }
   uaRender();
 }
 const uaRoleName = id => (UA.roles.find(r=>r.id===id)||{name:id}).name;
 const lbl = o => (LANG==='zh' && o.zh) ? o.zh : o.en;
 function uaUsersHTML(){
-  const meId = PMC.me && PMC.me.id;
-  const chips = (sel, onClick) => UA.roles.map(r=>`<button type="button" class="role-chip ${sel.includes(r.id)?'on':''}" onclick="${onClick(r.id)}" aria-pressed="${sel.includes(r.id)}">${esc(r.name)}</button>`).join('');
-  return `<div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>${T('Users','用户')}</div>
-  <p class="ua-sub">${T('Reset passwords and assign roles. A person with several roles gets everything those roles allow.','重置密码并分配角色。一人可有多个角色,权限取并集。')}</p>
-  <div class="rm-table-wrap"><table class="ua-table"><thead><tr><th>${T('User','用户')}</th><th>${T('Roles','角色')}</th><th>${T('Reset password','重置密码')}</th><th>${T('Last sign-in','最近登录')}</th><th></th></tr></thead><tbody>
-  ${UA.users.map(u=>`<tr>
-    <td><b>${esc(u.displayName)}</b>${u.id===meId?` <span class="ua-you">(${T('you','你')})</span>`:''}<div class="ua-meta">${esc(u.username)}${u.email?` · ${esc(u.email)}`:''}</div></td>
-    <td><div class="role-chips">${chips(u.roles, rid=>`uaToggleUserRole('${u.id}','${rid}')`)}</div></td>
-    <td><div class="ua-pw"><input type="password" id="pw_${u.id}" placeholder="${T('New password','新密码')}" autocomplete="new-password"><button class="btn-ghost" onclick="uaSetPassword('${u.id}')">${T('Set','设置')}</button></div></td>
-    <td class="ua-meta">${u.lastLoginAt?esc(fmtDT(u.lastLoginAt)):T('Never','从未')}</td>
-    <td style="text-align:right">${u.id===meId?'':`<button class="ua-del ${UA.armed===u.id?'armed':''}" title="${T('Delete user','删除用户')}" onclick="uaDelete('${u.id}')">${UA.armed===u.id?T('Delete?','确认删除?'):'<svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>'}</button>`}</td>
-  </tr>`).join('')}
-  </tbody></table></div>
+  const provider = (UA.signIn && UA.signIn.provider) || 'AI-factory Product Center';
+  const chips = (sel, onClick) => UA.roles.map(r=>`<button type="button" class="role-chip ${(sel||[]).includes(r.id)?'on':''}" onclick="${onClick(r.id)}" aria-pressed="${(sel||[]).includes(r.id)}">${esc(r.name)}</button>`).join('');
+  const pcIds = Object.keys(UA.pcRoles||{}).sort();
+  const byUser = Object.entries(UA.access.byUser||{}).sort((a,b)=>a[0].localeCompare(b[0]));
+  const grants = list => (list||[]).length ? (list||[]).map(uaRoleName).join(', ') : T('no access','无访问权限');
+
+  const roleRows = pcIds.map(id=>{
+    const label = UA.pcRoles[id] && UA.pcRoles[id] !== id ? `${esc(id)} · ${esc(UA.pcRoles[id])}` : esc(id);
+    return `<tr>
+      <td><b>${label}</b></td>
+      <td><div class="role-chips">${chips(UA.access.byRole[id], rid=>`uaToggleAccess('role','${id}','${rid}')`)}</div>
+        <div class="ua-meta">${esc(grants(UA.access.byRole[id]))}</div></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="2" class="ua-meta">${T('No Product Center roles known yet.','暂未获取到 Product Center 角色。')}</td></tr>`;
+
+  const userRows = byUser.map(([who, list])=>`<tr>
+    <td><b>${esc(who)}</b></td>
+    <td><div class="role-chips">${chips(list, rid=>`uaToggleAccess('user','${esc(who)}','${rid}')`)}</div>
+      <div class="ua-meta">${esc(grants(list))}</div></td>
+    <td style="text-align:right"><button class="ua-del" title="${T('Remove this override','移除该指定')}" onclick="uaRemoveOverride('${esc(who)}')"><svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>
+  </tr>`).join('') || `<tr><td colspan="3" class="ua-meta">${T('Nobody is named individually — everyone gets what their Product Center role grants above.','暂无按人指定 — 所有人按上方角色映射获得权限。')}</td></tr>`;
+
+  return `<div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>${T('Who gets in','谁可以访问')}</div>
+  <p class="ua-sub">${T(`Accounts and passwords live in ${provider} — add, disable or reset someone there. This page only decides what a ${provider} identity may do in this dashboard.`, `账号与密码由 ${provider} 管理 — 新增、停用、重置密码请在那里操作。本页只决定 ${provider} 的身份在本看板能做什么。`)}</p>
+
+  <div class="ua-sec-h">${T('Product Center role → roles here','Product Center 角色 → 本看板角色')}</div>
+  <div class="rm-table-wrap"><table class="ua-table"><thead><tr><th>${T('Product Center role','Product Center 角色')}</th><th>${T('Gets these roles here','在本看板获得的角色')}</th></tr></thead><tbody>${roleRows}</tbody></table></div>
+
+  <div class="ua-sec-h">${T('Named people (overrides their role)','按人指定(覆盖其角色映射)')}</div>
+  <p class="ua-sub" style="margin-top:-4px">${T('Needed for customers: Product Center has one "customer" role and cannot say which client, so pin each client contact here.','客户必须用这种方式:Product Center 只有一个 customer 角色,无法区分具体客户,因此需在此逐人指定。')}</p>
+  <div class="rm-table-wrap"><table class="ua-table"><thead><tr><th>${T('Email or username','邮箱或用户名')}</th><th>${T('Gets these roles here','在本看板获得的角色')}</th><th></th></tr></thead><tbody>${userRows}</tbody></table></div>
   <div class="ua-add">
-    <div class="ua-add-h">${T('Add new user','新增用户')}</div>
+    <div class="ua-add-h">${T('Name a person','新增指定人员')}</div>
     <div class="ua-add-row">
-      <input id="nu_username" placeholder="${T('username','用户名')}" autocomplete="off">
-      <input id="nu_password" type="password" placeholder="${T('password (8+ chars)','密码(至少 8 位)')}" autocomplete="new-password">
-      <input id="nu_display" placeholder="${T('display name','显示名')}">
-      <input id="nu_email" placeholder="email">
+      <input id="nu_who" placeholder="${T('their Product Center email or username','其 Product Center 邮箱或用户名')}" autocomplete="off">
       <div class="role-chips">${chips(UA.newRoles, rid=>`uaToggleNewRole('${rid}')`)}</div>
-      <button class="btn-primary" onclick="uaCreate()">${T('Create','创建')}</button>
+      <button class="btn-primary" onclick="uaAddOverride()">${T('Add','新增')}</button>
     </div>
+  </div>
+  <div class="rc-actions" style="margin-top:12px;justify-content:flex-end">
+    <button class="btn-primary" ${UA.accessDirty?'':'disabled'} onclick="uaSaveAccess()">${UA.accessDirty?T('Save access','保存访问设置'):T('Saved','已保存')}</button>
   </div>`;
 }
+
 function uaRolesHTML(){
   const c = UA.catalog; if(!c || !UA.draft) return '';
   const groups = [
@@ -4686,7 +4699,7 @@ function uaRolesHTML(){
   const cards = UA.draft.map(r=>`<div class="rc-card ${r.locked?'locked':''}">
     <div class="rc-head">
       ${UA.renaming===r.id ? `<input class="rc-rename" id="rn_${r.id}" value="${esc(r.name)}" onkeydown="if(event.key==='Enter')uaRename('${r.id}')" onblur="uaRename('${r.id}')">` : `<b>${esc(r.name)}</b>`}
-      <span class="rc-count">${UA.users.filter(u=>u.roles.includes(r.id)).length} ${T('users','人')}</span>
+      <span class="rc-count">${uaGrantCount(r.id)}</span>
       ${r.locked ? `<span class="rc-lock">${T('All permissions','全部权限')}</span>` : `
         <button class="rc-ic" title="${T('Rename','重命名')}" onclick="UA.renaming='${r.id}';uaRender();setTimeout(()=>{const i=document.getElementById('rn_${r.id}');if(i){i.focus();i.select();}},20)"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
         <button class="rc-ic del" title="${T('Delete role','删除角色')}" onclick="uaDeleteRole('${r.id}')"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`}
@@ -4709,37 +4722,49 @@ function uaRender(){
   if(!UA.catalog){ a.innerHTML = `<p class="ua-sub">${T('Loading…','加载中…')}</p>`; b.innerHTML = ''; return; }
   a.innerHTML = uaUsersHTML(); b.innerHTML = uaRolesHTML();
 }
-async function uaToggleUserRole(uid, rid){
-  const u = UA.users.find(x=>x.id===uid); if(!u) return;
-  const roles = u.roles.includes(rid) ? u.roles.filter(x=>x!==rid) : u.roles.concat(rid);
-  try{ const r = await pmcApi('POST',`/api/admin/users/${uid}`, {roles}); Object.assign(u, r); showToast(T('Roles updated','角色已更新'), `${u.displayName}: ${r.roles.map(uaRoleName).join(', ')||T('none','无')}`); }
-  catch(e){ showToast(T('Could not change roles','无法修改角色'), e.message); }
-  uaRender();
+/* Which Product Center roles / named people currently grant a dashboard role — the honest
+   replacement for "how many users have this role", now that users are not ours to count. */
+function uaGrantSources(rid){
+  const from = Object.entries(UA.access.byRole||{}).filter(([,v])=>(v||[]).includes(rid)).map(([k])=>k);
+  const who  = Object.entries(UA.access.byUser||{}).filter(([,v])=>(v||[]).includes(rid)).map(([k])=>k);
+  return from.concat(who);
 }
-async function uaSetPassword(uid){
-  const el = document.getElementById('pw_'+uid); const pw = el ? el.value : '';
-  try{ await pmcApi('POST',`/api/admin/users/${uid}/password`, {password:pw}); el.value=''; showToast(T('Password set','密码已设置'), T('Their open sessions were signed out.','该用户已登录的会话已被退出。')); }
-  catch(e){ showToast(T('Could not set password','无法设置密码'), e.message); }
+function uaGrantCount(rid){
+  const n = uaGrantSources(rid).length;
+  return n ? T(`${n} mapping${n>1?'s':''}`, `${n} 条映射`) : T('not granted','未授予');
 }
-async function uaDelete(uid){
-  if(UA.armed!==uid){ UA.armed = uid; uaRender(); setTimeout(()=>{ if(UA.armed===uid){ UA.armed=null; uaRender(); } }, 4000); return; }
-  UA.armed = null;
-  try{ await pmcApi('POST',`/api/admin/users/${uid}/delete`); showToast(T('User deleted','用户已删除'), ''); }
-  catch(e){ showToast(T('Could not delete','无法删除'), e.message); }
-  uaLoad();
+/* Edits are local until Save, like the role matrix beside it, so a half-made mapping never
+   locks anyone out mid-edit. */
+function uaToggleAccess(kind, key, rid){
+  const bag = kind === 'role' ? (UA.access.byRole = UA.access.byRole || {}) : (UA.access.byUser = UA.access.byUser || {});
+  const cur = bag[key] || [];
+  bag[key] = cur.includes(rid) ? cur.filter(x=>x!==rid) : cur.concat(rid);
+  UA.accessDirty = true; uaRender();
+}
+function uaRemoveOverride(who){
+  delete UA.access.byUser[who]; UA.accessDirty = true; uaRender();
 }
 function uaToggleNewRole(rid){
-  const keep = ['nu_username','nu_password','nu_display','nu_email'].map(id=>[id,(document.getElementById(id)||{}).value||'']);
+  const keep = (document.getElementById('nu_who')||{}).value || '';
   UA.newRoles = UA.newRoles.includes(rid) ? UA.newRoles.filter(x=>x!==rid) : UA.newRoles.concat(rid);
-  uaRender(); keep.forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.value=v; });
+  uaRender();
+  const el = document.getElementById('nu_who'); if(el) el.value = keep;
 }
-async function uaCreate(){
-  const v = id => (document.getElementById(id)||{}).value || '';
+function uaAddOverride(){
+  const el = document.getElementById('nu_who'); const who = ((el||{}).value || '').trim().toLowerCase();
+  if(!who) return el && el.focus();
+  if(!UA.newRoles.length) return showToast(T('Pick at least one role','请至少选择一个角色'), T('Otherwise they would get nothing.','否则该用户将没有任何权限。'));
+  UA.access.byUser = UA.access.byUser || {};
+  UA.access.byUser[who] = UA.newRoles.slice();
+  UA.newRoles = []; UA.accessDirty = true; uaRender();
+}
+async function uaSaveAccess(){
   try{
-    const u = await pmcApi('POST','/api/admin/users', {username:v('nu_username'), password:v('nu_password'), displayName:v('nu_display'), email:v('nu_email'), roles:UA.newRoles});
-    UA.newRoles = []; showToast(T('User created','用户已创建'), `${u.displayName} · ${u.roles.map(uaRoleName).join(', ')||T('no role yet','暂无角色')}`);
+    const r = await pmcApi('POST','/api/admin/access', UA.access);
+    UA.access = r.access; UA.accessDirty = false;
+    showToast(T('Access saved','访问设置已保存'), T('People see the change the next time they sign in or reload.','用户下次登录或刷新页面时生效。'));
     uaLoad();
-  }catch(e){ showToast(T('Could not create user','无法创建用户'), e.message); }
+  }catch(e){ showToast(T('Could not save access','无法保存访问设置'), e.message); }
 }
 function uaCheck(rid, kind, val, on){
   const r = UA.draft.find(x=>x.id===rid); if(!r || r.locked) return;
@@ -4759,9 +4784,11 @@ function uaAddRole(){
   UA.draft.push({id, name, pages:[], actions:[], projects:[]}); UA.dirty = true; uaRender();
 }
 function uaDeleteRole(rid){
-  const n = UA.users.filter(u=>u.roles.includes(rid)).length;
+  const n = uaGrantSources(rid).length;
   UA.draft = UA.draft.filter(r=>r.id!==rid); UA.dirty = true; uaRender();
-  if(n) showToast(T('Role removed from the draft','角色已从草稿移除'), T(`${n} users will lose it when you save.`,`保存后 ${n} 位用户将失去该角色。`));
+  if(n) showToast(T('Role removed from the draft','角色已从草稿移除'),
+    T(`Saving also drops it from ${n} access mapping(s): ${uaGrantSources(rid).join(', ')}.`,
+      `保存后也会从 ${n} 条访问映射中移除:${uaGrantSources(rid).join(', ')}。`));
 }
 async function uaSaveRoles(){
   try{
