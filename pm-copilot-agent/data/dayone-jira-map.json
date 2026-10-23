@@ -1,0 +1,24 @@
+{
+  "epic": "BA-2380",
+  "tasks": {
+    "00": "BA-2364",
+    "01": "BA-2362",
+    "02": "BA-2384",
+    "04": "BA-2387",
+    "05": "BA-2447",
+    "09": "BA-2383",
+    "31": "BA-2386"
+  },
+  "ignore": ["BA-2380", "BA-2382", "BA-2481"],
+  "_notes": {
+    "00": "VPN / VM Access = [1.0] Grant VPN access",
+    "01": "Technical Alignment (data-point confirmation) = [1.1.1] Select required data points",
+    "02": "Real-time BMS point exposure = BA-2384, whose description is BMS live data connectivity (1 of 14 DH done) despite the title 'Historical Data Export'",
+    "03": "No ticket of its own: historical filtering (500k -> 3k points) is a done checklist item inside BA-2384",
+    "04": "Data Hall / Chiller / Cooling Tower loops = [1.2] cooling system topology mapping + chiller plant as systems A-D",
+    "05": "Single Data Hall Pilot = [2.1] per-DH model, E-GA first",
+    "08": "Not linked: closest are BA-2387 subtasks BA-2417 / BA-2418 (E+ chiller plant), both Backlog",
+    "09": "DCWiz Demo Preparation = [1.5]",
+    "31": "Historical-data-driven baseline, Mingchen = [2.3] Historical data analysis and twin calibration"
+  }
+}

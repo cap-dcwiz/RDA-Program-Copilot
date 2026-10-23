@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Delivery Copilot · Program Kanban</title>
+<title>Delivery Copilot · Portfolio</title>
 <style>
 :root{
   --bg:#080b16; --bg2:#0b0f1e;
@@ -487,6 +487,365 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 #toast .toast-title{font-weight:800;font-size:13px;color:var(--purple);margin-bottom:4px;}
 #toast .toast-body{font-size:12px;color:var(--text-dim);}
 
+/* ===== Portfolio (home) =====
+   Leadership view across every active client project. Jira is the data source, not the layout:
+   each card carries data-src (ticket keys, or MTG for the PM weekly sync) and hovering it shows
+   exactly which records the statement was drawn from. */
+/* Project switcher: "All projects" is the portfolio; picking DayOne opens its project view
+   (and only then do the DayOne tabs show). Other projects open their snapshot drawer. */
+.topbar{z-index:20;}
+.proj-dd{position:relative;}
+button.project-select{font-family:inherit;}
+.project-select:hover,.project-select[aria-expanded="true"]{border-color:var(--border2);}
+.project-select[aria-expanded="true"] svg.i{transform:rotate(180deg);}
+.proj-menu{position:absolute;top:calc(100% + 6px);left:0;width:320px;max-width:calc(100vw - 32px);z-index:95;display:none;
+  background:rgba(13,17,34,.97);border:1px solid var(--border2);border-radius:12px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,.6);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.proj-menu.open{display:block;}
+.pm-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;cursor:pointer;border:none;background:transparent;
+  color:var(--text);font-family:inherit;text-align:left;}
+.pm-item:hover,.pm-item:focus-visible{background:var(--panel3);outline:none;}
+.pm-item.active{background:var(--purple-bg);}
+.pm-item .pm-ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--panel2);color:var(--text-dim);}
+.pm-item .pm-ic svg{width:14px;height:14px;}
+.pm-item .pm-ic .dot{width:8px;height:8px;}
+.pm-item .pm-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.pm-item .pm-tx b{font-size:13px;font-weight:700;}
+.pm-item .pm-tx span{font-size:11px;color:var(--text-dimmer);}
+.pm-item .pm-go{font-size:10.5px;font-weight:700;color:var(--text-dimmer);white-space:nowrap;}
+.pm-item.active .pm-go{color:var(--purple);}
+.pm-group{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);padding:8px 10px 4px;}
+.pm-sep{height:1px;background:var(--border);margin:6px 4px;}
+.tabs.mode-all .tab[data-scope="project"],.tabs:not(.mode-all) .tab[data-scope="all"]{display:none;}
+.tab-count{margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;}
+.stats.n6{grid-template-columns:repeat(6,1fr);}
+.stat-card[data-src]{cursor:help;}
+.pf-asof{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--text-dimmer);}
+.pf-asof code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--text-dim);background:var(--panel3);
+  border:1px solid var(--border);border-radius:6px;padding:2px 7px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pf-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px;flex-wrap:wrap;}
+.pf-section-head h2{font-size:15px;font-weight:800;margin:0;}
+.pf-section-head span{font-size:12px;color:var(--text-dimmer);}
+.pf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px;}
+.pf-card{position:relative;display:flex;flex-direction:column;gap:11px;padding:16px 18px;border-radius:var(--radius);
+  background:var(--panel);border:1px solid var(--border);cursor:pointer;transition:transform .15s,border-color .15s;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 8px 36px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.09);
+  background-image:linear-gradient(155deg, rgba(255,255,255,.10), rgba(255,255,255,0) 45%);}
+.pf-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.pf-card:focus-visible,.lc-cell:focus-visible,.ask:focus-visible{outline:2px solid var(--purple);outline-offset:2px;}
+.pf-card.h-red{border-color:rgba(239,68,68,.45);}
+.pf-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.pf-name{font-size:15px;font-weight:800;line-height:1.25;}
+.pf-client{font-size:11.5px;color:var(--text-dim);margin-top:2px;}
+.pf-phase{font-size:10.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);}
+.pf-headline{font-size:12.5px;line-height:1.6;color:#d6d9ee;margin:0;}
+.pf-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.pf-chip{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--border2);color:var(--text-dim);white-space:nowrap;}
+.pf-chip.warn{color:var(--orange);border-color:rgba(245,158,11,.35);}
+.pf-chip.bad{color:var(--red);border-color:rgba(239,68,68,.35);}
+.pf-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid var(--border);margin-top:auto;}
+.pf-next{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-dim);min-width:0;}
+.pf-next .d{flex-shrink:0;font-weight:800;font-size:10.5px;color:var(--purple);background:var(--purple-bg);border-radius:6px;padding:2px 7px;font-variant-numeric:tabular-nums;}
+.pf-next .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pf-open{flex-shrink:0;font-size:11.5px;font-weight:800;color:var(--purple);display:inline-flex;align-items:center;gap:4px;}
+.pf-open svg{width:13px;height:13px;}
+.pf-drillnote{font-size:10px;color:var(--text-dimmer);font-weight:600;}
+
+/* Lifecycle strip (card) and matrix (panel) share one state encoding: fill + glyph + texture for blocked */
+.lc-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;}
+.lc-seg{height:6px;border-radius:3px;}
+.lc-labels{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:4px;font-size:9.5px;color:var(--text-dimmer);font-weight:700;}
+.st-done{background:var(--green);} .st-wip{background:var(--blue);} .st-risk{background:var(--orange);}
+.st-blocked{background:repeating-linear-gradient(135deg,var(--red) 0 4px,rgba(239,68,68,.45) 4px 7px);}
+.st-todo{background:var(--panel2);box-shadow:inset 0 0 0 1px var(--border2);} .st-na{background:transparent;box-shadow:inset 0 0 0 1px var(--border);}
+.lc-wrap{overflow-x:auto;}
+.lc-matrix{display:grid;grid-template-columns:150px repeat(5,minmax(112px,1fr));gap:6px;min-width:720px;}
+.lc-h{font-size:10.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);padding:0 4px 4px;}
+.lc-h small{display:block;font-size:9.5px;font-weight:700;letter-spacing:.2px;text-transform:none;color:var(--red);margin-top:2px;}
+.lc-proj{font-size:12.5px;font-weight:800;display:flex;flex-direction:column;justify-content:center;padding:0 4px;cursor:pointer;}
+.lc-proj span{font-size:10.5px;font-weight:600;color:var(--text-dimmer);}
+.lc-cell{border-radius:9px;padding:8px 9px;font-size:11px;line-height:1.4;color:var(--text-dim);min-height:58px;cursor:help;
+  border:1px solid var(--border);background:var(--panel3);}
+.lc-cell b{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.2px;margin-bottom:3px;}
+.lc-cell .g{width:14px;height:14px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:9.5px;color:#0b0f1e;flex-shrink:0;}
+.lc-cell.c-done{border-color:rgba(34,197,94,.3);} .lc-cell.c-done b{color:var(--green);}
+.lc-cell.c-wip{border-color:rgba(59,130,246,.4);} .lc-cell.c-wip b{color:var(--blue);}
+.lc-cell.c-risk{border-color:rgba(245,158,11,.45);background:linear-gradient(180deg,rgba(245,158,11,.08),transparent),var(--panel3);} .lc-cell.c-risk b{color:var(--orange);}
+.lc-cell.c-blocked{border-color:rgba(239,68,68,.5);background:linear-gradient(180deg,rgba(239,68,68,.1),transparent),var(--panel3);} .lc-cell.c-blocked b{color:var(--red);}
+.lc-cell.c-todo,.lc-cell.c-na{border-style:dashed;color:var(--text-dimmer);} .lc-cell.c-todo b,.lc-cell.c-na b{color:var(--text-dimmer);}
+.lc-cell .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lc-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-dim);}
+.lc-legend span{display:inline-flex;align-items:center;gap:6px;}
+.lc-legend i{width:18px;height:8px;border-radius:3px;display:inline-block;}
+.pf-insight{margin-top:12px;font-size:12.5px;line-height:1.6;color:#d6d9ee;background:var(--purple-bg);border-radius:10px;padding:10px 12px;}
+.pf-insight b{color:var(--purple);}
+
+/* Leadership asks */
+.ask{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:12px 0;border-bottom:1px dashed var(--border);cursor:help;}
+.ask:last-of-type{border-bottom:none;padding-bottom:0;}
+.ask .ask-k{grid-row:span 3;padding-top:1px;}
+.ask .ask-t{font-size:13px;font-weight:700;line-height:1.4;}
+.ask .ask-w{font-size:12px;color:var(--text-dim);line-height:1.55;}
+.ask .ask-a{font-size:12px;color:var(--text);line-height:1.55;}
+.ask .ask-a em{font-style:normal;font-weight:800;color:var(--purple);margin-right:4px;}
+.pf-rec-note{font-size:11px;color:var(--text-dimmer);margin:-6px 0 6px;}
+
+/* Next 30 days */
+.pf-week + .pf-week{margin-top:12px;}
+.pf-week h5{margin:0 0 4px;font-size:10.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);}
+.pf-ev{display:grid;grid-template-columns:78px 1fr auto;gap:12px;padding:9px 0;border-bottom:1px dashed var(--border);align-items:start;cursor:help;}
+.pf-week .pf-ev:last-child{border-bottom:none;}
+.pf-ev .d{font-weight:800;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums;}
+.pf-ev .d span{display:block;color:var(--text-dimmer);font-size:10.5px;font-weight:600;}
+.pf-ev .t{font-size:12.5px;line-height:1.5;color:var(--text);}
+.pf-ev .t .tent{display:inline-block;margin-left:6px;font-size:9.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--orange);}
+.proj-tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--panel3);border:1px solid var(--border2);color:var(--text-dim);white-space:nowrap;}
+
+/* Team load + Jira freshness */
+.hbar-row{display:grid;grid-template-columns:118px 1fr 70px;align-items:center;gap:10px;font-size:12px;padding:6px 0;cursor:help;}
+.hbar-row .nm{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hbar-row .v{text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;font-size:11.5px;}
+.hbar-row .v b{color:var(--text);font-size:12.5px;}
+.hbar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;}
+.hbar i{display:block;height:100%;border-radius:4px;background:var(--purple);}
+.hbar.cy i{background:var(--cyan);}
+.pf-sub{font-size:11px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:var(--text-dimmer);margin:16px 0 6px;}
+.pf-sub:first-of-type{margin-top:0;}
+.pf-note{font-size:12px;color:var(--text-dim);line-height:1.6;margin-top:10px;}
+.pf-note b{color:var(--text);}
+
+/* Source tooltip */
+.src-tip{position:fixed;z-index:130;width:380px;max-width:calc(100vw - 24px);background:rgba(13,17,34,.97);border:1px solid var(--border2);
+  border-radius:12px;padding:12px 14px;box-shadow:0 16px 48px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .12s;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.src-tip.show{opacity:1;pointer-events:auto;}
+/* ===== DayOne data-source tags ===== */
+.ds-tag{display:inline-flex;align-items:center;gap:4px;height:17px;padding:0 7px;border-radius:999px;font-size:9.5px;font-weight:700;letter-spacing:.2px;
+  white-space:nowrap;vertical-align:middle;cursor:help;border:1px solid color-mix(in srgb,currentColor 45%,transparent);background:color-mix(in srgb,currentColor 9%,transparent);
+  line-height:1;text-transform:none;font-style:normal;}
+.ds-tag i{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.ds-tag i.p{margin-left:1px;}
+.k-jira{color:var(--cyan);} .k-edit{color:var(--violet);} .k-meeting{color:var(--orange);} .k-plan{color:var(--gray);}
+.k-calc{color:var(--blue);} .k-static{color:var(--gray);} .k-sample{color:var(--red);}
+.ds-tag.k-static,.ds-tag.k-sample{border-style:dashed;}
+.ds-tag i.p.k-edit{background:var(--violet);} .ds-tag i.p.k-meeting{background:var(--orange);}
+.ds-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:-6px 0 16px;font-size:11.5px;color:var(--text-dimmer);}
+.ds-strip .ds-tag{height:21px;font-size:10.5px;padding:0 9px;}
+.ds-strip .ds-lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-right:2px;}
+.ds-strip .ds-hint{margin-left:auto;font-size:11px;}
+.stat-card .ds-foot{margin-top:8px;}
+.ds-jd{font-size:10.5px;color:var(--cyan);opacity:.85;}
+.ds-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:middle;flex-shrink:0;}
+.ds-static{border-left:2px dashed color-mix(in srgb,var(--gray) 55%,transparent);padding-left:8px;cursor:help;}
+.panel-title .ds-own,.banner-title .ds-own,.side-card h3 .ds-own,.reco-card h4 .ds-own{margin-left:8px;}
+.fc-badges .ds-tag,.mc-badges .ds-tag{margin-left:auto;}
+.fc-badges,.mc-badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.gantt-left .gr .gid{white-space:nowrap;overflow:visible;}
+.gantt-left .gr.jira .gid::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cyan);margin-right:3px;vertical-align:middle;}
+.src-tip .ds-row{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:3px 8px;align-items:baseline;padding:6px 0;border-top:1px dashed var(--border);font-size:11.5px;}
+.src-tip .ds-row:first-of-type{border-top:none;}
+.src-tip .ds-f{color:var(--text-dimmer);font-size:11px;}
+.src-tip .ds-v{color:var(--text);font-weight:600;overflow-wrap:anywhere;}
+.src-tip .ds-d{grid-column:2 / 4;font-size:10.5px;color:var(--text-dimmer);}
+.src-tip .ds-legend{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text-dimmer);line-height:1.5;display:flex;flex-direction:column;gap:5px;}
+
+.src-tip .st-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--text-dimmer);margin-bottom:6px;}
+.src-tip .st-note{font-size:11.5px;color:var(--text-dim);line-height:1.5;margin-bottom:6px;}
+.src-tip .st-row{padding:7px 0;border-top:1px dashed var(--border);}
+.src-tip .st-row:first-of-type{border-top:none;}
+.src-tip .st-l1{display:flex;align-items:center;gap:8px;font-size:11.5px;}
+.src-tip .st-key{font-weight:800;color:var(--cyan);text-decoration:none;flex-shrink:0;}
+.src-tip .st-key:hover{text-decoration:underline;}
+.src-tip .st-sum{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-weight:600;}
+.src-tip .st-l2{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:10.5px;color:var(--text-dimmer);}
+.src-tip .st-l2 .badge{padding:1px 7px;font-size:9.5px;}
+.src-tip .st-l2 .stale{color:var(--orange);font-weight:700;}
+.src-tip .st-sig{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:4px;}
+.src-tip .st-mtg .st-key{color:var(--violet);}
+
+/* Project snapshot drawer */
+.pf-scrim{position:fixed;inset:0;background:rgba(4,6,14,.55);z-index:110;opacity:0;pointer-events:none;transition:opacity .2s;}
+.pf-scrim.show{opacity:1;pointer-events:auto;}
+.pf-drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,100vw);z-index:111;background:var(--bg2);border-left:1px solid var(--border2);
+  transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:22px 24px 40px;box-shadow:-20px 0 60px rgba(0,0,0,.5);}
+.pf-drawer.show{transform:none;}
+.pf-drawer h3{font-size:20px;margin:0;font-weight:800;}
+.pf-drawer h4{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);margin:20px 0 8px;}
+.pf-drawer .dr-close{position:absolute;top:18px;right:18px;}
+.pf-drawer ul.dr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.pf-drawer ul.dr-list li{font-size:12.5px;line-height:1.55;color:var(--text);padding-left:14px;position:relative;cursor:help;}
+.pf-drawer ul.dr-list li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--orange);}
+.pf-drawer .dr-src{font-size:10.5px;color:var(--text-dimmer);font-weight:700;margin-left:6px;}
+.dr-tk{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--panel3);margin-bottom:8px;}
+.dr-tk .st-l1{display:flex;align-items:center;gap:8px;font-size:12px;}
+.dr-tk .st-key{font-weight:800;color:var(--cyan);text-decoration:none;}
+.dr-tk .st-sum{flex:1;min-width:0;color:var(--text);font-weight:600;}
+.dr-tk .st-l2{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:11px;color:var(--text-dimmer);flex-wrap:wrap;}
+.dr-tk .st-l2 .badge{padding:1px 7px;font-size:9.5px;}
+.dr-tk .st-sig{font-size:11.5px;color:var(--text-dim);line-height:1.55;margin-top:6px;}
+
+
+/* ===== Gantt editing (action: edit_plan) ===== */
+.plan-hint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-dim);margin:0 0 10px;}
+.plan-hint b{color:var(--text);}
+.plan-hint .pf-chip{cursor:help;}
+.gantt-editable .gantt-left .gr[data-task],.gantt-editable .gantt-bar,.gantt-editable [data-task]{cursor:pointer;}
+.gantt-editable .gantt-left .gr[data-task]:hover{background:var(--purple-bg);}
+.gantt-editable .gantt-left .gr[data-task]:hover .gname::after{content:' ✎';color:var(--purple);font-weight:800;}
+.gantt-editable .gantt-bar:hover{outline:2px solid var(--purple);outline-offset:1px;}
+.gantt-left .gr.edited .gid::after,.gantt-bar.edited::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-left:4px;vertical-align:middle;}
+.gantt-bar.edited::before{margin:0 5px 0 0;}
+.pe-scrim{position:fixed;inset:0;background:rgba(4,6,14,.6);z-index:150;opacity:0;pointer-events:none;transition:opacity .15s;}
+.pe-scrim.show{opacity:1;pointer-events:auto;}
+.pe-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:151;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);overflow:auto;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.6);}
+.pe-modal[hidden]{display:none;}
+.pe-modal h3{margin:0 0 2px;font-size:17px;} .pe-sub{font-size:11.5px;color:var(--text-dimmer);margin-bottom:14px;}
+.pe-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;}
+.pe-grid label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--text-dim);}
+.pe-grid label.full{grid-column:1/-1;}
+.pe-grid input,.pe-grid select,.pe-grid textarea{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;}
+.pe-grid input:focus,.pe-grid select:focus,.pe-grid textarea:focus{outline:2px solid var(--purple);outline-offset:1px;}
+.pe-grid textarea{min-height:64px;resize:vertical;}
+.pe-grid .was{font-weight:600;color:var(--text-dimmer);font-size:10.5px;}
+.pe-jira{border:1px solid rgba(34,211,238,.35);background:var(--cyan-bg);border-radius:10px;padding:10px 12px;margin:0 0 14px;font-size:12.5px;color:var(--text);}
+.pe-jira a{color:var(--cyan);text-decoration:none;} .pe-jira-note{font-size:11px;color:var(--text-dim);margin-top:4px;}
+.pe-jira-c{font-size:11.5px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);line-height:1.55;white-space:pre-wrap;}
+.pe-grid input:disabled,.pe-grid select:disabled{opacity:.55;cursor:not-allowed;}
+.pe-err{font-size:12px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:8px 10px;margin-top:12px;}
+.pe-actions{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap;} .pe-actions .sp{flex:1;}
+.pe-hist{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-dim);}
+.pe-hist div{padding:3px 0;} .pe-hist b{color:var(--text);}
+@media (max-width:600px){ .pe-grid{grid-template-columns:1fr;} }
+
+/* ===== Sign-in gate + Users & Roles ===== */
+body.gated .app, body.gated .icon-rail{visibility:hidden;}
+body.gated{padding-left:0;}
+.perm-hidden{display:none!important;}
+.auth-gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+.auth-gate[hidden]{display:none;}
+.ag-card{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;padding:28px 26px;border-radius:16px;background:var(--panel);
+  border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.5);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.ag-brand{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.ag-brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple2),var(--cyan));display:flex;align-items:center;justify-content:center;color:#0a0e1c;font-weight:900;}
+.ag-brand b{display:block;font-size:15px;} .ag-brand span{font-size:11px;color:var(--text-dimmer);}
+.ag-card h1{margin:0;font-size:22px;font-weight:800;} .ag-card p{margin:0 0 4px;font-size:12.5px;color:var(--text-dim);line-height:1.55;}
+.ag-card label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--text-dim);}
+.ag-card input{background:var(--panel2);border:1px solid var(--border2);border-radius:9px;color:var(--text);padding:10px 12px;font-size:13.5px;font-family:inherit;}
+.ag-card input:focus,.ua-table input:focus,.ua-add input:focus,.rc-actions input:focus{outline:2px solid var(--purple);outline-offset:1px;}
+.ag-card .btn-primary{padding:11px;font-size:13.5px;margin-top:4px;}
+.ag-card .btn-primary:disabled{opacity:.6;}
+.ag-err{font-size:12px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:8px 10px;}
+.ag-adv summary{cursor:pointer;font-size:11.5px;color:var(--text-dimmer);margin-bottom:6px;} .ag-adv input{width:100%;}
+.user-chip{display:flex;align-items:center;gap:8px;font-size:12px;}
+.user-chip .sp-in{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:6px 9px;font-size:12px;width:140px;font-family:inherit;}
+.ag-pw{display:flex;flex-direction:column;gap:12px;}
+.ag-card [hidden]{display:none!important;}
+.user-chip .uc-name{font-weight:700;color:var(--text);} .user-chip .uc-role{color:var(--text-dimmer);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ua-sub{font-size:12.5px;color:var(--text-dim);margin:-6px 0 12px;}
+.ua-table td{vertical-align:middle;} .ua-table td b{font-size:13px;}
+.ua-you{color:var(--text-dimmer);font-weight:600;font-size:12px;}
+.ua-meta{font-size:11.5px;color:var(--text-dimmer);margin-top:2px;}
+.role-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.role-chip{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+  background:transparent;border:1px solid var(--border2);color:var(--text-dim);}
+.role-chip:hover{color:var(--text);border-color:var(--text-dimmer);}
+.role-chip.on{background:var(--purple-bg);border-color:var(--purple);color:#d9d4ff;}
+.ua-pw{display:flex;gap:6px;} .ua-pw input,.ua-add input,.rc-actions input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12.5px;font-family:inherit;min-width:0;}
+.ua-pw input{width:150px;}
+.ua-del{background:transparent;border:1px solid transparent;color:var(--red);border-radius:7px;padding:5px 8px;cursor:pointer;font-size:11.5px;font-weight:800;font-family:inherit;}
+.ua-del:hover{border-color:rgba(239,68,68,.4);} .ua-del.armed{background:var(--red-bg);border-color:rgba(239,68,68,.5);}
+.ua-add{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.ua-add-h{font-size:12.5px;font-weight:800;margin-bottom:8px;}
+.ua-add-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;} .ua-add-row input{width:150px;}
+.rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+.rc-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;} .rc-actions .btn-primary:disabled{opacity:.5;cursor:default;}
+.rc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+.rc-card{border:1px solid var(--border2);border-radius:12px;background:var(--panel3);padding:14px 14px 10px;min-width:0;}
+.rc-card.locked{border-color:rgba(163,148,255,.45);}
+.rc-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;} .rc-head b{font-size:14px;color:var(--purple);}
+.rc-count{font-size:11px;color:var(--text-dimmer);margin-right:auto;}
+.rc-lock{font-size:10.5px;font-weight:700;color:var(--text-dimmer);}
+.rc-ic{background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:4px;border-radius:6px;} .rc-ic:hover{background:var(--panel2);color:var(--text);} .rc-ic.del{color:var(--red);}
+.rc-rename{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--purple);border-radius:7px;color:var(--text);padding:4px 8px;font-size:13px;font-weight:700;font-family:inherit;}
+.rc-sec{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dimmer);margin:12px 0 4px;}
+.rc-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text);padding:4px 0;line-height:1.4;cursor:pointer;}
+.rc-item input{margin-top:2px;accent-color:#7c6cf6;flex-shrink:0;} .rc-item.dis{color:var(--text-dim);cursor:default;}
+@media (max-width:1400px){ .rc-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+@media (max-width:760px){ .rc-grid{grid-template-columns:1fr;} .user-chip .uc-role{display:none;} }
+
+/* ===== PM Copilot: Meeting To-dos + History ===== */
+.pmc-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:16px;border-radius:12px;
+  background:var(--panel3);border:1px solid var(--border);font-size:12.5px;color:var(--text-dim);}
+.pmc-bar .who{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:700;}
+.pmc-bar .sp{flex:1;}
+.pmc-bar .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg);}
+.pmc-bar .off-dot{width:7px;height:7px;border-radius:50%;background:var(--gray);}
+.pmc-bar input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12.5px;font-family:inherit;min-width:0;}
+.pmc-bar input#pmcUrl{width:240px;} .pmc-bar input#pmcToken{width:260px;}
+.pmc-connect{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.pmc-empty{padding:28px 24px;text-align:left;}
+.pmc-empty h3{margin:0 0 6px;font-size:15px;} .pmc-empty p{margin:0 0 10px;font-size:12.5px;color:var(--text-dim);line-height:1.6;max-width:70ch;}
+.pmc-empty ol{margin:0;padding-left:18px;font-size:12.5px;color:var(--text-dim);line-height:1.8;}
+.pmc-empty code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--text);}
+.pmc-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.pmc-group{margin-bottom:18px;}
+.pmc-group-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 8px;flex-wrap:wrap;}
+.pmc-group-h b{font-size:13.5px;} .pmc-group-h span{font-size:11.5px;color:var(--text-dimmer);}
+.pmc-group-h a{color:var(--cyan);font-size:11.5px;font-weight:700;text-decoration:none;}
+.sug{border:1px solid var(--border2);border-radius:12px;background:var(--panel3);padding:13px 16px;margin-bottom:10px;}
+.sug.approved{border-color:rgba(34,197,94,.4);} .sug.rejected{opacity:.6;}
+.sug-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.sug-kind{font-size:10.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--text-dimmer);}
+.sug-key{font-weight:800;font-size:11.5px;color:var(--cyan);text-decoration:none;cursor:help;}
+.sug-title{font-size:13.5px;font-weight:700;line-height:1.4;margin:0 0 4px;}
+.sug-detail{font-size:12.5px;color:#d6d9ee;line-height:1.6;margin:0;}
+.sug-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin-top:8px;}
+.sug-meta b{color:var(--text);font-weight:700;}
+.sug .prop-evidence{margin:8px 0 6px;}
+.sug-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.sug-actions .hint{font-size:11px;color:var(--text-dimmer);}
+.sug-actions button[disabled]{opacity:.45;cursor:not-allowed;}
+.sug-result{margin-top:10px;font-size:12px;color:var(--text-dim);background:var(--panel2);border-radius:8px;padding:8px 10px;}
+.sug-result b{color:var(--text);} .sug-result a{color:var(--cyan);font-weight:700;}
+.sug-result details summary{cursor:pointer;color:var(--text-dimmer);font-size:11px;margin-top:4px;}
+.sug-result pre{white-space:pre-wrap;word-break:break-word;font-size:10.5px;color:var(--text-dim);margin:6px 0 0;max-height:220px;overflow:auto;}
+.sug-edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.sug-edit label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:var(--text-dimmer);}
+.sug-edit label.full{grid-column:1/-1;}
+.sug-edit input,.sug-edit textarea,.pmc-form input,.pmc-form textarea,.sug-reject input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);
+  padding:7px 10px;font-size:12.5px;font-family:inherit;resize:vertical;}
+.sug-edit textarea{min-height:70px;}
+.sug-reject{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;} .sug-reject input{flex:1;min-width:200px;}
+.mh-card{border:1px solid var(--border);border-radius:12px;background:var(--panel);padding:14px 16px;margin-bottom:12px;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
+.mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.mh-top b{font-size:14px;} .mh-date{font-size:11.5px;color:var(--text-dimmer);font-weight:700;font-variant-numeric:tabular-nums;}
+.mh-sub{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 8px;font-size:11.5px;color:var(--text-dimmer);}
+.mh-sub a{color:var(--cyan);font-weight:700;text-decoration:none;}
+.mh-sum{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#d6d9ee;line-height:1.55;}
+.mh-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.mh-err{font-size:12px;color:var(--red);margin-top:6px;}
+.pmc-form{display:flex;flex-direction:column;gap:8px;}
+.pmc-form textarea{min-height:140px;}
+.pmc-form .row{display:grid;grid-template-columns:1fr 150px;gap:8px;}
+.aud-row{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:12px;}
+.aud-row:last-child{border-bottom:none;}
+.aud-row .t{font-size:10.5px;color:var(--text-dimmer);font-variant-numeric:tabular-nums;grid-row:span 2;padding-top:2px;}
+.aud-row .a{color:var(--text);} .aud-row .d{color:var(--text-dim);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pmc-busy{opacity:.6;pointer-events:none;}
+@media (max-width:900px){ .sug-edit{grid-template-columns:1fr;} .pmc-bar input#pmcUrl,.pmc-bar input#pmcToken{width:100%;} }
+@media (max-width:1400px){
+  .stats.n6{grid-template-columns:repeat(3,1fr);}
+  .pf-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:860px){
+  .pf-grid{grid-template-columns:1fr;}
+  .stats.n6{grid-template-columns:repeat(2,1fr);}
+}
+
 @media (max-width:1400px){
   .stats{grid-template-columns:repeat(3,1fr);}
   .row2{grid-template-columns:1fr;}
@@ -498,18 +857,40 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 </style>
 </head>
 <body>
+<!-- ===== SIGN-IN GATE (PM Copilot agent) ===== -->
+<div class="auth-gate" id="authGate" hidden>
+  <form class="ag-card" onsubmit="authLogin(event)" autocomplete="on">
+    <div class="ag-brand"><div class="logo">D</div><div><b>Delivery Copilot</b><span>RDA</span></div></div>
+    <h1><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></h1>
+    <p><span data-i18n-en="Use the account your admin gave you. What you see depends on your role." data-i18n-zh="请使用管理员为你开通的账号。可见内容取决于你的角色。">Use the account your admin gave you. What you see depends on your role.</span></p>
+    <label><span data-i18n-en="Username" data-i18n-zh="用户名">Username</span><input id="agUser" name="username" autocomplete="username" required></label>
+    <label><span data-i18n-en="Password" data-i18n-zh="密码">Password</span><input id="agPass" name="password" type="password" autocomplete="current-password" required></label>
+    <div class="ag-err" id="agErr" role="alert" hidden></div>
+    <button class="btn-primary" id="agBtn" type="submit"><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></button>
+    <div class="ag-pw" id="agPwBox" hidden>
+      <p><span data-i18n-en="Set a new password before you continue (at least 8 characters)." data-i18n-zh="继续前请设置新密码(至少 8 位)。">Set a new password before you continue (at least 8 characters).</span></p>
+      <label><span data-i18n-en="New password" data-i18n-zh="新密码">New password</span><input id="agNew1" type="password" autocomplete="new-password"></label>
+      <label><span data-i18n-en="Repeat new password" data-i18n-zh="再次输入新密码">Repeat new password</span><input id="agNew2" type="password" autocomplete="new-password"></label>
+      <button class="btn-primary" type="button" onclick="authChangePassword()"><span data-i18n-en="Save password" data-i18n-zh="保存密码">Save password</span></button>
+    </div>
+    <details class="ag-adv"><summary><span data-i18n-en="Server address" data-i18n-zh="服务器地址">Server address</span></summary><input id="agUrl" placeholder="http://host:8790"></details>
+  </form>
+</div>
 <!-- ===== LEFT ICON RAIL (global nav) ===== -->
 <div class="icon-rail">
   <div class="rail-logo">D</div>
-  <div class="rail-icon active" data-page="overview" title="Overview" onclick="goPage('overview')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+  <div class="rail-icon active" data-page="portfolio" title="Portfolio" onclick="goPage('portfolio')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+  <div class="rail-icon" data-page="todo" title="Meeting To-dos" onclick="goPage('todo')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="rail-dot" id="railTodoDot" style="display:none"></span></div>
+  <div class="rail-icon" data-page="history" title="Meeting History" onclick="goPage('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+  <div class="rail-icon" data-page="overview" title="DayOne NTPE · Overview" onclick="goPage('overview')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
   <div class="rail-icon" data-page="blocker" title="Blocker Impact Map" onclick="goPage('blocker')"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5L15.5 10.5M8.5 16.5L15.5 13.5"/></svg></div>
   <div class="rail-icon" data-page="dependency" title="Dependency View" onclick="goPage('dependency')"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
   <div class="rail-icon" data-page="roadmap" title="Roadmap View" onclick="goPage('roadmap')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
   <div class="rail-icon" data-page="meetings" title="Meetings" onclick="goPage('meetings')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
   <div class="rail-icon" data-page="luna" title="Luna Queue" onclick="goPage('luna')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="rail-dot" id="railLunaDot"></span></div>
   <div class="rail-spacer"></div>
-  <div class="rail-icon" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-  <div class="rail-avatar" title="Selena">SV</div>
+  <div class="rail-icon" data-page="users" title="Users &amp; Roles" onclick="goPage('users')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  <div class="rail-avatar" id="railAvatar" title="">··</div>
 </div>
 <div class="app">
 
@@ -539,7 +920,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       </div>
       <div class="top-right">
         <div class="updated-block">
-          <span class="live"><span class="live-dot"></span><span data-i18n-en="Maintained by Selena" data-i18n-zh="由 Selena 维护">Maintained by Selena</span></span>
+          <span class="live"><span class="live-dot"></span><span id="whoLive"></span></span>
           <span>Last updated: <b id="updatedTime" style="color:var(--text)">2026-08-21 09:15</b></span>
         </div>
         <span class="icon-btn" title="Refresh"><svg class="i" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
@@ -547,21 +928,29 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
         <div id="langToggle" class="lang-toggle" style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:11.5px;font-weight:700;cursor:pointer;user-select:none;">
           <span data-lang-opt="en" style="padding:5px 9px;">EN</span><span data-lang-opt="zh" style="padding:5px 9px;">中文</span>
         </div>
+        <span class="user-chip" id="userChip"></span>
         <span class="icon-btn"><svg class="i" viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
       </div>
     </div>
     <div class="topbar-row" style="justify-content:flex-start;gap:14px;">
-      <div class="project-select" title="Switch project">
-        <span class="lbl"><span data-i18n-en="Project:" data-i18n-zh="项目:">Project:</span></span> DayOne NTPE
-        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="proj-dd" id="projDD">
+        <button type="button" class="project-select" id="projectSelect" aria-haspopup="listbox" aria-expanded="false" aria-controls="projMenu">
+          <span class="lbl"><span data-i18n-en="Project:" data-i18n-zh="项目:">Project:</span></span> <span id="projSelLabel">DayOne NTPE</span>
+          <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="proj-menu" id="projMenu" role="listbox"></div>
       </div>
       <div class="tabs">
-        <button class="tab active" data-page="overview"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
-        <button class="tab" data-page="blocker"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
-        <button class="tab" data-page="dependency"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
-        <button class="tab" data-page="roadmap"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
-        <button class="tab" data-page="meetings"><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span><span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
-        <button class="tab" data-page="luna"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
+        <button class="tab active" data-page="portfolio" data-scope="all"><span data-i18n-en="Portfolio" data-i18n-zh="项目组合">Portfolio</span></button>
+        <button class="tab" data-page="todo" data-scope="all"><span data-i18n-en="Meeting To-dos" data-i18n-zh="会议待办">Meeting To-dos</span><span id="pmcTodoBadge" class="tab-count" style="display:none"></span></button>
+        <button class="tab" data-page="history" data-scope="all"><span data-i18n-en="Meeting History" data-i18n-zh="会议记录">Meeting History</span></button>
+        <button class="tab" data-page="users" data-scope="all"><span data-i18n-en="Users &amp; Roles" data-i18n-zh="用户与角色">Users &amp; Roles</span></button>
+        <button class="tab" data-page="overview" data-scope="project"><span data-i18n-en="Overview" data-i18n-zh="总览">Overview</span></button>
+        <button class="tab" data-page="blocker" data-scope="project"><span data-i18n-en="Blocker Impact Map" data-i18n-zh="阻塞影响图">Blocker Impact Map</span></button>
+        <button class="tab" data-page="dependency" data-scope="project"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
+        <button class="tab" data-page="roadmap" data-scope="project"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
+        <button class="tab" data-page="meetings" data-scope="project"><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span><span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
+        <button class="tab" data-page="luna" data-scope="project"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
       </div>
     </div>
   </div>
@@ -569,7 +958,95 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
   <!-- ============================================================ -->
   <!-- OVERVIEW -->
   <!-- ============================================================ -->
-  <div class="page active" id="page-overview">
+  <!-- ============================================================ -->
+  <!-- PORTFOLIO (home) — rendered from PF_TICKETS / PF_PROJECTS    -->
+  <!-- ============================================================ -->
+  <div class="page active" id="page-portfolio">
+    <div class="page-head">
+      <h1><span data-i18n-en="Portfolio Overview" data-i18n-zh="项目组合总览">Portfolio Overview</span></h1>
+      <p><span data-i18n-en="Every active client project on one page: where each stands, what is stuck, and what leadership needs to decide. Hover any card to see the records behind it." data-i18n-zh="所有在执行的客户项目汇总在一页:各自进展、卡在哪里、需要管理层拍板什么。悬停任一卡片可查看其背后的数据记录。">Every active client project on one page: where each stands, what is stuck, and what leadership needs to decide. Hover any card to see the records behind it.</span></p>
+      <div class="pf-asof" id="pfAsOf"></div>
+    </div>
+
+    <div class="stats n6" id="pfKpis"></div>
+
+    <div class="banner" data-src="MTG,BA-2010,BA-1098,BA-1864,BA-2380">
+      <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div style="flex:1;min-width:0;">
+        <div class="banner-title"><span data-i18n-en="Portfolio Brief" data-i18n-zh="组合简报">Portfolio Brief</span><span class="ai-tag">PM</span></div>
+        <div class="banner-text" id="pfBrief"></div>
+      </div>
+    </div>
+
+    <div class="pf-section-head">
+      <h2><span data-i18n-en="Project Health" data-i18n-zh="项目健康度">Project Health</span></h2>
+      <span><span data-i18n-en="Sorted by what needs attention first · click DayOne for its full project view" data-i18n-zh="按需关注程度排序 · 点击 DayOne 进入完整项目视图">Sorted by what needs attention first · click DayOne for its full project view</span></span>
+    </div>
+    <div class="pf-grid" id="pfCards"></div>
+
+    <div class="row2">
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="1.5"/><circle cx="14" cy="12" r="1.5"/><circle cx="10" cy="18" r="1.5"/></svg></div><span data-i18n-en="Where the Portfolio Is Stuck" data-i18n-zh="组合卡点在哪里">Where the Portfolio Is Stuck</span></div>
+        <div class="lc-wrap"><div class="lc-matrix" id="pfMatrix"></div></div>
+        <div class="lc-legend" id="pfMatrixLegend"></div>
+        <div class="pf-insight" id="pfMatrixInsight"></div>
+      </div>
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span data-i18n-en="Decisions for Leadership" data-i18n-zh="需管理层决策事项">Decisions for Leadership</span></div>
+        <div class="pf-rec-note"><span data-i18n-en="Facts come from Jira and the 12 Oct PM sync; the recommended action is the PM's call." data-i18n-zh="事实来自 Jira 与 10 月 12 日项目周会;建议动作为 PM 的判断。">Facts come from Jira and the 12 Oct PM sync; the recommended action is the PM's call.</span></div>
+        <div id="pfAsks"></div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span data-i18n-en="Next 30 Days" data-i18n-zh="未来 30 天">Next 30 Days</span></div>
+        <div id="pfTimeline"></div>
+      </div>
+      <div class="panel" style="min-width:0;">
+        <div class="panel-title"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span data-i18n-en="Team Load & Data Freshness" data-i18n-zh="团队负载与数据新鲜度">Team Load &amp; Data Freshness</span></div>
+        <div id="pfTeam"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MEETING TO-DOS + MEETING HISTORY — served by pm-copilot-agent -->
+  <!-- ============================================================ -->
+  <div class="page" id="page-todo">
+    <div class="page-head">
+      <h1><span data-i18n-en="Meeting To-dos" data-i18n-zh="会议待办">Meeting To-dos</span></h1>
+      <p><span data-i18n-en="PM Copilot reads each meeting from Granola and drafts Jira updates. Nothing reaches Jira until an admin approves it here." data-i18n-zh="PM Copilot 从 Granola 读取每场会议并起草 Jira 更新。只有管理员在此审批后才会写入 Jira。">PM Copilot reads each meeting from Granola and drafts Jira updates. Nothing reaches Jira until an admin approves it here.</span></p>
+    </div>
+    <div class="pmc-bar" data-pmc-bar></div>
+    <div id="pmcTodo"></div>
+  </div>
+
+  <div class="page" id="page-history">
+    <div class="page-head">
+      <h1><span data-i18n-en="Meeting History" data-i18n-zh="会议记录">Meeting History</span></h1>
+      <p><span data-i18n-en="Every meeting PM Copilot has read, what it concluded, and what was approved from it." data-i18n-zh="PM Copilot 读过的每场会议、它的结论,以及从中审批了哪些事项。">Every meeting PM Copilot has read, what it concluded, and what was approved from it.</span></p>
+    </div>
+    <div class="pmc-bar" data-pmc-bar></div>
+    <div class="row2" style="grid-template-columns:1.7fr 1fr;">
+      <div id="pmcHistory" style="min-width:0;"></div>
+      <div style="min-width:0;display:flex;flex-direction:column;gap:16px;">
+        <div class="panel" id="pmcImport"></div>
+        <div class="panel" id="pmcAudit"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-users">
+    <div class="page-head">
+      <h1><span data-i18n-en="Users &amp; Roles" data-i18n-zh="用户与角色">Users &amp; Roles</span></h1>
+      <p><span data-i18n-en="Who can sign in, which pages they see, which projects' data they see, and who may approve to-dos into Jira." data-i18n-zh="谁可以登录、能看到哪些页面和哪些项目的数据,以及谁可以把待办审批写入 Jira。">Who can sign in, which pages they see, which projects' data they see, and who may approve to-dos into Jira.</span></p>
+    </div>
+    <div class="panel" id="uaUsers" style="margin-bottom:18px;"></div>
+    <div class="panel" id="uaRoles"></div>
+  </div>
+
+  <div class="page" id="page-overview">
     <div class="page-head">
       <h1><span data-i18n-en="Program Overview" data-i18n-zh="项目总览">Program Overview</span></h1>
       <p><span data-i18n-en="Program management console · health, blocker impact, and key actions at a glance" data-i18n-zh="项目管理控制台 · 一览健康度、阻塞影响与关键行动项">Program management console · health, blocker impact, and key actions at a glance</span></p>
@@ -581,7 +1058,6 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,20 14,22 28,14 42,18 56,9 70,15 84,6 100,11" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="blocked">2</div>
         <div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Tasks blocked" data-i18n-zh="阻塞任务数">Tasks blocked</span></div>
       </div>
@@ -590,7 +1066,6 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <div class="stat-label"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,18 14,12 28,16 42,8 56,13 70,7 84,12 100,5" fill="none" stroke="var(--orange)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="atrisk">8</div>
         <div class="stat-sub up" data-kpi="atrisk-sub"><span data-i18n-en="Tasks at risk" data-i18n-zh="有风险任务数">Tasks at risk</span></div>
       </div>
@@ -599,7 +1074,6 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,10 14,16 28,12 42,20 56,15 70,22 84,18 100,24" fill="none" stroke="var(--red)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="overdue">1</div>
         <div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Tasks overdue" data-i18n-zh="逾期任务数">Tasks overdue</span></div>
       </div>
@@ -608,7 +1082,6 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Due in 7 Days" data-i18n-zh="7天内到期">Due in 7 Days</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,8 14,14 28,10 42,17 56,13 70,19 84,15 100,20" fill="none" stroke="var(--blue)" stroke-width="2.5"/></svg>
         <div class="stat-value" data-kpi="duesoon">2</div>
         <div class="stat-sub down" data-kpi="duesoon-sub"><span data-i18n-en="Tasks due soon" data-i18n-zh="即将到期任务数">Tasks due soon</span></div>
       </div>
@@ -617,7 +1090,6 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
           <div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="stat-label"><span data-i18n-en="Current Phase" data-i18n-zh="当前阶段">Current Phase</span></div>
         </div>
-        <svg class="stat-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><circle cx="50" cy="15" r="11" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-dasharray="52 69"/></svg>
         <div class="stat-value small"><span data-i18n-en="Month 2" data-i18n-zh="第 2 月">Month 2</span></div>
         <div class="stat-sub">Aug 2026 · Digital Twin Construction</div>
       </div>
@@ -784,23 +1256,23 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
     <div class="stats">
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label"><span data-i18n-en="Blocked" data-i18n-zh="已阻塞">Blocked</span></div></div>
-        <div class="stat-value" data-kpi="blocked">2</div><div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="blocked">2</div><div class="stat-sub" data-kpi="blocked-sub"><span data-i18n-en="Tasks blocked" data-i18n-zh="阻塞任务数">Tasks blocked</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-label"><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></div></div>
-        <div class="stat-value" data-kpi="atrisk">8</div><div class="stat-sub up" data-kpi="atrisk-sub"><span data-i18n-en="+1 vs. last week" data-i18n-zh="较上周 +1">+1 vs. last week</span></div>
+        <div class="stat-value" data-kpi="atrisk">8</div><div class="stat-sub" data-kpi="atrisk-sub"><span data-i18n-en="Tasks at risk" data-i18n-zh="有风险任务数">Tasks at risk</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></div></div>
-        <div class="stat-value" data-kpi="overdue">1</div><div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="overdue">1</div><div class="stat-sub" data-kpi="overdue-sub"><span data-i18n-en="Tasks overdue" data-i18n-zh="逾期任务数">Tasks overdue</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="stat-label"><span data-i18n-en="Current Blocker Sources" data-i18n-zh="当前阻塞源数量">Current Blocker Sources</span></div></div>
-        <div class="stat-value" data-kpi="blockersources">2</div><div class="stat-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="blockersources">2</div><div class="stat-sub"><span data-i18n-en="Tasks holding up others" data-i18n-zh="卡住其他任务的任务">Tasks holding up others</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="stat-label"><span data-i18n-en="Milestones Impacted" data-i18n-zh="受影响里程碑数">Milestones Impacted</span></div></div>
-        <div class="stat-value" data-kpi="msimpacted">1</div><div class="stat-sub"><span data-i18n-en="Flat vs. last week" data-i18n-zh="与上周持平">Flat vs. last week</span></div>
+        <div class="stat-value" data-kpi="msimpacted">1</div><div class="stat-sub"><span data-i18n-en="Milestones with a late input" data-i18n-zh="有输入滞后的里程碑">Milestones with a late input</span></div>
       </div>
     </div>
 
@@ -1004,7 +1476,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--gray-bg);color:var(--text-dim)"><svg class="i" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="stat-label"><span data-i18n-en="Tasks This Month" data-i18n-zh="本月任务数">Tasks This Month</span></div></div>
-        <div class="stat-value" data-kpi="monthtasks">10</div><div class="stat-sub up"><span data-i18n-en="+1 vs. last month" data-i18n-zh="较上月 +1">+1 vs. last month</span></div>
+        <div class="stat-value" data-kpi="monthtasks">10</div><div class="stat-sub"><span data-i18n-en="Tasks scheduled" data-i18n-zh="已排期任务">Tasks scheduled</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="icon-box" style="background:var(--green-bg);color:var(--green)"><svg class="i" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label"><span data-i18n-en="Completed" data-i18n-zh="已完成">Completed</span></div></div>
@@ -1025,6 +1497,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
     <div class="subview active" id="rm-gantt">
       <div class="rm-body">
         <div>
+          <div class="plan-hint" id="planHint" hidden></div>
           <div class="gantt-wrap">
             <div class="gantt-left">
               <div class="gh"><span>#</span><span><span data-i18n-en="Task / Task" data-i18n-zh="任务">Task / Task</span></span><span><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></span></div>
@@ -1043,6 +1516,8 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
             <span class="legend-item"><span class="dot" style="color:var(--orange)"></span><span data-i18n-en="At Risk" data-i18n-zh="有风险">At Risk</span></span>
             <span class="legend-item"><span class="dot" style="color:var(--gray)"></span><span data-i18n-en="Not Started" data-i18n-zh="未开始">Not Started</span></span>
             <span class="legend-item"><span class="msdiamond"></span>&nbsp;<span data-i18n-en="Milestone" data-i18n-zh="里程碑">Milestone</span></span>
+            <span class="legend-item"><span class="ds-dot k-jira"></span><span data-i18n-en="Linked to Jira" data-i18n-zh="已关联 Jira">Linked to Jira</span></span>
+            <span class="legend-item"><span class="ds-dot k-edit"></span><span data-i18n-en="Edited on the Gantt" data-i18n-zh="在甘特图上修改过">Edited on the Gantt</span></span>
             <span class="legend-item">┈→ <span data-i18n-en="Dependency" data-i18n-zh="依赖关系">Dependency</span></span>
           </div>
         </div>
@@ -1314,6 +1789,11 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 </div>
 
 <div id="toast"><div class="toast-title" id="toastTitle">Program updated</div><div class="toast-body" id="toastBody"></div></div>
+<div class="src-tip" id="srcTip" role="tooltip"></div>
+<div class="pe-scrim" id="peScrim" onclick="planClose()"></div>
+<div class="pe-modal" id="peModal" role="dialog" aria-modal="true" aria-labelledby="peTitle" hidden></div>
+<div class="pf-scrim" id="pfScrim" onclick="closeProjectDrawer()"></div>
+<aside class="pf-drawer" id="pfDrawer" aria-hidden="true" aria-label="Project snapshot"></aside>
 
 <div class="snap-hint" id="snapHint">
   <span id="snapHintText"></span>
@@ -1393,7 +1873,7 @@ const TASKS = [
  {id:'15',name:'DCWiz Telemetry & What-if Validation',nameZh:'DCWiz 遥测与假设分析验证',en:'Monitoring + Energy/CFD what-if analysis',month:4,monthLabel:'Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)',owner:'Valdy',status:'notstarted',health:'none',progress:0,next:'Design validation scenarios',due:'10/20',ms:'—',gs:'2026-10-20',ge:'2026-11-10'},
 ];
 const MILESTONE = {id:'MS2',name:'Digital Twin Calibrated',nameZh:'数字孪生标定完成',en:'Digital Twin Calibrated',owner:'Valdy',due:'08/28',date:'2026-08-28',month:2};
-const TODAY = new Date('2026-08-21');
+const TODAY = new Date(new Date(Date.now()+8*3600e3).toISOString().slice(0,10));   // today, Singapore
 
 /* ===================== i18n (EN / ZH switch) =====================
    Scope (per product decision): UI chrome (nav, headers, buttons, badges,
@@ -1699,11 +2179,12 @@ function computeKPIs(){
     if(t.status!=='inprogress' || isOverdue(t) || isEffectivelyBlocked(t.id)) return false;
     const d = parseDue(t.due); if(!d) return false;
     const diff = Math.round((d-TODAY)/86400000);
-    return diff>=0 && diff<=3;
+    return diff>=0 && diff<=7;
   });
   const blockerSourceIds = new Set(TASKS.filter(t=>(t.status==='blocked'||isOverdue(t)) && EDGES.some(e=>e.from===t.id)).map(t=>t.id));
   const msImpacted = EDGES.some(e=>e.to==='MS2' && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]))) ? 1 : 0;
-  const monthTasks = TASKS.filter(t=>t.month===2);
+  const CUR = (typeof dsPhase==='function') ? dsPhase().months : [2];
+  const monthTasks = TASKS.filter(t=>CUR.includes(t.month));
   const monthDone = monthTasks.filter(t=>t.status==='done');
   const monthProg = monthTasks.filter(t=>t.status==='inprogress');
   return {
@@ -1725,6 +2206,7 @@ function applyKPIs(){
 
 /* ===================== NAV ===================== */
 function goPage(id){
+  if(typeof AUTH_READY!=='undefined' && AUTH_READY && !pageAllowed(id)){ const f = firstAllowedPage(); if(!f) return; id = f; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.rail-icon[data-page]').forEach(r=>r.classList.remove('active'));
@@ -1735,6 +2217,22 @@ function goPage(id){
   if(id==='dependency') requestAnimationFrame(()=>requestAnimationFrame(drawDepConnectors));
   if(id==='blocker') requestAnimationFrame(()=>requestAnimationFrame(drawBimConnectors));
   if(id==='meetings') renderMeetingsPage();
+  // The portfolio spans every client; the remaining tabs are the DayOne NTPE project view.
+  const sel = document.getElementById('projSelLabel');
+  const ALL_SCOPE = ['portfolio','todo','history','users'];
+  if(sel) sel.textContent = ALL_SCOPE.includes(id)
+    ? (LANG==='zh' ? `全部项目(${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})` : `All projects (${typeof PF_PROJECTS!=='undefined'?PF_PROJECTS.length:''})`)
+    : 'DayOne NTP-E';
+  const upd = document.getElementById('updatedTime');
+  if(upd) upd.textContent = ALL_SCOPE.includes(id) ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '')
+    : ((typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.syncedAt) ? `${fmtDT(PLAN.jira.syncedAt)} (Jira)` : '2026-08-21 09:15');
+  const tabsEl = document.querySelector('.tabs'); if(tabsEl) tabsEl.classList.toggle('mode-all', ALL_SCOPE.includes(id));
+  if(typeof renderProjMenu==='function') renderProjMenu();
+  if(id==='portfolio' && typeof renderPortfolio==='function') renderPortfolio();
+  if((id==='todo' || id==='history') && typeof pmcRefresh==='function') pmcRefresh();
+  if(id==='users' && typeof uaLoad==='function') uaLoad();
+  if(typeof hideSrcTip==='function') hideSrcTip(true);
+  if(!ALL_SCOPE.includes(id) && typeof applyDataSources==='function') applyDataSources();
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
 
@@ -1978,7 +2476,7 @@ function renderList(){
     const barColor = t.progress>=75?'var(--green)':t.progress>=50?'var(--orange)':t.progress>=25?'var(--red)':'var(--gray)';
     body.innerHTML += `<tr>
       <td>${t.id}</td>
-      <td class="name-cell">${taskName(t)}<span class="en">${t.en}</span></td>
+      <td class="name-cell">${taskName(t)} ${typeof dsTaskTag==='function' ? dsTaskTag(t.id) : ''}<span class="en">${t.en}</span></td>
       <td>${monthWord(t.month)}</td>
       <td>${t.owner}</td>
       <td>${badge(t.status)}</td>
@@ -2046,12 +2544,12 @@ function buildGantt(){
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else if(r.kind==='milestone'){
-      leftRows.innerHTML += `<div class="gr"><span class="gid">◆</span><span class="gname">${msName()}</span><span></span></div>`;
+      leftRows.innerHTML += `<div class="gr" data-task="__ms"><span class="gid">◆</span><span class="gname">${msName()}</span><span></span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     } else {
       const t=r.t;
-      leftRows.innerHTML += `<div class="gr"><span class="gid">${t.id}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
+      leftRows.innerHTML += `<div class="gr" data-task="${t.id}"><span class="gid">${String(t.id).replace(/^BA-/,'')}</span><span class="gname">${taskName(t)}</span><span>${badgeSmall(t.status)}</span></div>`;
       let bgHtml=''; MONTHS.forEach(()=>{ bgHtml += `<div class="gc"></div>`; });
       rowsEl.innerHTML += `<div class="gantt-row-bg">${bgHtml}</div>`;
     }
@@ -2067,6 +2565,7 @@ function buildGantt(){
       const el = document.createElement('div');
       el.style.position='absolute'; el.style.left = `calc(${left}% - 6px)`; el.style.top = (r.top+8)+'px';
       el.innerHTML = `<span class="msdiamond" style="width:16px;height:16px;background:var(--purple)"></span>`;
+      el.dataset.task = '__ms'; el.style.zIndex = 6;
       rowsEl.appendChild(el);
       const tag=document.createElement('div');
       tag.style.position='absolute'; tag.style.left=`calc(${left}% + 14px)`; tag.style.top=(r.top+10)+'px';
@@ -2081,7 +2580,7 @@ function buildGantt(){
     const width = Math.max(rawWidth,1.2);
     const colorMap = {done:'var(--green)',inprogress:'var(--orange)',blocked:'var(--red)',overdue:'var(--red)',notstarted:'var(--gray)'};
     const bar = document.createElement('div');
-    bar.className='gantt-bar';
+    bar.className='gantt-bar'; bar.dataset.task = t.id;
     bar.style.left = left+'%'; bar.style.width = width+'%'; bar.style.top = (r.top+8)+'px';
     bar.style.background = colorMap[t.status]||'var(--gray)';
     bar.style.zIndex = 6;
@@ -2093,7 +2592,7 @@ function buildGantt(){
       ext.style.position='absolute'; ext.style.left = `calc(${left}% + ${width}% + 6px)`; ext.style.top = (r.top+8)+'px';
       ext.style.fontSize='10px'; ext.style.fontWeight='700'; ext.style.color='var(--text-dim)'; ext.style.whiteSpace='nowrap';
       ext.style.height='20px'; ext.style.display='flex'; ext.style.alignItems='center'; ext.style.zIndex=6;
-      ext.textContent = label;
+      ext.textContent = label; ext.dataset.task = t.id;
       rowsEl.appendChild(ext);
     } else {
       bar.textContent = label;
@@ -2102,6 +2601,7 @@ function buildGantt(){
   });
 
   rowsEl.style.height = y+'px';
+  if(typeof planMarkEditable==='function') planMarkEditable();
 
   // today line
   const todayOffset = pct(dayOffset(TODAY));
@@ -2144,7 +2644,7 @@ function renderActionsTables(){
   const sorted = [...ACTIONS].sort((a,b)=>(pr[a.priority]??1)-(pr[b.priority]??1));
   const top5Body = document.getElementById('top5ActionsBody');
   if(top5Body){
-    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${actionTitle(a)}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
+    top5Body.innerHTML = sorted.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${actionTitle(a)} ${typeof dsActionTag==='function' ? dsActionTag(a) : ''}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${actionStatusBadge(a.status)}</td></tr>`).join('');
   }
   const recoveryBody = document.getElementById('recoveryActionsBody');
   if(recoveryBody){
@@ -2152,7 +2652,7 @@ function renderActionsTables(){
     recoveryBody.innerHTML = recovery.map((a,i)=>{
       const rt = a.relatedTask ? TASKS_BY_ID[a.relatedTask] : null;
       const impact = rt ? `→ ${taskName(rt)}${rt.ms==='MS2' ? ' → MS2' : ''}` : '—';
-      return `<tr><td>${i+1}</td><td>${actionTitle(a)}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${impact}</td><td>${actionStatusBadge(a.status)}</td></tr>`;
+      return `<tr><td>${i+1}</td><td>${actionTitle(a)} ${typeof dsActionTag==='function' ? dsActionTag(a) : ''}</td><td>${a.owner}</td><td>${a.due||'—'}</td><td>${impact}</td><td>${actionStatusBadge(a.status)}</td></tr>`;
     }).join('');
   }
 }
@@ -2252,7 +2752,7 @@ function confBadge(c){
   if(c==='inferred') return `<span class="conf-badge inferred">🟡 ${tr('Inferred')}</span>`;
   return `<span class="conf-badge unknown">⚪ ${tr('Unknown')}</span>`;
 }
-function nowLabel(){ return '2026-08-19'; }
+function nowLabel(){ return new Date(Date.now()+8*3600e3).toISOString().slice(0,10); }
 
 /* Approving writes into program data, so withdrawing has to put it back exactly. Each apply
    records what it touched — the field's previous value, the ACTIONS rows it created and its
@@ -2292,6 +2792,7 @@ function applyProposal(p){
 function withdrawProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status==='pending') return;
+  if(typeof mtRemote==='function' && mtRemote([id], 'withdraw')) return;
   const wasApproved = p.status==='approved';
   const j = p._applied;
   let clash = '';
@@ -2325,6 +2826,7 @@ function withdrawProposal(id){
 function approveProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status!=='pending') return;
+  if(typeof mtRemote==='function' && mtRemote([id], 'approved')) return;
   applyProposal(p);
   render();
   const body = p.entityType==='task'
@@ -2335,6 +2837,7 @@ function approveProposal(id){
 function rejectProposal(id){
   const p = PROPOSALS.find(x=>x.id===id);
   if(!p || p.status!=='pending') return;
+  if(typeof mtRemote==='function' && mtRemote([id], 'rejected')) return;
   p.status = 'rejected';
   render();
   showToast(tr('Update Rejected'), tr('This Change Proposal will not be written to project data — the original record is unchanged'));
@@ -2342,6 +2845,7 @@ function rejectProposal(id){
 function approveAllConfirmed(){
   const targets = PROPOSALS.filter(p=>p.meetingId===currentMeetingId && p.status==='pending' && p.confidence==='confirmed');
   if(targets.length===0){ showToast(tr('Nothing to batch-approve'), tr('No pending 🟢 Confirmed proposals for this meeting')); return; }
+  if(typeof mtRemote==='function' && mtRemote(targets.map(p=>p.id), 'approved')) return;
   targets.forEach(applyProposal);
   render();
   showToast(`${targets.length} ${tr('Confirmed updates applied')}`, tr('Health / KPIs / Blocker Map / Roadmap recalculated automatically'));
@@ -2920,7 +3424,8 @@ function renderProposalList(){
     const diffHtml = p.entityType==='task'
       ? `<div class="prop-diff"><span class="old">${formatFieldVal(p.field,p.oldValue)}</span>→<span class="new">${p.confidence==='unknown' ? tr('Pending confirmation (not guessed)') : formatFieldVal(p.field,p.newValue)}</span></div>`
       : `<div class="prop-diff"><span class="new">${tr('New:')} ${p.newValue.title} (${p.newValue.owner} · ${p.newValue.due||'—'})</span></div>`;
-    const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}</span>` : '';
+    const who = p._srv ? ` <span style="font-weight:500;opacity:.8">· ${p._srv.by} · ${typeof fmtDT==='function' ? fmtDT(p._srv.at) : p._srv.at}</span>` : '';
+    const statusTag = p.status==='approved' ? `<span class="prop-status-tag approved">${tr('Approved')}${who}</span>` : p.status==='rejected' ? `<span class="prop-status-tag rejected">${tr('Rejected')}${who}</span>` : '';
     const actionsHtml = p.status==='pending'
       ? `<div class="prop-actions"><button class="btn-approve" onclick="approveProposal('${p.id}')">✓ ${tr('Approve')}</button><button class="btn-reject" onclick="rejectProposal('${p.id}')">✕ ${tr('Reject')}</button></div>`
       : `<div class="prop-actions" style="align-items:center;">${statusTag}<button class="btn-withdraw" onclick="withdrawProposal('${p.id}')">↩ ${tr('Withdraw')}</button></div>`;
@@ -2998,6 +3503,7 @@ function renderMeetingsPage(){
   updatePendingBadge();
   updateLunaButton();
   if(document.getElementById('mt-history').classList.contains('active')) renderHistory();
+  if(typeof applyDataSources==='function') applyDataSources();
 }
 function updatePendingBadge(){
   const pendingCount = PROPOSALS.filter(p=>p.status==='pending').length;
@@ -3038,7 +3544,7 @@ try{ SNAP_ENABLED = localStorage.getItem('dc_snap') !== 'off'; }catch(e){}
 const EDGE_IDLE_RESET = 400;  // ms of stillness that ends a gesture, for momentum detection
 let _snapUntil = 0, _edgePush = 0, _edgeDir = 0, _edgeLast = 0, _awaitIdle = false;
 
-function pageOrder(){ return [...document.querySelectorAll('.tab[data-page]')].map(t=>t.dataset.page); }
+function pageOrder(){ return [...document.querySelectorAll('.tab[data-page]')].filter(t=>t.offsetParent!==null).map(t=>t.dataset.page); }
 function activePageId(){ const el = document.querySelector('.page.active'); return el ? el.id.replace('page-','') : null; }
 function pageLabel(id){
   const tab = document.querySelector(`.tab[data-page="${id}"]`);
@@ -3239,6 +3745,7 @@ function render(){
   if(document.getElementById('page-dependency').classList.contains('active')) drawDepConnectors();
   updatePendingBadge();
   if(document.getElementById('page-meetings').classList.contains('active')) renderMeetingsPage();
+  if(typeof applyDataSources==='function') applyDataSources();
   saveState();
 }
 // Restore the previous session before the first paint, so a refresh keeps imported meetings and
@@ -3287,6 +3794,8 @@ function setLang(lang){
   renderList();
   buildGantt();
   render();
+  if(typeof renderPortfolio==='function') renderPortfolio();
+  const active = activePageId(); if(active) goPage(active);
 }
 document.getElementById('langToggle').querySelectorAll('[data-lang-opt]').forEach(el=>{
   el.addEventListener('click', ()=> setLang(el.dataset.langOpt));
@@ -3296,6 +3805,1538 @@ updateLangToggleUI();
 
 /* set updated timestamp to now (Singapore) */
 document.getElementById('updatedTime').textContent = '2026-08-21 09:15';
+</script>
+<script>
+/* =====================================================================================
+   PORTFOLIO (home page)
+
+   Data model, kept deliberately in two layers:
+     · PF_TICKETS  — a snapshot of the Jira query below. These are the facts. KPIs, freshness,
+                     overdue and team-load figures are COMPUTED from this array, never typed in.
+                     To refresh, re-run the JQL and replace the rows (key/status/assignee/updated/due).
+     · PF_PROJECTS — the PM's reading of those facts: health, what is stuck, what is next.
+                     Every statement carries src: [...] so the page can show where it came from.
+   A src entry is a Jira key, or 'MTG' for the PM weekly sync minutes (12 Oct 2026), which is
+   ahead of Jira on several projects. Hovering anything with data-src shows those records.
+   ===================================================================================== */
+const PF_ASOF = new Date('2026-10-14T14:45:00+08:00');
+let PF_ASOF_LABEL = '';
+const PF_JQL = 'project = BA AND "client[dropdown]" != RDA AND status NOT IN (Done, Backlog) ORDER BY cf[10019] ASC';
+const JIRA_BROWSE = 'https://projects-teams.atlassian.net/browse/';
+const PF_MEETING = { id:'MTG', title:'PM weekly sync · 12 Oct 2026', titleZh:'项目周会 · 2026-10-12', file:'智能纪要：1012project meeting' };
+
+// inQuery:false = parent/master ticket outside the JQL (status Backlog), shown for context only.
+const PF_TICKETS = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
+const PF_TEXT = {};   // portfolio-wide narrative, only sent to roles that see every project
+const PF_TK = {};
+const PF_Q = [];   // exactly the JQL result set
+/* Portfolio data lives in the agent, not in this file, so a role only ever receives its own
+   projects. Called once after sign-in. */
+function pfLoad(data){
+  const fill = (arr, rows) => { arr.length = 0; (rows||[]).forEach(r=>arr.push(r)); };
+  fill(PF_TICKETS, data.tickets); fill(PF_PROJECTS, data.projects); fill(PF_ASKS, data.asks); fill(PF_EVENTS_EXTRA, data.events);
+  Object.keys(PF_TK).forEach(k=>delete PF_TK[k]); PF_TICKETS.forEach(t=>{ PF_TK[t.key] = t; });
+  fill(PF_Q, PF_TICKETS.filter(t=>t.inQuery!==false));
+  Object.keys(PF_TEXT).forEach(k=>delete PF_TEXT[k]); Object.assign(PF_TEXT, data.text || {});
+  PF_ASOF_LABEL = data.syncedAt ? fmtDT(data.syncedAt) : (data.asOf || '');
+}
+
+/* Lifecycle stages every RDA deployment passes through, left to right. */
+const PF_STAGES = [
+  {id:'data',   en:'Data access',      zh:'数据接入'},
+  {id:'model',  en:'Digital twin',     zh:'数字孪生'},
+  {id:'ai',     en:'AI & validation',  zh:'AI 与验证'},
+  {id:'deploy', en:'Deployment',       zh:'部署'},
+  {id:'ops',    en:'Operate & report', zh:'运营与报告'},
+];
+const PF_STATE = {
+  done:   {en:'Done',        zh:'已完成', g:'✓', cls:'st-done'},
+  wip:    {en:'In progress', zh:'进行中', g:'●', cls:'st-wip'},
+  risk:   {en:'At risk',     zh:'有风险', g:'!', cls:'st-risk'},
+  blocked:{en:'Blocked',     zh:'已阻塞', g:'✕', cls:'st-blocked'},
+  todo:   {en:'Not started', zh:'未开始', g:'',  cls:'st-todo'},
+  na:     {en:'Not in scope',zh:'不在范围', g:'–', cls:'st-na'},
+};
+const PF_HEALTH = {
+  red:  {en:'Escalate', zh:'需升级', badge:'red',    rank:0},
+  amber:{en:'At risk',  zh:'有风险', badge:'orange', rank:1},
+  green:{en:'On track', zh:'正常',   badge:'green',  rank:2},
+};
+
+const PF_PROJECTS = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
+
+/* Decisions that need someone above the project. Facts are sourced; the action is the PM's recommendation. */
+const PF_ASKS = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
+const PF_ASK_KIND = {
+  escalate:   {en:'Escalate',    zh:'升级',   badge:'red'},
+  decide:     {en:'Decide',      zh:'决策',   badge:'orange'},
+  align:      {en:'Align',       zh:'对齐',   badge:'blue'},
+  opportunity:{en:'Opportunity', zh:'机会',   badge:'green'},
+};
+
+/* Dated commitments from the 12 Oct sync and Jira. 'This week' items are pinned to Fri 16 Oct. */
+const PF_EVENTS_EXTRA = [];   // filled after sign-in from the agent (GET /api/portfolio), already filtered to the role's projects
+
+/* ---------- helpers ---------- */
+const L = o => (o == null) ? '' : (typeof o === 'string' ? o : ((LANG==='zh' && o.zh) ? o.zh : o.en));
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pfDays = (a,b) => Math.round((new Date(b+'T00:00:00+08:00') - new Date(a+'T00:00:00+08:00'))/86400000);
+const PF_TODAY = new Date(Date.now()+8*3600e3).toISOString().slice(0,10);   // today, Singapore
+const ageDays = t => pfDays(t.updated, PF_TODAY);
+const overdueDays = t => t.due ? pfDays(t.due, PF_TODAY) : 0;
+const MON_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], DOW_ZH = ['周日','周一','周二','周三','周四','周五','周六'];
+function fmtD(iso, withDow){
+  if(!iso) return LANG==='zh' ? '待定' : 'TBC';
+  const d = new Date(iso+'T00:00:00+08:00');
+  if(LANG==='zh') return `${d.getMonth()+1}月${d.getDate()}日` + (withDow?` ${DOW_ZH[d.getDay()]}`:'');
+  return (withDow?`${DOW_EN[d.getDay()]} `:'') + `${d.getDate()} ${MON_EN[d.getMonth()]}`;
+}
+const PF_TSTATUS = {
+  inprogress:{en:'In Progress', zh:'进行中', c:'blue'},
+  review:    {en:'In Review',   zh:'审查中', c:'violet'},
+  blocked:   {en:'Blocked',     zh:'已阻塞', c:'red'},
+  todo:      {en:'To Do',       zh:'待办',   c:'gray'},
+  backlog:   {en:'Backlog',     zh:'Backlog', c:'gray'},
+};
+const tBadge = s => { const m = PF_TSTATUS[s]||{en:s,c:'gray'}; return `<span class="badge ${m.c}">${esc(L(m))}</span>`; };
+const projById = id => PF_PROJECTS.find(p=>p.id===id);
+const projName = id => id==='internal' ? (LANG==='zh'?'内部':'Internal') : id==='team' ? (LANG==='zh'?'团队':'Team') : ((projById(id)||{}).name || id);
+const srcAttr = arr => esc((arr||[]).join(','));
+const T = (en, zh) => LANG==='zh' ? zh : en;
+
+/* ---------- computed portfolio metrics (from PF_Q only) ---------- */
+function pfMetrics(){
+  const overdue = PF_Q.filter(t=>t.due && overdueDays(t)>0).sort((a,b)=>overdueDays(b)-overdueDays(a));
+  const fresh   = PF_Q.filter(t=>ageDays(t)<=14);
+  const stale60 = PF_Q.filter(t=>ageDays(t)>60);
+  const blocked = PF_Q.filter(t=>t.status==='blocked');
+  const byOwner = {};
+  PF_Q.forEach(t=>{ (byOwner[t.assignee] = byOwner[t.assignee] || {n:0, projects:new Set(), keys:[]}); byOwner[t.assignee].n++; byOwner[t.assignee].projects.add(t.proj); byOwner[t.assignee].keys.push(t.key); });
+  const owners = Object.entries(byOwner).map(([name,v])=>({name, n:v.n, projects:v.projects.size, keys:v.keys})).sort((a,b)=>b.n-a.n);
+  const delivery = PF_PROJECTS.filter(p=>p.kind==='delivery');
+  const gated = PF_PROJECTS.filter(p=>p.gate==='client');
+  const reds = PF_PROJECTS.filter(p=>p.health==='red');
+  const buckets = [
+    {en:'≤ 14 days', zh:'≤ 14 天', test:d=>d<=14},
+    {en:'15–30 days', zh:'15–30 天', test:d=>d>14&&d<=30},
+    {en:'31–60 days', zh:'31–60 天', test:d=>d>30&&d<=60},
+    {en:'> 60 days', zh:'> 60 天', test:d=>d>60},
+  ].map(b=>({...b, keys:PF_Q.filter(t=>b.test(ageDays(t))).map(t=>t.key)}));
+  return {overdue, fresh, stale60, blocked, owners, delivery, gated, reds, buckets, total:PF_Q.length};
+}
+
+/* ---------- render ---------- */
+function renderPortfolio(){
+  if(!document.getElementById('pfKpis') || !PF_PROJECTS.length || !PF_Q.length) return;
+  const m = pfMetrics();
+  const top = m.owners[0];
+
+  document.getElementById('pfAsOf').innerHTML =
+    `<span>${T('Jira, synced','Jira 同步于')} <b style="color:var(--text)">${esc(PF_ASOF_LABEL)}</b> · ${m.total} ${T('open tickets','个在途工单')}</span>
+     <code title="${esc(PF_JQL)}">${esc(PF_JQL)}</code>
+     <span data-src="MTG" style="cursor:help;text-decoration:underline dotted;">+ ${esc(T(PF_MEETING.title, PF_MEETING.titleZh))}</span>`;
+
+  const kpi = (icon, color, label, value, sub, src, subCls) => `
+    <div class="stat-card" data-src="${srcAttr(src)}" tabindex="0">
+      <div class="stat-top"><div class="icon-box" style="background:var(--${color}-bg);color:var(--${color})">${icon}</div><div class="stat-label">${esc(label)}</div></div>
+      <div class="stat-value">${value}</div>
+      <div class="stat-sub ${subCls||''}">${esc(sub)}</div>
+    </div>`;
+  const I = {
+    grid:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+    flag:'<svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    lock:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    clock:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    user:'<svg class="i" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    pulse:'<svg class="i" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  };
+  const allKeys = PF_Q.map(t=>t.key);
+  const keysOf = ps => PF_Q.filter(t=>ps.some(p=>p.id===t.proj)).map(t=>t.key);
+  document.getElementById('pfKpis').innerHTML = [
+    kpi(I.grid,'purple', T('Active Projects','在执行项目'), PF_PROJECTS.length,
+        T(`${m.delivery.length} in delivery · ${PF_PROJECTS.length-m.delivery.length} in operation`, `${m.delivery.length} 个交付中 · ${PF_PROJECTS.length-m.delivery.length} 个运营中`), allKeys),
+    kpi(I.flag,'red', T('Need Escalation','需升级'), m.reds.length, m.reds.map(p=>p.name).join(' · '), keysOf(m.reds).concat(['MTG']), 'up'),
+    kpi(I.lock,'orange', T('Waiting on Client Data','受阻于客户数据'), `${m.gated.length}<span style="font-size:15px;color:var(--text-dimmer);font-weight:700"> / ${m.delivery.length}</span>`,
+        T('delivery projects; not an RDA engineering gap','个交付项目;并非 RDA 工程能力问题'), keysOf(m.gated).concat(['MTG'])),
+    kpi(I.clock,'red', T('Past Due Date','超过截止日'), m.overdue.length,
+        m.overdue.length ? T(`oldest ${overdueDays(m.overdue[0])} days (${m.overdue[0].key})`, `最久 ${overdueDays(m.overdue[0])} 天(${m.overdue[0].key})`) : '—', m.overdue.map(t=>t.key)),
+    kpi(I.user,'orange', T('Key-Person Load','关键人负载'), `${Math.round(top.n/m.total*100)}%`,
+        T(`${top.name}: ${top.n}/${m.total} tickets, ${top.projects}/${PF_PROJECTS.length} projects`, `${top.name}:${top.n}/${m.total} 个工单,覆盖 ${top.projects}/${PF_PROJECTS.length} 个项目`), top.keys, 'up'),
+    kpi(I.pulse,'cyan', T('Updated in 14 Days','14 天内有更新'), `${Math.round(m.fresh.length/m.total*100)}%`,
+        T(`${m.stale60.length} tickets untouched for 60+ days`, `${m.stale60.length} 个工单超过 60 天未更新`), m.fresh.map(t=>t.key).concat(m.stale60.map(t=>t.key))),
+  ].join('');
+
+  const briefBanner = document.getElementById('pfBrief').closest('.banner'); if(briefBanner) briefBanner.hidden = !PF_TEXT.brief;
+  document.getElementById('pfBrief').textContent = L(PF_TEXT.brief);
+
+  /* project cards */
+  const sorted = PF_PROJECTS.slice().sort((a,b)=>PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
+  document.getElementById('pfCards').innerHTML = sorted.map(p=>{
+    const h = PF_HEALTH[p.health];
+    const tks = p.tickets.map(k=>PF_TK[k]).filter(t=>t && t.inQuery!==false);
+    const od = tks.filter(t=>t.due && overdueDays(t)>0).length;
+    const st = tks.filter(t=>ageDays(t)>30).length;
+    const bl = tks.filter(t=>t.status==='blocked').length;
+    const chips = [];
+    if(p.gate==='client') chips.push(`<span class="pf-chip warn">${T('Waiting on client data','等待客户数据')}</span>`);
+    if(bl) chips.push(`<span class="pf-chip bad">${bl} ${T('blocked','个阻塞')}</span>`);
+    if(od) chips.push(`<span class="pf-chip bad">${od} ${T('past due','个逾期')}</span>`);
+    if(st) chips.push(`<span class="pf-chip">${st} ${T('stale > 30d','个超 30 天未更新')}</span>`);
+    chips.push(`<span class="pf-chip">${tks.length} ${T('open in Jira','个 Jira 在途')}</span>`);
+    const nx = p.next[0];
+    const src = p.tickets.concat(p.risks.some(r=>r.src.includes('MTG'))?['MTG']:[]);
+    const open = p.drill
+      ? `<span class="pf-open">${T('Open project','进入项目')} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>`
+      : `<span class="pf-open">${T('Snapshot','快照')} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>`;
+    return `<div class="pf-card h-${p.health}" tabindex="0" role="button" data-proj="${p.id}" data-src="${srcAttr(src)}"
+               data-src-note="${esc(T('Card drawn from these records','卡片内容来自以下记录'))}">
+      <div class="pf-card-top">
+        <div style="min-width:0;"><div class="pf-name">${esc(p.name)}</div><div class="pf-client">${esc(L(p.client))}</div></div>
+        <span class="badge ${h.badge}"><span class="dot"></span>${esc(L(h))}</span>
+      </div>
+      <div class="pf-phase">${esc(L(p.phase))}</div>
+      <p class="pf-headline">${esc(L(p.headline))}</p>
+      <div>
+        <div class="lc-strip">${PF_STAGES.map(s=>`<div class="lc-seg ${PF_STATE[p.stages[s.id].s].cls}"></div>`).join('')}</div>
+        <div class="lc-labels">${PF_STAGES.map(s=>`<span>${esc(L(s))}</span>`).join('')}</div>
+      </div>
+      <div class="pf-chips">${chips.join('')}</div>
+      <div class="pf-foot">
+        <div class="pf-next"><span class="d">${esc(fmtD(nx.date))}${nx.tentative?'?':''}</span><span class="t">${esc(L(nx))}</span></div>
+        ${open}
+      </div>
+      ${p.drill?`<div class="pf-drillnote">${T('Project view holds DayOne data as of 21 Aug 2026','项目视图中的 DayOne 数据截至 2026-08-21')}</div>`:''}
+    </div>`;
+  }).join('');
+
+  /* lifecycle matrix */
+  const mx = document.getElementById('pfMatrix');
+  const stuckBy = PF_STAGES.map(s=>PF_PROJECTS.filter(p=>['blocked','risk'].includes(p.stages[s.id].s)).length);
+  let html = `<div class="lc-h"></div>` + PF_STAGES.map((s,i)=>`<div class="lc-h">${esc(L(s))}${stuckBy[i]?`<small>${stuckBy[i]} ${T('stuck or at risk','个受阻/有风险')}</small>`:''}</div>`).join('');
+  sorted.forEach(p=>{
+    html += `<div class="lc-proj" data-proj="${p.id}">${esc(p.name)}<span>${esc(L(PF_HEALTH[p.health]))}</span></div>`;
+    PF_STAGES.forEach(s=>{
+      const c = p.stages[s.id], st = PF_STATE[c.s];
+      html += `<div class="lc-cell c-${c.s}" tabindex="0" data-src="${srcAttr(c.src)}" data-src-note="${esc(p.name+' · '+L(s)+': '+L(c))}">
+        <b><span class="g ${st.cls}">${st.g}</span>${esc(L(st))}</b><span class="n">${esc(L(c))}</span></div>`;
+    });
+  });
+  mx.innerHTML = html;
+  document.getElementById('pfMatrixLegend').innerHTML = ['done','wip','risk','blocked','todo'].map(k=>`<span><i class="${PF_STATE[k].cls}"></i>${esc(L(PF_STATE[k]))}</span>`).join('');
+  const dataStuck = stuckBy[0], dataBlocked = PF_PROJECTS.filter(p=>p.stages.data.s==='blocked').length;
+  const builtAhead = PF_PROJECTS.filter(p=>['blocked','risk'].includes(p.stages.data.s) && ['wip','done','risk','blocked'].includes(p.stages.deploy.s)).length;
+  document.getElementById('pfMatrixInsight').innerHTML = T(
+    `<b>The bottleneck is data access.</b> It is blocked or at risk in ${dataStuck} of ${PF_PROJECTS.length} projects (${dataBlocked} blocked outright), while ${builtAhead} of those already have a deployment built or in progress. The value is built but cannot be proven until clients deliver data, so the lever is client escalation, not more engineering.`,
+    `<b>瓶颈在数据接入。</b>${PF_PROJECTS.length} 个项目中有 ${dataStuck} 个在该环节受阻或有风险(其中 ${dataBlocked} 个完全阻塞),而这些项目里有 ${builtAhead} 个已完成或正在部署。价值已经搭好,但在客户交付数据前无法被证明;抓手是推动客户,而不是追加工程投入。`);
+
+  /* leadership asks */
+  const xuKeys = (m.owners.find(o=>o.name==='Xu Mingchen')||{keys:[]}).keys;
+  document.getElementById('pfAsks').innerHTML = PF_ASKS.map(a=>{
+    const k = PF_ASK_KIND[a.kind];
+    const src = a.srcTickets==='xu' ? a.src.concat(xuKeys) : a.src;
+    return `<div class="ask" tabindex="0" data-src="${srcAttr(src)}">
+      <div class="ask-k"><span class="badge ${k.badge}">${esc(L(k))}</span></div>
+      <div class="ask-t">${esc(L(a.t))} <span class="proj-tag" style="margin-left:4px">${esc(projName(a.proj))}</span></div>
+      <div class="ask-w">${esc(L(a.w))}</div>
+      <div class="ask-a"><em>${T('Recommend','建议')}</em>${esc(L(a.a))}</div>
+    </div>`;
+  }).join('');
+
+  /* next 30 days */
+  const evs = [];
+  PF_PROJECTS.forEach(p=>p.next.forEach(n=>{ if(n.date) evs.push({...n, proj:p.id}); }));
+  PF_EVENTS_EXTRA.forEach(e=>evs.push(e));
+  const end = '2026-11-13';
+  const inWin = evs.filter(e=>e.date>=PF_TODAY && e.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
+  const weeks = [
+    {en:'This week', zh:'本周', from:'2026-10-12', to:'2026-10-18'},
+    {en:'Next week', zh:'下周', from:'2026-10-19', to:'2026-10-25'},
+    {en:'Week of 26 Oct', zh:'10 月 26 日当周', from:'2026-10-26', to:'2026-11-01'},
+    {en:'Later', zh:'之后', from:'2026-11-02', to:end},
+  ];
+  document.getElementById('pfTimeline').innerHTML = weeks.map(w=>{
+    const items = inWin.filter(e=>e.date>=w.from && e.date<=w.to);
+    if(!items.length) return '';
+    return `<div class="pf-week"><h5>${esc(L(w))}</h5>${items.map(e=>{
+      const thisWeekLoose = w.from==='2026-10-12' && e.date==='2026-10-16';
+      return `<div class="pf-ev" data-src="${srcAttr(e.src)}">
+        <div class="d">${thisWeekLoose ? T('By Fri','周五前') : esc(fmtD(e.date))}<span>${thisWeekLoose ? esc(fmtD(e.date)) : esc(fmtD(e.date,true).split(' ')[LANG==='zh'?1:0])}</span></div>
+        <div class="t">${esc(L(e))}${e.tentative?`<span class="tent">${T('Tentative','暂定')}</span>`:''}</div>
+        <span class="proj-tag">${esc(projName(e.proj))}</span>
+      </div>`; }).join('')}</div>`;
+  }).join('') + `<div class="pf-note">${T(
+    'Every dated item here comes from the 12 Oct PM sync. None of them is a due date in Jira yet.',
+    '以上带日期事项均来自 10 月 12 日项目周会,目前都还不是 Jira 中的截止日期。')}</div>`;
+
+  /* team load + freshness */
+  const maxN = top.n, maxB = Math.max(...m.buckets.map(b=>b.keys.length));
+  const mtgOnly = PF_PROJECTS.filter(p=>p.risks.some(r=>r.src.length===1 && r.src[0]==='MTG')).length;
+  document.getElementById('pfTeam').innerHTML =
+    `<div class="pf-sub">${T('Open tickets by assignee','各负责人在途工单')}</div>` +
+    m.owners.map(o=>`<div class="hbar-row" data-src="${srcAttr(o.keys)}">
+       <span class="nm">${esc(o.name)}</span><div class="hbar"><i style="width:${o.n/maxN*100}%"></i></div>
+       <span class="v"><b>${o.n}</b> · ${o.projects} ${T('proj.','项目')}</span></div>`).join('') +
+    `<div class="pf-sub">${T('Days since last Jira update','距上次 Jira 更新天数')}</div>` +
+    m.buckets.map(b=>`<div class="hbar-row" data-src="${srcAttr(b.keys)}">
+       <span class="nm">${esc(L(b))}</span><div class="hbar cy"><i style="width:${maxB? b.keys.length/maxB*100:0}%"></i></div>
+       <span class="v"><b>${b.keys.length}</b> ${T('tickets','个')}</span></div>`).join('') +
+    (PF_TEXT.freshness ? `<div class="pf-note">${L(PF_TEXT.freshness)}</div>` : '');
+}
+
+/* ---------- source tooltip ---------- */
+const tip = document.getElementById('srcTip');
+let _tipTimer = null, _tipFor = null;
+function srcRowsHTML(keys){
+  return keys.map(k=>{
+    if(k==='MTG') return `<div class="st-row st-mtg"><div class="st-l1"><span class="st-key">${T('Meeting','会议')}</span><span class="st-sum">${esc(T(PF_MEETING.title, PF_MEETING.titleZh))}</span></div>
+      <div class="st-l2">${T('Minutes · not yet in Jira','会议纪要 · 尚未写入 Jira')}</div></div>`;
+    const t = PF_TK[k]; if(!t) return '';
+    const age = ageDays(t), od = overdueDays(t);
+    return `<div class="st-row"><div class="st-l1"><a class="st-key" href="${JIRA_BROWSE}${t.key}" target="_blank" rel="noopener">${t.key}</a><span class="st-sum" title="${esc(t.summary)}">${esc(t.summary)}</span></div>
+      <div class="st-l2">${tBadge(t.status)}<span>${esc(t.assignee)}</span><span class="${age>30?'stale':''}">${T(`updated ${age}d ago`,`${age} 天前更新`)}</span>${od>0?`<span class="stale" style="color:var(--red)">${T(`${od}d past due`,`逾期 ${od} 天`)}</span>`:''}${t.inQuery===false?`<span>${T('parent · outside query','父工单 · 不在查询内')}</span>`:''}</div></div>`;
+  }).join('');
+}
+function showSrcTip(el, x, y){
+  if(el.hasAttribute('data-ds') && !el.hasAttribute('data-src')){ const h = dsTipHTML(el); if(!h) return; tip.innerHTML = h; return placeSrcTip(x, y); }
+  const keys = (el.getAttribute('data-src')||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if(!keys.length) return;
+  const jiraN = keys.filter(k=>k!=='MTG').length, hasM = keys.includes('MTG');
+  const head = [jiraN?`Jira · ${jiraN}`:'', hasM?T('Meeting','会议'):''].filter(Boolean).join(' + ');
+  const note = el.getAttribute('data-src-note');
+  const MAX = 7, shown = keys.slice(0, MAX), more = keys.length - shown.length;
+  tip.innerHTML = `<div class="st-h"><span>${T('Data source','数据来源')}</span><span>${esc(head)}</span></div>` +
+    (note?`<div class="st-note">${esc(note)}</div>`:'') + srcRowsHTML(shown) +
+    (more>0?`<div class="st-row" style="font-size:11px;color:var(--text-dimmer)">+ ${more} ${T('more','个')}</div>`:'');
+  placeSrcTip(x, y);
+}
+function placeSrcTip(x, y){
+  tip.classList.add('show');
+  const r = tip.getBoundingClientRect(), pad = 12;
+  let left = x + 16, top = y + 16;
+  if(left + r.width > window.innerWidth - pad) left = Math.max(pad, x - r.width - 16);
+  if(top + r.height > window.innerHeight - pad) top = Math.max(pad, y - r.height - 16);
+  tip.style.left = left+'px'; tip.style.top = top+'px';
+}
+function hideSrcTip(now){
+  clearTimeout(_tipTimer);
+  const go = ()=>{ tip.classList.remove('show'); _tipFor = null; };
+  if(now) go(); else _tipTimer = setTimeout(go, 160);
+}
+document.addEventListener('mouseover', e=>{
+  if(tip.contains(e.target)){ clearTimeout(_tipTimer); return; }
+  const el = e.target.closest('[data-src],[data-ds]');
+  if(!el){ if(_tipFor) hideSrcTip(); return; }
+  if(el === _tipFor){ clearTimeout(_tipTimer); return; }
+  clearTimeout(_tipTimer);
+  _tipFor = el;
+  showSrcTip(el, e.clientX, e.clientY);
+});
+document.addEventListener('focusin', e=>{
+  const el = e.target.closest && e.target.closest('[data-src],[data-ds]');
+  if(el && !tip.contains(el)){ const r = el.getBoundingClientRect(); _tipFor = el; showSrcTip(el, r.left, r.bottom - 8); }
+});
+document.addEventListener('focusout', e=>{ if(_tipFor && e.target===_tipFor) hideSrcTip(); });
+window.addEventListener('scroll', ()=>{ if(_tipFor) hideSrcTip(true); }, {passive:true});
+
+/* ---------- card click: DayOne opens its project view, others open a snapshot ---------- */
+function openProject(id){
+  const p = projById(id); if(!p) return;
+  hideSrcTip(true);
+  if(p.drill){ goPage('overview'); window.scrollTo({top:0}); return; }
+  openProjectDrawer(id);
+}
+function openProjectDrawer(id){
+  const p = projById(id); if(!p) return;
+  const h = PF_HEALTH[p.health];
+  const d = document.getElementById('pfDrawer');
+  d.innerHTML = `
+    <span class="icon-btn dr-close" role="button" tabindex="0" onclick="closeProjectDrawer()" title="${T('Close','关闭')}"><svg class="i" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+    <div class="pf-phase">${esc(L(p.client))}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin:6px 40px 8px 0;flex-wrap:wrap;"><h3>${esc(p.name)}</h3><span class="badge ${h.badge}"><span class="dot"></span>${esc(L(h))}</span></div>
+    <div class="pf-phase" style="margin-bottom:10px">${esc(L(p.phase))} · ${esc(p.owners)}</div>
+    <p class="pf-headline">${esc(L(p.headline))}</p>
+    <h4>${T('Lifecycle','生命周期')}</h4>
+    <div class="lc-strip">${PF_STAGES.map(s=>`<div class="lc-seg ${PF_STATE[p.stages[s.id].s].cls}"></div>`).join('')}</div>
+    <div class="lc-labels">${PF_STAGES.map(s=>`<span>${esc(L(s))}</span>`).join('')}</div>
+    <h4>${T('What is at risk','风险点')}</h4>
+    <ul class="dr-list">${p.risks.map(r=>`<li data-src="${srcAttr(r.src)}">${esc(L(r))}<span class="dr-src">${esc(r.src.map(k=>k==='MTG'?T('Meeting 12 Oct','10/12 周会'):k).join(' · '))}</span></li>`).join('')}</ul>
+    <h4>${T('Next','下一步')}</h4>
+    <ul class="dr-list">${p.next.map(n=>`<li data-src="${srcAttr(n.src)}"><b>${esc(fmtD(n.date,true))}${n.tentative?' ('+T('tentative','暂定')+')':''}</b> · ${esc(L(n))}</li>`).join('')}</ul>
+    <h4>${T('Jira records','Jira 记录')} (${p.tickets.length})</h4>
+    ${p.tickets.map(k=>{ const t = PF_TK[k]; if(!t) return ''; const age = ageDays(t), od = overdueDays(t);
+      return `<div class="dr-tk"><div class="st-l1"><a class="st-key" href="${JIRA_BROWSE}${t.key}" target="_blank" rel="noopener">${t.key}</a><span class="st-sum">${esc(t.summary)}</span></div>
+        <div class="st-l2">${tBadge(t.status)}<span>${esc(t.assignee)}</span><span style="${age>30?'color:var(--orange)':''}">${T(`updated ${fmtD(t.updated)} (${age}d)`,`${fmtD(t.updated)} 更新(${age} 天)`)}</span>${t.due?`<span style="${od>0?'color:var(--red)':''}">${T('due','截止')} ${fmtD(t.due)}</span>`:''}${t.inQuery===false?`<span>${T('parent · outside query','父工单 · 不在查询内')}</span>`:''}</div>
+        <div class="st-sig">${esc(t.signal)}</div></div>`; }).join('')}`;
+  d.classList.add('show'); d.setAttribute('aria-hidden','false');
+  document.getElementById('pfScrim').classList.add('show');
+  d.scrollTop = 0;
+}
+function closeProjectDrawer(){
+  document.getElementById('pfDrawer').classList.remove('show');
+  document.getElementById('pfDrawer').setAttribute('aria-hidden','true');
+  document.getElementById('pfScrim').classList.remove('show');
+  hideSrcTip(true);
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeProjectDrawer(); });
+document.getElementById('page-portfolio').addEventListener('click', e=>{
+  if(e.target.closest('a')) return;
+  const c = e.target.closest('[data-proj]'); if(c) openProject(c.dataset.proj);
+});
+document.getElementById('page-portfolio').addEventListener('keydown', e=>{
+  if(e.key!=='Enter' && e.key!==' ') return;
+  const c = e.target.closest('.pf-card[data-proj]'); if(c){ e.preventDefault(); openProject(c.dataset.proj); }
+});
+
+/* ---------- project switcher ---------- */
+const projMenu = document.getElementById('projMenu'), projBtn = document.getElementById('projectSelect');
+function renderProjMenu(){
+  if(!projMenu) return;
+  const onAll = ['portfolio','todo','history','users'].includes(activePageId());
+  const allowed = id => typeof AUTH_READY==='undefined' || !AUTH_READY || pageAllowed(id);
+  const anyAll = ['portfolio','todo','history','users'].some(allowed), anyDayOne = DAYONE_PAGES.some(allowed);
+  const grid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
+  const sorted = PF_PROJECTS.slice().filter(p=> p.drill ? anyDayOne : allowed('portfolio')).sort((a,b)=>(b.drill?1:0)-(a.drill?1:0) || PF_HEALTH[a.health].rank-PF_HEALTH[b.health].rank);
+  projMenu.innerHTML = (anyAll ?
+    `<button type="button" class="pm-item ${onAll?'active':''}" role="option" aria-selected="${onAll}" data-pm="all">
+       <span class="pm-ic">${grid}</span>
+       <span class="pm-tx"><b>${T('All projects','全部项目')} (${PF_PROJECTS.length})</b><span>${T('Portfolio overview','项目组合总览')}</span></span>
+       <span class="pm-go">${onAll?'✓':''}</span></button>
+     <div class="pm-sep"></div>` : '') + `<div class="pm-group">${T('Projects','项目')}</div>` +
+    sorted.map(p=>{
+      const h = PF_HEALTH[p.health], act = !onAll && p.drill;
+      return `<button type="button" class="pm-item ${act?'active':''}" role="option" aria-selected="${act}" data-pm="${p.id}">
+        <span class="pm-ic" style="color:var(--${h.badge})"><span class="dot"></span></span>
+        <span class="pm-tx"><b>${esc(p.name)}</b><span>${esc(L(h))} · ${esc(L(p.client))}</span></span>
+        <span class="pm-go">${act?'✓':(p.drill?T('Project view','项目视图'):T('Snapshot','快照'))}</span></button>`;
+    }).join('');
+}
+function toggleProjMenu(open){
+  const willOpen = (open===undefined) ? !projMenu.classList.contains('open') : open;
+  if(willOpen) renderProjMenu();
+  projMenu.classList.toggle('open', willOpen);
+  projBtn.setAttribute('aria-expanded', String(willOpen));
+  if(willOpen){ hideSrcTip(true); const a = projMenu.querySelector('.pm-item.active') || projMenu.querySelector('.pm-item'); if(a) a.focus(); }
+}
+projBtn.addEventListener('click', e=>{ e.stopPropagation(); toggleProjMenu(); });
+projMenu.addEventListener('click', e=>{
+  const it = e.target.closest('[data-pm]'); if(!it) return;
+  toggleProjMenu(false);
+  const id = it.dataset.pm;
+  if(id==='all'){ goPage(['portfolio','todo','history','users'].find(x=>typeof AUTH_READY==='undefined'||!AUTH_READY||pageAllowed(x))||'portfolio'); window.scrollTo({top:0}); return; }
+  const p = projById(id);
+  if(p && p.drill){ goPage('overview'); window.scrollTo({top:0}); return; }
+  if(activePageId()!=='portfolio') goPage('portfolio');
+  openProjectDrawer(id);
+});
+projMenu.addEventListener('keydown', e=>{
+  const items = [...projMenu.querySelectorAll('.pm-item')], i = items.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'){ e.preventDefault(); items[Math.min(items.length-1,i+1)].focus(); }
+  if(e.key==='ArrowUp'){ e.preventDefault(); items[Math.max(0,i-1)].focus(); }
+  if(e.key==='Escape'){ e.stopPropagation(); toggleProjMenu(false); projBtn.focus(); }
+});
+document.addEventListener('click', e=>{ if(projMenu.classList.contains('open') && !e.target.closest('#projDD')) toggleProjMenu(false); });
+
+/* ===================== PM COPILOT CLIENT (Meeting To-dos + Meeting History) =====================
+   Talks to pm-copilot-agent (repo: /pm-copilot-agent). The agent reads Granola, asks Claude for
+   Jira suggestions and only writes to Jira when an admin approves. This page never holds the
+   Claude, Granola or Jira credentials; it holds one per-person sign-in token, kept in this
+   browser only. Roles are enforced by the agent; the disabled buttons here are a courtesy. */
+const PMC = { url:'', token:'', me:null, health:null, suggestions:[], meetings:[], audit:[], error:null,
+  filter:{status:'pending', project:'all', meeting:null}, editing:null, rejecting:null, notes:{}, busy:false };
+try{
+  PMC.url = localStorage.getItem('dc_pmc_url') || (location.protocol.startsWith('http') ? `${location.protocol}//${location.hostname}:8790` : 'http://localhost:8790');
+  PMC.token = localStorage.getItem('dc_pmc_token') || '';
+}catch(e){ PMC.url = 'http://localhost:8790'; }
+
+async function pmcApi(method, path, body){
+  const res = await fetch(PMC.url.replace(/\/$/,'') + path, { method,
+    headers: Object.assign({'Content-Type':'application/json'}, PMC.token ? {Authorization:`Bearer ${PMC.token}`} : {}),
+    body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw Object.assign(new Error(data.error || `HTTP ${res.status}`), {status:res.status});
+  return data;
+}
+const can = a => !!(PMC.me && PMC.me.perms && PMC.me.perms.actions.includes(a));
+const canPage = id => !!(PMC.me && PMC.me.perms && PMC.me.perms.pages.includes(id));
+function fmtDT(iso){
+  if(!iso) return '—';
+  const d = new Date(iso); if(isNaN(d)) return String(iso);
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Singapore',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).map(x=>[x.type,x.value]));
+  if(LANG==='zh'){ const z = new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Singapore',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).format(d); return z; }
+  return `${p.weekday} ${p.day} ${p.month}, ${p.hour}:${p.minute}`;
+}
+
+async function pmcRefresh(){
+  try{ PMC.health = await pmcApi('GET','/api/health'); PMC.error = null; }
+  catch(e){ PMC.health = null; PMC.error = T(`Cannot reach the PM Copilot agent at ${PMC.url}`, `无法连接 PM Copilot agent(${PMC.url})`); }
+  if(PMC.health && PMC.token){
+    try{
+      const me = await pmcApi('GET','/api/me');
+      const [sg, mt, au] = await Promise.all([
+        me.perms.pages.includes('todo') ? pmcApi('GET','/api/suggestions') : {suggestions:[]},
+        me.perms.pages.includes('history') ? pmcApi('GET','/api/meetings') : {meetings:[]},
+        me.perms.pages.includes('history') ? pmcApi('GET','/api/audit') : {audit:[]}]);
+      PMC.me = me; PMC.suggestions = sg.suggestions; PMC.meetings = mt.meetings; PMC.audit = au.audit;
+    }catch(e){
+      if(e.status===401) return authSignOut(true);
+      PMC.error = e.message;
+    }
+  }
+  pmcRender();
+}
+async function pmcSync(){
+  PMC.busy = true; pmcRender();
+  try{ const r = await pmcApi('POST','/api/sync'); showToast(T('Granola synced','Granola 已同步'), T(`${r.notes} new or updated notes, ${r.analysed} analysed`,`${r.notes} 条新增/更新纪要,已分析 ${r.analysed} 条`)); }
+  catch(e){ showToast(T('Sync failed','同步失败'), e.message); }
+  PMC.busy = false; await pmcRefresh();
+}
+
+/* ---------- top bar (shared by both pages) ---------- */
+function pmcBarHTML(){
+  if(PMC.me){
+    const h = PMC.health || {};
+    return `<span class="who"><span class="live-dot"></span>${esc(PMC.me.displayName)} · ${esc((PMC.me.perms.roles||[]).join(', ')||T('No role','无角色'))}</span>
+      <span>· Jira: <b style="color:${h.jiraDryRun?'var(--orange)':'var(--green)'}">${h.jiraDryRun?T('dry run, nothing is written','演练模式,不写入'):T('live','实时写入')}</b></span>
+      <span>· Granola: ${h.granola ? (h.lastGranolaSync ? T(`last sync ${fmtDT(h.lastGranolaSync)}`,`上次同步 ${fmtDT(h.lastGranolaSync)}`) : T('not synced yet','尚未同步')) : T('no API key','未配置 API key')}</span>
+      <span class="sp"></span>
+      ${can('ingest') && h.granola ? `<button class="btn-ghost" onclick="pmcSync()">${T('Sync Granola now','立即同步 Granola')}</button>` : ''}
+      <button class="btn-ghost" onclick="pmcRefresh()">${T('Refresh','刷新')}</button>
+      `;
+  }
+  return `<span class="who"><span class="off-dot"></span>${PMC.error ? esc(PMC.error) : T('Not signed in','未登录')}</span>`;
+}
+function pmcSetupHTML(){
+  return `<div class="panel pmc-empty">
+    <h3>${T('Connect PM Copilot','连接 PM Copilot')}</h3>
+    <p>${T('Meeting to-dos come from the PM Copilot agent, a small service that reads Granola, drafts Jira updates with Claude, and writes them to Jira after an admin approves. Sign in above once it is running.',
+           '会议待办来自 PM Copilot agent:一个读取 Granola、用 Claude 起草 Jira 更新,并在管理员审批后写入 Jira 的小服务。服务启动后在上方登录即可。')}</p>
+    <ol>
+      <li>${T('On the server:','在服务器上:')} <code>cd pm-copilot-agent && cp .env.example .env</code> ${T('and fill in the Claude, Granola and Jira keys','并填入 Claude、Granola、Jira 的密钥')}</li>
+      <li>${T('Create sign-ins:','创建账号:')} <code>npm run add-user -- "Sherry Liu" admin</code> · <code>npm run add-user -- "Name" viewer</code></li>
+      <li><code>npm start</code> ${T('then paste the agent URL and your token above.','然后在上方粘贴 agent 地址和你的令牌。')}</li>
+    </ol></div>`;
+}
+
+/* ---------- Meeting To-dos ---------- */
+const PMC_KIND = {
+  comment:   {en:'Comment on', zh:'评论到'},
+  due_date:  {en:'Change due date', zh:'修改截止日'},
+  new_ticket:{en:'New ticket', zh:'新建工单'},
+};
+function sugHTML(s){
+  const k = PMC_KIND[s.kind] || {en:s.kind};
+  const keyHTML = s.jiraKey ? `<a class="sug-key" href="${JIRA_BROWSE}${esc(s.jiraKey)}" target="_blank" rel="noopener" ${PF_TK[s.jiraKey]?`data-src="${esc(s.jiraKey)}"`:''}>${esc(s.jiraKey)}</a>` : '';
+  const conf = s.confidence==='confirmed' ? `<span class="conf-badge confirmed">${T('Stated','明确提出')}</span>` : `<span class="conf-badge inferred">${T('Inferred','推断')}</span>`;
+  const meta = [
+    s.newDueDate ? `<span>${T('Due','截止')} <b>${esc(fmtD(s.newDueDate))}</b></span>` : '',
+    s.owner ? `<span>${T('Owner','负责人')} <b>${esc(s.owner)}</b></span>` : '',
+    s.editedBy ? `<span>${T('Edited by','编辑人')} ${esc(s.editedBy)}</span>` : '',
+  ].filter(Boolean).join('');
+  let actions = '';
+  if(s.status==='pending'){
+    if(PMC.editing===s.id){
+      actions = `<div class="sug-edit">
+        <label class="full">${T('Title','标题')}<input id="ed_title" value="${esc(s.title)}"></label>
+        <label class="full">${T('Text written to Jira','写入 Jira 的内容')}<textarea id="ed_detail">${esc(s.detail)}</textarea></label>
+        <label>${T('Jira key (blank = new ticket)','Jira 编号(留空 = 新建)')}<input id="ed_jiraKey" value="${esc(s.jiraKey||'')}"></label>
+        <label>${T('Due date','截止日')}<input id="ed_newDueDate" type="date" value="${esc(s.newDueDate||'')}"></label>
+        <label>${T('Owner','负责人')}<input id="ed_owner" value="${esc(s.owner||'')}"></label>
+      </div><div class="sug-actions"><button class="btn-primary" onclick="pmcSaveEdit('${s.id}')">${T('Save changes','保存修改')}</button><button class="btn-ghost" onclick="PMC.editing=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
+    } else if(PMC.rejecting===s.id){
+      actions = `<div class="sug-reject"><input id="rj_reason" placeholder="${T('Why? (optional, kept in the audit log)','原因(可选,记入审计日志)')}"><button class="btn-reject" onclick="pmcReject('${s.id}')">${T('Confirm reject','确认驳回')}</button><button class="btn-ghost" onclick="PMC.rejecting=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
+    } else {
+      const dis = can('approve') ? '' : 'disabled';
+      actions = `<div class="sug-actions">
+        <button class="btn-approve" ${dis} onclick="pmcApprove('${s.id}')">${(PMC.health&&PMC.health.jiraDryRun)?T('Approve (dry run)','批准(演练)'):T('Approve to Jira','批准并写入 Jira')}</button>
+        <button class="btn-ghost" ${dis} onclick="PMC.editing='${s.id}';PMC.rejecting=null;pmcRender()">${T('Edit','编辑')}</button>
+        <button class="btn-reject" ${dis} onclick="PMC.rejecting='${s.id}';PMC.editing=null;pmcRender()">${T('Reject','驳回')}</button>
+        ${can('approve') ? '' : `<span class="hint">${T('Your role can read to-dos but not approve them.','你的角色可以查看待办,但不能审批。')}</span>`}
+      </div>`;
+    }
+  } else {
+    const j = s.jira || {};
+    const when = `${esc(s.decidedBy||'')} · ${esc(fmtDT(s.decidedAt))}`;
+    actions = s.status==='approved'
+      ? `<div class="sug-result"><b>${j.dryRun ? T('Approved · dry run, not written to Jira','已批准 · 演练模式,未写入 Jira') : T('Written to Jira','已写入 Jira')}</b> · ${when}
+          ${j.url ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.createdKey||s.jiraKey||T('Open','打开'))}</a>` : ''}
+          ${j.steps ? `<details><summary>${T('Jira request','Jira 请求')}</summary><pre>${esc(JSON.stringify(j.steps,null,2))}</pre></details>` : ''}</div>`
+      : `<div class="sug-result"><b>${T('Rejected','已驳回')}</b> · ${when}${s.rejectReason?` · ${esc(s.rejectReason)}`:''}</div>`;
+  }
+  return `<div class="sug ${s.status}">
+    <div class="sug-top"><span class="sug-kind">${esc(L(k))}</span>${keyHTML}<span class="proj-tag">${esc(projName(s.project))}</span>${conf}</div>
+    <div class="sug-title">${esc(s.title)}</div>
+    <p class="sug-detail">${esc(s.detail)}</p>
+    ${meta?`<div class="sug-meta">${meta}</div>`:''}
+    ${s.evidence?`<div class="prop-evidence"><b>${T('From the notes','纪要原文')}</b> “${esc(s.evidence)}”</div>`:''}
+    ${s.reason?`<div class="prop-reason">${esc(s.reason)}</div>`:''}
+    ${actions}
+  </div>`;
+}
+function renderTodo(){
+  const box = document.getElementById('pmcTodo'); if(!box) return;
+  if(!PMC.me){ box.innerHTML = pmcSetupHTML(); return; }
+  const f = PMC.filter;
+  const byStatus = st => PMC.suggestions.filter(s=>s.status===st).length;
+  const projects = [...new Set(PMC.suggestions.map(s=>s.project))];
+  let list = PMC.suggestions.filter(s=>s.status===f.status && (f.project==='all'||s.project===f.project) && (!f.meeting||s.meetingId===f.meeting));
+  const pill = (val, cur, label, on) => `<button class="pill ${val===cur?'active':''}" onclick="${on}">${label}</button>`;
+  const mtg = f.meeting && PMC.meetings.find(m=>m.id===f.meeting);
+  let html = `<div class="pmc-filters">
+    <div class="pillgroup">${['pending','approved','rejected'].map(st=>pill(st,f.status,`${{pending:T('Pending','待审批'),approved:T('Approved','已批准'),rejected:T('Rejected','已驳回')}[st]} (${byStatus(st)})`,`PMC.filter.status='${st}';pmcRender()`)).join('')}</div>
+    <div class="pillgroup">${pill('all',f.project,T('All projects','全部项目'),"PMC.filter.project='all';pmcRender()")}${projects.map(p=>pill(p,f.project,esc(projName(p)),`PMC.filter.project='${p}';pmcRender()`)).join('')}</div>
+    ${mtg?`<span class="pf-chip">${T('Meeting','会议')}: ${esc(mtg.title)} <a style="cursor:pointer;margin-left:4px" onclick="PMC.filter.meeting=null;pmcRender()">✕</a></span>`:''}
+  </div>`;
+  if(!list.length){
+    html += `<div class="panel pmc-empty"><h3>${f.status==='pending'?T('Nothing waiting for approval','没有待审批事项'):T('Nothing here yet','暂无记录')}</h3>
+      <p>${f.status==='pending'?T('New suggestions appear after the next meeting is synced from Granola.','下一场会议从 Granola 同步后会出现新建议。'):''}</p></div>`;
+    box.innerHTML = html; return;
+  }
+  const groups = {};
+  list.forEach(s=>{ (groups[s.meetingId] = groups[s.meetingId] || {m:s.meeting, items:[]}).items.push(s); });
+  html += Object.values(groups).sort((a,b)=>String(b.m.date).localeCompare(String(a.m.date))).map(g=>`
+    <div class="pmc-group"><div class="pmc-group-h"><div><b>${esc(g.m.title||T('Meeting','会议'))}</b> <span>· ${esc(fmtDT(g.m.date))} · ${g.items.length} ${T('items','项')}</span></div>
+      ${g.m.url?`<a href="${esc(g.m.url)}" target="_blank" rel="noopener">${T('Open in Granola','在 Granola 打开')}</a>`:''}</div>
+      ${g.items.map(sugHTML).join('')}</div>`).join('');
+  box.innerHTML = html;
+}
+async function pmcApprove(id){
+  PMC.busy = true;
+  try{
+    const s = await pmcApi('POST',`/api/suggestions/${id}/approve`);
+    const i = PMC.suggestions.findIndex(x=>x.id===id); if(i>=0) PMC.suggestions[i] = Object.assign(PMC.suggestions[i], s);
+    showToast(s.jira&&s.jira.dryRun ? T('Approved (dry run)','已批准(演练)') : T('Written to Jira','已写入 Jira'), s.title);
+  }catch(e){ showToast(T('Could not approve','审批失败'), e.message); }
+  PMC.busy = false; pmcRefresh();
+}
+async function pmcReject(id){
+  const r = (document.getElementById('rj_reason')||{}).value || '';
+  try{ await pmcApi('POST',`/api/suggestions/${id}/reject`, {reason:r}); PMC.rejecting = null; showToast(T('Rejected','已驳回'), r||''); }
+  catch(e){ showToast(T('Could not reject','驳回失败'), e.message); }
+  pmcRefresh();
+}
+async function pmcSaveEdit(id){
+  const v = k => (document.getElementById('ed_'+k)||{}).value;
+  const patch = { title:v('title'), detail:v('detail'), jiraKey:(v('jiraKey')||'').trim()||null, newDueDate:v('newDueDate')||null, owner:(v('owner')||'').trim()||null };
+  const cur = PMC.suggestions.find(x=>x.id===id);
+  if(cur && !patch.jiraKey) patch.kind = 'new_ticket';
+  else if(cur && cur.kind==='new_ticket' && patch.jiraKey) patch.kind = patch.newDueDate && patch.newDueDate!==cur.newDueDate ? 'due_date' : 'comment';
+  try{ await pmcApi('POST',`/api/suggestions/${id}/edit`, patch); PMC.editing = null; showToast(T('Saved','已保存'), patch.title); }
+  catch(e){ showToast(T('Could not save','保存失败'), e.message); }
+  pmcRefresh();
+}
+
+/* ---------- Meeting History ---------- */
+function renderHistory(){
+  const box = document.getElementById('pmcHistory'); if(!box) return;
+  const imp = document.getElementById('pmcImport'), aud = document.getElementById('pmcAudit');
+  if(!PMC.me){ box.innerHTML = pmcSetupHTML(); imp.style.display='none'; aud.style.display='none'; return; }
+  imp.style.display=''; aud.style.display='';
+  box.innerHTML = PMC.meetings.length ? PMC.meetings.map(m=>{
+    const notes = PMC.notes[m.id];
+    return `<div class="mh-card">
+      <div class="mh-top"><b>${esc(m.title)}</b><span class="mh-date">${esc(fmtDT(m.date))}</span></div>
+      <div class="mh-sub">${m.source==='granola'?`<span>Granola</span>${m.url?` · <a href="${esc(m.url)}" target="_blank" rel="noopener">${T('Open note','打开纪要')}</a>`:''}`:`<span>${T('Imported','手动导入')}</span>`}
+        ${m.attendees&&m.attendees.length?`<span>· ${m.attendees.length} ${T('attendees','人参会')}</span>`:''}
+        ${(m.projects||[]).map(p=>`<span class="proj-tag">${esc(projName(p))}</span>`).join('')}</div>
+      ${m.status==='failed'?`<div class="mh-err">${T('Analysis failed','分析失败')}: ${esc(m.error)}</div>`:''}
+      ${m.status==='analysing'?`<div class="mh-sub">${T('Claude is reading this meeting…','Claude 正在阅读这场会议…')}</div>`:''}
+      ${(m.summary||[]).length?`<ul class="mh-sum">${m.summary.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+      <div class="mh-foot">
+        <span class="pf-chip ${m.counts.pending?'warn':''}">${m.counts.pending} ${T('pending','待审批')}</span>
+        <span class="pf-chip">${m.counts.approved} ${T('approved','已批准')}</span>
+        <span class="pf-chip">${m.counts.rejected} ${T('rejected','已驳回')}</span>
+        <span class="sp" style="flex:1"></span>
+        <button class="btn-ghost" onclick="PMC.filter={status:'pending',project:'all',meeting:'${m.id}'};goPage('todo')">${T('View to-dos','查看待办')}</button>
+        <button class="btn-ghost" onclick="pmcToggleNotes('${m.id}')">${notes?T('Hide notes','收起纪要'):T('Show notes','查看纪要')}</button>
+        ${can('ingest')?`<button class="btn-withdraw" onclick="pmcReanalyse('${m.id}')">${T('Re-analyse','重新分析')}</button>`:''}
+      </div>
+      ${notes?`<details class="hist-raw" open><summary>${T('Meeting notes','会议纪要')}</summary><pre>${esc(notes)}</pre></details>`:''}
+    </div>`; }).join('')
+    : `<div class="panel pmc-empty"><h3>${T('No meetings yet','暂无会议')}</h3><p>${T('Sync Granola or import minutes on the right.','请同步 Granola 或在右侧导入纪要。')}</p></div>`;
+
+  imp.innerHTML = `<div class="panel-title">${T('Import minutes','导入纪要')}</div>` + (can('ingest') ? `
+    <div class="pmc-form">
+      <div class="row"><input id="imTitle" placeholder="${T('Meeting title','会议标题')}"><input id="imDate" type="date" value="${PF_TODAY}"></div>
+      <textarea id="imText" placeholder="${T('Paste minutes from a meeting Granola did not capture (Feishu, Teams, typed notes)…','粘贴 Granola 未记录的会议纪要(飞书、Teams、手写笔记等)…')}"></textarea>
+      <button class="btn-primary" onclick="pmcImport()">${T('Analyse with Claude','用 Claude 分析')}</button>
+    </div>` : `<p class="pf-note" style="margin:0">${T('Your role cannot import meetings.','你的角色不能导入会议。')}</p>`);
+
+  aud.innerHTML = `<div class="panel-title">${T('Decision log','决策日志')}</div>` + (PMC.audit.filter(a=>['approve','reject','edit','sync','analyse'].includes(a.action)).slice(0,15).map(a=>`
+    <div class="aud-row"><span class="t">${esc(fmtDT(a.at))}</span><span class="a"><b>${esc(a.by)}</b> · ${esc({approve:T('approved','批准'),reject:T('rejected','驳回'),edit:T('edited','编辑'),sync:T('synced Granola','同步 Granola'),analyse:T('analysed','分析')}[a.action]||a.action)}</span>
+      <span class="d" title="${esc(a.detail||'')}">${esc(a.detail||'')}</span></div>`).join('') || `<p class="pf-note" style="margin:0">${T('No decisions yet.','暂无决策。')}</p>`);
+}
+async function pmcToggleNotes(id){
+  if(PMC.notes[id]){ delete PMC.notes[id]; return pmcRender(); }
+  try{ const m = await pmcApi('GET',`/api/meetings/${id}`); PMC.notes[id] = m.notesText || T('(no notes stored)','(未保存纪要)'); }
+  catch(e){ showToast(T('Could not load notes','无法加载纪要'), e.message); }
+  pmcRender();
+}
+async function pmcReanalyse(id){
+  showToast(T('Re-analysing','重新分析中'), T('Claude is reading the meeting again; pending items will be replaced.','Claude 正在重新阅读,待审批事项将被替换。'));
+  try{ await pmcApi('POST',`/api/meetings/${id}/reanalyse`); }catch(e){ showToast(T('Re-analyse failed','重新分析失败'), e.message); }
+  pmcRefresh();
+}
+async function pmcImport(){
+  const title = document.getElementById('imTitle').value.trim(), date = document.getElementById('imDate').value, text = document.getElementById('imText').value;
+  if(text.trim().length < 40) return showToast(T('Paste the minutes first','请先粘贴纪要'), '');
+  document.getElementById('pmcImport').classList.add('pmc-busy');
+  showToast(T('Analysing','分析中'), T('Claude usually takes 20–60 seconds.','通常需要 20–60 秒。'));
+  try{ const m = await pmcApi('POST','/api/meetings/import', {title:title||T('Imported meeting','导入的会议'), date: date ? `${date}T09:00:00+08:00` : undefined, text});
+       showToast(m.status==='failed'?T('Analysis failed','分析失败'):T('Meeting analysed','会议已分析'), m.status==='failed'?m.error:`${m.counts.pending} ${T('to-dos drafted','条待办已起草')}`); }
+  catch(e){ showToast(T('Import failed','导入失败'), e.message); }
+  document.getElementById('pmcImport').classList.remove('pmc-busy');
+  pmcRefresh();
+}
+
+function pmcRender(){
+  document.querySelectorAll('[data-pmc-bar]').forEach(el=>{ el.innerHTML = pmcBarHTML(); });
+  renderTodo(); renderHistory();
+  const n = PMC.suggestions.filter(s=>s.status==='pending').length;
+  const b = document.getElementById('pmcTodoBadge'); if(b){ b.textContent = n; b.style.display = n ? '' : 'none'; }
+  const d = document.getElementById('railTodoDot'); if(d) d.style.display = n ? '' : 'none';
+}
+setInterval(()=>{ const a = activePageId(); if(PMC.token && (a==='todo'||a==='history') && !PMC.editing && !PMC.rejecting) pmcRefresh(); }, 60000);
+/* boot happens in the AUTH block below, after sign-in */
+
+/* ===================== AUTH + USERS & ROLES =====================
+   The whole dashboard sits behind sign-in to the PM Copilot agent. What a person sees is the
+   union of their roles: pages (menu entries), actions (approve, ingest), projects (whose data).
+   The agent enforces all of it on every API call; this page hides what the role does not grant.
+   Note: the portfolio and DayOne figures are baked into this HTML file, so hiding them here keeps
+   them out of the menu but not out of "view source". Serve those from the agent when that matters. */
+const DAYONE_PAGES = ['overview','blocker','dependency','roadmap','meetings','luna'];
+let AUTH_READY = false, PF_SCOPED = false;
+
+function pageAllowed(id){
+  if(!PMC.me) return false;
+  const p = PMC.me.perms;
+  if(!p.pages.includes(id)) return false;
+  if(DAYONE_PAGES.includes(id) && !(p.projects.includes('*') || p.projects.includes('dayone'))) return false;
+  return true;
+}
+function firstAllowedPage(){
+  return ['portfolio','todo','history',...DAYONE_PAGES,'users'].find(pageAllowed) || null;
+}
+function applyProjectScope(perms){
+  if(perms.projects.includes('*')) return;
+  PF_SCOPED = true;
+  const ok = new Set(perms.projects);
+  const keep = (arr, f) => { const k = arr.filter(f); arr.length = 0; k.forEach(x=>arr.push(x)); };
+  keep(PF_PROJECTS, p=>ok.has(p.id)); keep(PF_Q, t=>ok.has(t.proj)); keep(PF_ASKS, a=>ok.has(a.proj)); keep(PF_EVENTS_EXTRA, e=>ok.has(e.proj));
+  Object.keys(PF_TK).forEach(k=>{ if(!ok.has(PF_TK[k].proj)) delete PF_TK[k]; });
+}
+function applyPagePerms(){
+  document.querySelectorAll('.tab[data-page], .rail-icon[data-page]').forEach(el=>{
+    el.classList.toggle('perm-hidden', !pageAllowed(el.dataset.page));
+  });
+}
+function renderUserChip(){
+  const u = PMC.me; if(!u) return;
+  const initials = (u.displayName||u.username).split(/[\s._@-]+/).filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join('') || '?';
+  const av = document.getElementById('railAvatar'); if(av){ av.textContent = initials; av.title = `${u.displayName} · ${T('Sign out','退出')}`; }
+  const chip = document.getElementById('userChip');
+  if(chip) chip.innerHTML = `<span class="uc-name">${esc(u.displayName)}</span><span class="uc-role">${esc((u.perms.roles||[]).join(', ')||T('No role','无角色'))}</span>
+    <button class="btn-withdraw" onclick="uaSelfPassword()">${T('Password','密码')}</button>
+    <button class="btn-withdraw" onclick="authSignOut()">${T('Sign out','退出')}</button>`;
+  const live = document.getElementById('whoLive'); if(live) live.textContent = T(`Signed in as ${u.displayName}`, `已登录:${u.displayName}`);
+}
+
+function showGate(msg){
+  document.body.classList.add('gated');
+  const g = document.getElementById('authGate');
+  g.hidden = false;
+  document.getElementById('agUrl').value = PMC.url;
+  const e = document.getElementById('agErr'); e.textContent = msg || ''; e.hidden = !msg;
+  setTimeout(()=>{ const u = document.getElementById('agUser'); if(u && !u.value) u.focus(); }, 50);
+}
+async function authLogin(ev){
+  if(ev) ev.preventDefault();
+  const url = document.getElementById('agUrl').value.trim(); if(url) PMC.url = url;
+  const btn = document.getElementById('agBtn'); btn.disabled = true;
+  try{
+    const r = await pmcApi('POST','/api/login', {username:document.getElementById('agUser').value, password:document.getElementById('agPass').value});
+    PMC.token = r.token; PMC.me = r.user; _pwCurrent = document.getElementById('agPass').value;
+    try{ localStorage.setItem('dc_pmc_url', PMC.url); localStorage.setItem('dc_pmc_token', PMC.token); }catch(e){}
+    document.getElementById('agPass').value = '';
+    onSignedIn();
+  }catch(e){
+    showGate(e.status ? e.message : T(`Cannot reach the agent at ${PMC.url}. Check the address and that the service is running.`, `无法连接 ${PMC.url},请检查地址和服务是否运行。`));
+  }
+  btn.disabled = false;
+}
+async function onSignedIn(){
+  if(PMC.me.mustChangePassword) return showPwChange();
+  try{ pfLoad(await pmcApi('GET','/api/portfolio')); }catch(e){ showToast(T('Could not load the portfolio','无法加载项目组合'), e.message); }
+  AUTH_READY = true;
+  applyProjectScope(PMC.me.perms);
+  applyPagePerms();
+  renderUserChip();
+  const first = firstAllowedPage();
+  if(!first){ PMC.me = null; return showGate(T('Your account has no pages yet. Ask an admin to give you a role.','你的账号还没有可见页面,请联系管理员分配角色。')); }
+  document.getElementById('authGate').hidden = true;
+  document.body.classList.remove('gated');
+  planLoad();
+  renderPortfolio(); renderProjMenu();
+  const cur = activePageId();
+  goPage(pageAllowed(cur) ? cur : first);
+  pmcRefresh();
+}
+let _pwCurrent = '';
+function showPwChange(){
+  showGate();
+  document.getElementById('agPwBox').hidden = false;
+  ['agUser','agPass','agBtn'].forEach(id=>{ const el = document.getElementById(id); (el.closest('label')||el).hidden = true; });
+  setTimeout(()=>document.getElementById('agNew1').focus(), 50);
+}
+async function authChangePassword(){
+  const a = document.getElementById('agNew1').value, b = document.getElementById('agNew2').value;
+  const e = document.getElementById('agErr');
+  if(a !== b){ e.textContent = T('The two passwords do not match.','两次输入的密码不一致。'); e.hidden = false; return; }
+  try{
+    const r = await pmcApi('POST','/api/me/password', {current:_pwCurrent, password:a});
+    PMC.token = r.token; PMC.me = r.user; _pwCurrent = '';
+    try{ localStorage.setItem('dc_pmc_token', PMC.token); }catch(x){}
+    document.getElementById('agPwBox').hidden = true; e.hidden = true;
+    ['agUser','agPass','agBtn'].forEach(id=>{ const el = document.getElementById(id); (el.closest('label')||el).hidden = false; });
+    onSignedIn();
+  }catch(x){ e.textContent = x.message; e.hidden = false; }
+}
+async function authSignOut(expired){
+  if(!expired){ try{ await pmcApi('POST','/api/logout'); }catch(e){} }
+  try{ localStorage.removeItem('dc_pmc_token'); }catch(e){}
+  location.reload();
+}
+async function authBoot(){
+  document.body.classList.add('gated');
+  if(!PMC.token) return showGate();
+  try{ PMC.me = await pmcApi('GET','/api/me'); onSignedIn(); }
+  catch(e){
+    if(e.status===401){ try{ localStorage.removeItem('dc_pmc_token'); }catch(x){} PMC.token=''; return showGate(T('Your session has ended. Please sign in again.','登录已过期,请重新登录。')); }
+    showGate(T(`Cannot reach the agent at ${PMC.url}.`, `无法连接 ${PMC.url}。`));
+  }
+}
+
+/* Change your own password: the current one is asked for in the page, never via prompt(). */
+function uaSelfPassword(){
+  const chip = document.getElementById('userChip');
+  chip.innerHTML = `<input type="password" id="spCur" placeholder="${T('Current password','当前密码')}" class="sp-in"><input type="password" id="spNew" placeholder="${T('New password (8+)','新密码(8 位以上)')}" class="sp-in">
+    <button class="btn-primary" onclick="uaSelfPasswordSave()">${T('Save','保存')}</button><button class="btn-withdraw" onclick="renderUserChip()">${T('Cancel','取消')}</button>`;
+  document.getElementById('spCur').focus();
+}
+async function uaSelfPasswordSave(){
+  try{
+    const r = await pmcApi('POST','/api/me/password', {current:document.getElementById('spCur').value, password:document.getElementById('spNew').value});
+    PMC.token = r.token; try{ localStorage.setItem('dc_pmc_token', PMC.token); }catch(x){}
+    showToast(T('Password changed','密码已修改'), T('Other sessions were signed out.','其他会话已退出。')); renderUserChip();
+  }catch(e){ showToast(T('Could not change password','无法修改密码'), e.message); }
+}
+
+/* ---------- Users & Roles page ---------- */
+const UA = { catalog:null, users:[], roles:[], draft:null, dirty:false, armed:null, newRoles:[], renaming:null };
+async function uaLoad(){
+  try{
+    const [c,u,r] = await Promise.all([pmcApi('GET','/api/admin/catalog'), pmcApi('GET','/api/admin/users'), pmcApi('GET','/api/admin/roles')]);
+    UA.catalog = c; UA.users = u.users; UA.roles = r.roles;
+    if(!UA.dirty) UA.draft = JSON.parse(JSON.stringify(r.roles));
+  }catch(e){ showToast(T('Could not load users','无法加载用户'), e.message); }
+  uaRender();
+}
+const uaRoleName = id => (UA.roles.find(r=>r.id===id)||{name:id}).name;
+const lbl = o => (LANG==='zh' && o.zh) ? o.zh : o.en;
+function uaUsersHTML(){
+  const meId = PMC.me && PMC.me.id;
+  const chips = (sel, onClick) => UA.roles.map(r=>`<button type="button" class="role-chip ${sel.includes(r.id)?'on':''}" onclick="${onClick(r.id)}" aria-pressed="${sel.includes(r.id)}">${esc(r.name)}</button>`).join('');
+  return `<div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>${T('Users','用户')}</div>
+  <p class="ua-sub">${T('Reset passwords and assign roles. A person with several roles gets everything those roles allow.','重置密码并分配角色。一人可有多个角色,权限取并集。')}</p>
+  <div class="rm-table-wrap"><table class="ua-table"><thead><tr><th>${T('User','用户')}</th><th>${T('Roles','角色')}</th><th>${T('Reset password','重置密码')}</th><th>${T('Last sign-in','最近登录')}</th><th></th></tr></thead><tbody>
+  ${UA.users.map(u=>`<tr>
+    <td><b>${esc(u.displayName)}</b>${u.id===meId?` <span class="ua-you">(${T('you','你')})</span>`:''}<div class="ua-meta">${esc(u.username)}${u.email?` · ${esc(u.email)}`:''}</div></td>
+    <td><div class="role-chips">${chips(u.roles, rid=>`uaToggleUserRole('${u.id}','${rid}')`)}</div></td>
+    <td><div class="ua-pw"><input type="password" id="pw_${u.id}" placeholder="${T('New password','新密码')}" autocomplete="new-password"><button class="btn-ghost" onclick="uaSetPassword('${u.id}')">${T('Set','设置')}</button></div></td>
+    <td class="ua-meta">${u.lastLoginAt?esc(fmtDT(u.lastLoginAt)):T('Never','从未')}</td>
+    <td style="text-align:right">${u.id===meId?'':`<button class="ua-del ${UA.armed===u.id?'armed':''}" title="${T('Delete user','删除用户')}" onclick="uaDelete('${u.id}')">${UA.armed===u.id?T('Delete?','确认删除?'):'<svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>'}</button>`}</td>
+  </tr>`).join('')}
+  </tbody></table></div>
+  <div class="ua-add">
+    <div class="ua-add-h">${T('Add new user','新增用户')}</div>
+    <div class="ua-add-row">
+      <input id="nu_username" placeholder="${T('username','用户名')}" autocomplete="off">
+      <input id="nu_password" type="password" placeholder="${T('password (8+ chars)','密码(至少 8 位)')}" autocomplete="new-password">
+      <input id="nu_display" placeholder="${T('display name','显示名')}">
+      <input id="nu_email" placeholder="email">
+      <div class="role-chips">${chips(UA.newRoles, rid=>`uaToggleNewRole('${rid}')`)}</div>
+      <button class="btn-primary" onclick="uaCreate()">${T('Create','创建')}</button>
+    </div>
+  </div>`;
+}
+function uaRolesHTML(){
+  const c = UA.catalog; if(!c || !UA.draft) return '';
+  const groups = [
+    {id:'all', en:'All projects', zh:'全部项目'},
+    {id:'dayone', en:'DayOne NTP-E project view', zh:'DayOne NTP-E 项目视图'},
+    {id:'admin', en:'Administration', zh:'管理'},
+  ];
+  const cb = (role, kind, val, label, extra='') => {
+    const locked = role.locked;
+    const checked = locked || role[kind].includes(val) || (kind==='projects' && val!=='*' && role.projects.includes('*'));
+    const disabled = locked || (kind==='projects' && val!=='*' && role.projects.includes('*'));
+    return `<label class="rc-item ${disabled?'dis':''}"><input type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''} onchange="uaCheck('${role.id}','${kind}','${val}',this.checked)">${esc(label)}${extra}</label>`;
+  };
+  const cards = UA.draft.map(r=>`<div class="rc-card ${r.locked?'locked':''}">
+    <div class="rc-head">
+      ${UA.renaming===r.id ? `<input class="rc-rename" id="rn_${r.id}" value="${esc(r.name)}" onkeydown="if(event.key==='Enter')uaRename('${r.id}')" onblur="uaRename('${r.id}')">` : `<b>${esc(r.name)}</b>`}
+      <span class="rc-count">${UA.users.filter(u=>u.roles.includes(r.id)).length} ${T('users','人')}</span>
+      ${r.locked ? `<span class="rc-lock">${T('All permissions','全部权限')}</span>` : `
+        <button class="rc-ic" title="${T('Rename','重命名')}" onclick="UA.renaming='${r.id}';uaRender();setTimeout(()=>{const i=document.getElementById('rn_${r.id}');if(i){i.focus();i.select();}},20)"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="rc-ic del" title="${T('Delete role','删除角色')}" onclick="uaDeleteRole('${r.id}')"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`}
+    </div>
+    ${groups.map(g=>{ const ps = c.pages.filter(p=>p.group===g.id); return ps.length?`<div class="rc-sec">${esc(lbl(g))}</div>${ps.map(p=>cb(r,'pages',p.id, lbl(p).replace(/^DayOne \/ /,''))).join('')}`:''; }).join('')}
+    <div class="rc-sec">${T('Can do','可执行操作')}</div>${c.actions.map(a=>cb(r,'actions',a.id,lbl(a))).join('')}
+    <div class="rc-sec">${T('Projects whose data it sees','可见项目数据')}</div>${cb(r,'projects','*',T('All projects','全部项目'))}${c.projects.map(p=>cb(r,'projects',p.id,lbl(p))).join('')}
+  </div>`).join('');
+  return `<div class="rc-top">
+      <div><div class="panel-title" style="margin:0 0 4px"><div class="icon-box" style="background:var(--cyan-bg);color:var(--cyan)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>${T('Role → what it can see and do','角色 → 可见页面与操作')}</div>
+      <p class="ua-sub" style="margin:0">${T('Tick what each role may see and do. Changes apply after Save; people see them on their next page load.','勾选每个角色可见的页面和可执行的操作。点击保存后生效,用户下次加载页面时看到变化。')}</p></div>
+      <div class="rc-actions"><input id="newRoleName" placeholder="${T('new role name','新角色名称')}"><button class="btn-ghost" onclick="uaAddRole()">+ ${T('Add role','新增角色')}</button>
+      <button class="btn-primary" ${UA.dirty?'':'disabled'} onclick="uaSaveRoles()">${UA.dirty?T('Save changes','保存修改'):T('Saved','已保存')}</button></div>
+    </div>
+    <div class="rc-grid">${cards}</div>`;
+}
+function uaRender(){
+  const a = document.getElementById('uaUsers'), b = document.getElementById('uaRoles');
+  if(!a || !b) return;
+  if(!UA.catalog){ a.innerHTML = `<p class="ua-sub">${T('Loading…','加载中…')}</p>`; b.innerHTML = ''; return; }
+  a.innerHTML = uaUsersHTML(); b.innerHTML = uaRolesHTML();
+}
+async function uaToggleUserRole(uid, rid){
+  const u = UA.users.find(x=>x.id===uid); if(!u) return;
+  const roles = u.roles.includes(rid) ? u.roles.filter(x=>x!==rid) : u.roles.concat(rid);
+  try{ const r = await pmcApi('POST',`/api/admin/users/${uid}`, {roles}); Object.assign(u, r); showToast(T('Roles updated','角色已更新'), `${u.displayName}: ${r.roles.map(uaRoleName).join(', ')||T('none','无')}`); }
+  catch(e){ showToast(T('Could not change roles','无法修改角色'), e.message); }
+  uaRender();
+}
+async function uaSetPassword(uid){
+  const el = document.getElementById('pw_'+uid); const pw = el ? el.value : '';
+  try{ await pmcApi('POST',`/api/admin/users/${uid}/password`, {password:pw}); el.value=''; showToast(T('Password set','密码已设置'), T('Their open sessions were signed out.','该用户已登录的会话已被退出。')); }
+  catch(e){ showToast(T('Could not set password','无法设置密码'), e.message); }
+}
+async function uaDelete(uid){
+  if(UA.armed!==uid){ UA.armed = uid; uaRender(); setTimeout(()=>{ if(UA.armed===uid){ UA.armed=null; uaRender(); } }, 4000); return; }
+  UA.armed = null;
+  try{ await pmcApi('POST',`/api/admin/users/${uid}/delete`); showToast(T('User deleted','用户已删除'), ''); }
+  catch(e){ showToast(T('Could not delete','无法删除'), e.message); }
+  uaLoad();
+}
+function uaToggleNewRole(rid){
+  const keep = ['nu_username','nu_password','nu_display','nu_email'].map(id=>[id,(document.getElementById(id)||{}).value||'']);
+  UA.newRoles = UA.newRoles.includes(rid) ? UA.newRoles.filter(x=>x!==rid) : UA.newRoles.concat(rid);
+  uaRender(); keep.forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.value=v; });
+}
+async function uaCreate(){
+  const v = id => (document.getElementById(id)||{}).value || '';
+  try{
+    const u = await pmcApi('POST','/api/admin/users', {username:v('nu_username'), password:v('nu_password'), displayName:v('nu_display'), email:v('nu_email'), roles:UA.newRoles});
+    UA.newRoles = []; showToast(T('User created','用户已创建'), `${u.displayName} · ${u.roles.map(uaRoleName).join(', ')||T('no role yet','暂无角色')}`);
+    uaLoad();
+  }catch(e){ showToast(T('Could not create user','无法创建用户'), e.message); }
+}
+function uaCheck(rid, kind, val, on){
+  const r = UA.draft.find(x=>x.id===rid); if(!r || r.locked) return;
+  if(kind==='projects' && val==='*'){ r.projects = on ? ['*'] : []; }
+  else r[kind] = on ? Array.from(new Set(r[kind].concat(val))) : r[kind].filter(x=>x!==val);
+  UA.dirty = true; uaRender();
+}
+function uaRename(rid){
+  const el = document.getElementById('rn_'+rid); const r = UA.draft.find(x=>x.id===rid);
+  if(el && r && el.value.trim() && el.value.trim()!==r.name){ r.name = el.value.trim(); UA.dirty = true; }
+  UA.renaming = null; uaRender();
+}
+function uaAddRole(){
+  const el = document.getElementById('newRoleName'); const name = (el.value||'').trim(); if(!name) return el.focus();
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || ('role-'+Date.now());
+  if(UA.draft.some(r=>r.id===id)) return showToast(T('Role exists','角色已存在'), name);
+  UA.draft.push({id, name, pages:[], actions:[], projects:[]}); UA.dirty = true; uaRender();
+}
+function uaDeleteRole(rid){
+  const n = UA.users.filter(u=>u.roles.includes(rid)).length;
+  UA.draft = UA.draft.filter(r=>r.id!==rid); UA.dirty = true; uaRender();
+  if(n) showToast(T('Role removed from the draft','角色已从草稿移除'), T(`${n} users will lose it when you save.`,`保存后 ${n} 位用户将失去该角色。`));
+}
+async function uaSaveRoles(){
+  try{
+    const r = await pmcApi('POST','/api/admin/roles', {roles:UA.draft});
+    UA.roles = r.roles; UA.draft = JSON.parse(JSON.stringify(r.roles)); UA.dirty = false;
+    showToast(T('Roles saved','角色已保存'), T('People see the change on their next page load.','用户下次加载页面时生效。'));
+    uaLoad();
+  }catch(e){ showToast(T('Could not save roles','无法保存角色'), e.message); }
+}
+window.addEventListener('beforeunload', e=>{ if(UA.dirty){ e.preventDefault(); e.returnValue=''; } });
+
+
+/* ===================== GANTT EDITING =====================
+   Roles with the edit_plan action (RDA Manager, Super Admin by default) can click a task or its
+   bar to change title, dates, owner, status, progress and next step. Edits are stored by the agent
+   (data/plan.json), checked against the role there, and applied to every viewer after sign-in. */
+const PLAN = { project:'dayone', history:[], edits:{}, edited:new Set(), editing:null };
+const canEditPlan = () => typeof can==='function' && can('edit_plan') && typeof pageAllowed==='function' && pageAllowed('roadmap');
+const isoDue = t => { if(!t.due || t.due==='—') return t.ge; const [m,d] = t.due.split('/'); const y = (t.ge||'2026').slice(0,4); return `${y}-${m}-${d}`; };
+function planApply(data){
+  PLAN.history = data.history || []; PLAN.edits = data.tasks || {}; PLAN.edited = new Set(Object.keys(PLAN.edits));
+  // The agent is the source of truth for plan fields: start from the shipped plan, then apply its edits,
+  // so a reset or another manager's change is not masked by an older copy cached in this browser.
+  if(Array.isArray(data.decisions)) mtReconcile(data.decisions);
+  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next','targetOriginal'];
+  TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; else if(k==='targetOriginal') delete t[k]; }); });
+  // 2) Jira (nightly sync): status, owner and target date of linked tasks; Jira-only tickets become tasks.
+  const J = data.jira; PLAN.jira = J || null;
+  TASKS.forEach(t=>{ delete t.jira; });
+  if(J){
+    const mmdd = d => d ? d.slice(5).replace('-','/') : null;
+    Object.entries(J.tasks||{}).forEach(([id, x])=>{
+      const t = TASKS_BY_ID[id]; if(!t) return;
+      t.status = x.status; if(x.owner) t.owner = x.owner; if(x.due) t.due = mmdd(x.due);
+      if(x.status==='done') t.progress = 100;
+      t.jira = x;
+    });
+    (J.extra||[]).forEach(x=>{
+      let t = TASKS_BY_ID[x.key];
+      const ge = [x.due, x.resolved, x.updated].find(Boolean) || x.created;
+      const fields = { name:x.title, nameZh:x.title, en:x.summary, month:x.month, owner:x.owner||'—', status:x.status, health:'none',
+        progress: x.status==='done' ? 100 : 0, next:'—', due: mmdd(ge), ms:'—', gs:x.created, ge: ge < x.created ? x.created : ge };
+      if(!t){ t = Object.assign({id:x.key}, fields); TASKS.push(t); TASKS_BY_ID[x.key] = t; TASK_BASELINE[x.key] = Object.assign({}, t); }
+      else Object.assign(t, fields);
+      t.jira = x;
+    });
+  }
+  // 3) Manual edits made on the Gantt, except fields Jira owns on linked tasks.
+  Object.entries(data.tasks||{}).forEach(([id, f])=>{
+    const t = TASKS_BY_ID[id]; if(!t) return;
+    const c = Object.assign({}, f);
+    if(t.jira){ delete c.status; delete c.owner; delete c.due; }
+    if(c.due){ c.due = c.due.slice(5).replace('-','/'); }
+    Object.assign(t, c);
+  });
+  if(data.milestone){ if(data.milestone.date){ MILESTONE.date = data.milestone.date; MILESTONE.due = data.milestone.date.slice(5).replace('-','/'); } if(data.milestone.name){ MILESTONE.name = data.milestone.name; MILESTONE.en = data.milestone.name; } }
+}
+async function planLoad(){
+  if(!(typeof pageAllowed==='function' && DAYONE_PAGES.some(pageAllowed))) return;
+  try{ if(!PMC.health){ try{ PMC.health = await pmcApi('GET','/api/health'); }catch(e){} }
+       planApply(await pmcApi('GET',`/api/plan/${PLAN.project}`)); render(); renderList(); buildGantt(); }
+  catch(e){ showToast(T('Could not load plan edits','无法加载计划修改'), e.message); }
+}
+function planMarkEditable(){
+  const wrap = document.querySelector('.gantt-wrap'); if(!wrap) return;
+  const on = canEditPlan();
+  wrap.classList.toggle('gantt-editable', on);
+  document.querySelectorAll('.gantt-wrap [data-task]').forEach(el=>{
+    const id = el.dataset.task;
+    el.classList.toggle('edited', PLAN.edited.has(id) && (el.classList.contains('gr') || el.classList.contains('gantt-bar')));
+    const t = TASKS_BY_ID[id];
+    el.classList.toggle('jira', !!(t && t.jira) && el.classList.contains('gr') && !/^BA-/.test(id));
+    el.removeAttribute('title');
+    if(id==='milestone' || id==='MS2') el.setAttribute('data-ds','ms:MS2'); else if(t) el.setAttribute('data-ds','task:'+id);
+    if(on) el.setAttribute('data-ds-note', T('Click to edit','点击编辑')); else el.removeAttribute('data-ds-note');
+  });
+  const hint = document.getElementById('planHint');
+  if(hint){
+    hint.hidden = !(on || PLAN.history.length);
+    const last = PLAN.history[0];
+    hint.innerHTML = (on ? `<span>✎ <b>${T('Click a task or its bar to edit it.','点击任务名或任务条即可编辑。')}</b></span>` : '') +
+      (last ? `<span class="pf-chip">${T('Last manual edit','最近手动修改')}: ${esc(last.by)} · ${esc(fmtDT(last.at))} · ${esc(last.taskId==='milestone'?msName():taskName(TASKS_BY_ID[last.taskId])||last.taskId)}</span>` : '') +
+      (PLAN.jira ? `<span class="pf-chip">Jira: ${T('synced','同步于')} ${esc(fmtDT(PLAN.jira.syncedAt))} · ${Object.keys(PLAN.jira.tasks||{}).length + (PLAN.jira.extra||[]).length} ${T('tasks linked','个任务已关联')}${PMC.health && PMC.health.nextJiraSync ? ` · ${T('next','下次')} ${esc(fmtDT(PMC.health.nextJiraSync))}` : ''}</span>`
+        : `<span class="pf-chip">${T('Not synced with Jira yet','尚未与 Jira 同步')}</span>`) +
+      (on ? `<button class="btn-ghost" id="jiraSyncBtn" onclick="planJiraSync()">${T('Sync Jira now','立即同步 Jira')}</button>` : '') +
+      (PLAN.edited.size ? `<span class="pf-chip"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-right:5px"></span>${PLAN.edited.size} ${T('tasks changed from the original plan','个任务已改动(相对原计划)')}</span>` : '');
+  }
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest('.gantt-wrap [data-task]'); if(!el || !canEditPlan()) return;
+  planOpen(el.dataset.task);
+});
+function planOpen(id){
+  PLAN.editing = id;
+  const m = document.getElementById('peModal'), err = '';
+  const hist = PLAN.history.filter(h=>h.taskId===id).slice(0,5);
+  const histHTML = hist.length ? `<div class="pe-hist">${hist.map(h=>`<div><b>${esc(h.by)}</b> · ${esc(fmtDT(h.at))} · ${esc(Object.keys(h.changes).map(k=>({name:T('title','题目'),nameZh:T('Chinese title','中文题目'),gs:T('start','开始'),ge:T('end','结束'),due:T('target date','目标日期'),owner:T('owner','负责人'),status:T('status','状态'),progress:T('progress','进度'),next:T('next step','下一步'),date:T('date','日期'),reset:T('reset','恢复原计划')}[k]||k)).join(', '))}</div>`).join('')}</div>` : '';
+  if(id==='__ms'){
+    m.innerHTML = `<h3 id="peTitle">${T('Edit milestone','编辑里程碑')}</h3><div class="pe-sub">◆ ${esc(MILESTONE.id)} · DayOne NTP-E</div>
+      <div class="pe-grid"><label class="full">${T('Name','名称')}<input id="pe_msname" value="${esc(MILESTONE.name)}"></label>
+      <label>${T('Date','日期')}<input id="pe_msdate" type="date" value="${esc(MILESTONE.date)}"></label></div>
+      <div class="pe-err" id="peErr" hidden></div>
+      <div class="pe-actions"><span class="sp"></span><button class="btn-ghost" onclick="planClose()">${T('Cancel','取消')}</button><button class="btn-primary" onclick="planSaveMs()">${T('Save','保存')}</button></div>${histHTML}`;
+  } else {
+    const t = TASKS_BY_ID[id]; if(!t) return;
+    const base = TASK_BASELINE[id] || {};
+    const was = (k, v) => (PLAN.edited.has(id) && base[k]!==undefined && String(base[k])!==String(v)) ? ` <span class="was">(${T('was','原')} ${esc(k==='due'?base[k]:base[k])})</span>` : '';
+    const opt = Object.keys(STATUS_META).map(k=>`<option value="${k}" ${t.status===k?'selected':''}>${esc(tr(STATUS_META[k].label))}</option>`).join('');
+    const J = t.jira, lock = J ? 'disabled' : '';
+    const jiraHTML = J ? `<div class="pe-jira"><a href="${esc(J.url)}" target="_blank" rel="noopener"><b>${esc(J.key)}</b></a> · ${esc(J.statusName||'')} · ${esc(J.owner||'—')}${J.due?` · ${T('due','截止')} ${esc(fmtD(J.due))}`:''}
+        <div class="pe-jira-note">${T('Status, owner and target date come from Jira; change them there. Synced','状态、负责人、目标日期来自 Jira,请在 Jira 中修改。同步于')} ${esc(fmtDT(PLAN.jira && PLAN.jira.syncedAt))}</div>
+        ${J.lastComment ? `<div class="pe-jira-c"><b>${esc(J.lastComment.by||'')}</b> · ${esc(fmtDT(J.lastComment.at))}<br>${esc(J.lastComment.text.slice(0,400))}</div>` : ''}</div>` : '';
+    m.innerHTML = `<h3 id="peTitle">${T('Edit task','编辑任务')} ${esc(t.id)}</h3><div class="pe-sub">${esc(phaseLabel(t.month))}</div>${jiraHTML}
+      <div class="pe-grid">
+        <label class="full">${T('Title (EN)','题目(英文)')}${was('name',t.name)}<input id="pe_name" value="${esc(t.name)}"></label>
+        <label class="full">${T('Title (中文)','题目(中文)')}${was('nameZh',t.nameZh)}<input id="pe_nameZh" value="${esc(t.nameZh||'')}"></label>
+        <label>${T('Start','开始')}${was('gs',t.gs)}<input id="pe_gs" type="date" value="${esc(t.gs)}"></label>
+        <label>${T('End','结束')}${was('ge',t.ge)}<input id="pe_ge" type="date" value="${esc(t.ge)}"></label>
+        <label>${T('Target date','目标日期')}${was('due',t.due)}<input id="pe_due" type="date" value="${esc(isoDue(t))}" ${lock}></label>
+        <label>${T('Owner','负责人')}${was('owner',t.owner)}<input id="pe_owner" value="${esc(t.owner)}" ${lock}></label>
+        <label>${T('Status','状态')}<select id="pe_status" ${lock}>${opt}</select></label>
+        <label>${T('Progress %','进度 %')}<input id="pe_progress" type="number" min="0" max="100" step="5" value="${esc(t.progress)}"></label>
+        <label class="full">${T('Next step','下一步')}<textarea id="pe_next">${esc(t.next==='—'?'':t.next)}</textarea></label>
+      </div>
+      <div class="pe-err" id="peErr" hidden></div>
+      <div class="pe-actions">${PLAN.edited.has(id)?`<button class="btn-withdraw" onclick="planReset('${id}')">${T('Restore original plan','恢复原计划')}</button>`:''}<span class="sp"></span>
+        <button class="btn-ghost" onclick="planClose()">${T('Cancel','取消')}</button><button class="btn-primary" onclick="planSave('${id}')">${T('Save','保存')}</button></div>${histHTML}`;
+  }
+  m.hidden = false; document.getElementById('peScrim').classList.add('show');
+  hideSrcTip(true);
+  setTimeout(()=>{ const f = m.querySelector('input'); if(f) f.focus(); }, 30);
+}
+function planClose(){ document.getElementById('peModal').hidden = true; document.getElementById('peScrim').classList.remove('show'); PLAN.editing = null; }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && PLAN.editing) planClose(); });
+function planErr(msg){ const e = document.getElementById('peErr'); e.textContent = msg; e.hidden = !msg; }
+function planRerender(){ render(); renderList(); buildGantt(); applyLiveBadges && applyLiveBadges(); }
+async function planSave(id){
+  const t = TASKS_BY_ID[id]; const v = k => document.getElementById('pe_'+k).value;
+  const next = { name:v('name').trim(), nameZh:v('nameZh').trim(), gs:v('gs'), ge:v('ge'), due:v('due'), owner:v('owner').trim(), status:v('status'), progress:Number(v('progress')), next:v('next').trim()||'—' };
+  if(!next.name) return planErr(T('The title cannot be empty.','题目不能为空。'));
+  if(!next.gs || !next.ge) return planErr(T('Pick a start and an end date.','请选择开始和结束日期。'));
+  if(next.gs > next.ge) return planErr(T('The end date is before the start date.','结束日期早于开始日期。'));
+  const cur = { name:t.name, nameZh:t.nameZh||'', gs:t.gs, ge:t.ge, due:isoDue(t), owner:t.owner, status:t.status, progress:t.progress, next:t.next };
+  const fields = {}, before = {};
+  Object.keys(next).forEach(k=>{ if(t.jira && ['status','owner','due'].includes(k)) return; if(String(next[k])!==String(cur[k]) && !(k==='nameZh' && !next[k])){ fields[k] = next[k]; before[k] = cur[k]; } });
+  if(!Object.keys(fields).length) return planClose();
+  try{
+    await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}`, {fields, before});
+    const local = Object.assign({}, fields); if(local.due) local.due = local.due.slice(5).replace('-','/');
+    Object.assign(t, local);
+    const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; PLAN.edits = d.tasks||{}; PLAN.edited = new Set(Object.keys(PLAN.edits));
+    planClose(); planRerender();
+    showToast(T('Plan updated','计划已更新'), `${t.id} · ${taskName(t)}`);
+  }catch(e){ planErr(e.message); }
+}
+async function planSaveMs(){
+  const name = document.getElementById('pe_msname').value.trim(), date = document.getElementById('pe_msdate').value;
+  const body = {}; if(name && name!==MILESTONE.name) body.name = name; if(date && date!==MILESTONE.date) body.date = date;
+  if(!Object.keys(body).length) return planClose();
+  try{ const r = await pmcApi('POST',`/api/plan/${PLAN.project}/milestone`, body); const ms = r.milestone||{}; if(ms.date){ MILESTONE.date = ms.date; MILESTONE.due = ms.date.slice(5).replace('-','/'); } if(ms.name){ MILESTONE.name = ms.name; MILESTONE.en = ms.name; }
+       const d = await pmcApi('GET',`/api/plan/${PLAN.project}`); PLAN.history = d.history||[]; planClose(); planRerender(); showToast(T('Milestone updated','里程碑已更新'), msName()); }
+  catch(e){ planErr(e.message); }
+}
+async function planJiraSync(){
+  const b = document.getElementById('jiraSyncBtn'); if(b){ b.disabled = true; b.textContent = T('Syncing…','同步中…'); }
+  try{
+    const r = await pmcApi('POST','/api/jira/sync');
+    if(!r.ok) showToast(T('Jira sync failed','Jira 同步失败'), r.error||'');
+    else showToast(T('Jira synced','Jira 已同步'), T(`DayOne: ${r.dayone.tickets} tickets · portfolio: ${r.portfolio.open} open`,`DayOne:${r.dayone.tickets} 个工单 · 组合:${r.portfolio.open} 个在途`));
+    try{ pfLoad(await pmcApi('GET','/api/portfolio')); renderPortfolio(); }catch(e){}
+    try{ PMC.health = await pmcApi('GET','/api/health'); }catch(e){}
+    await planLoad(); goPage(activePageId());
+  }catch(e){ showToast(T('Jira sync failed','Jira 同步失败'), e.message); }
+  if(b){ b.disabled = false; }
+}
+async function planReset(id){
+  try{
+    const d = await pmcApi('POST',`/api/plan/${PLAN.project}/tasks/${id}/reset`);
+    Object.assign(TASKS_BY_ID[id], TASK_BASELINE[id]);
+    PLAN.history = d.history||[]; PLAN.edits = d.tasks||{}; PLAN.edited = new Set(Object.keys(PLAN.edits));
+    planClose(); planRerender(); showToast(T('Restored','已恢复'), T('Task is back to the original plan.','任务已恢复为原计划。'));
+  }catch(e){ planErr(e.message); }
+}
+
+/* ===================== DATA SOURCES (DayOne project view) =====================
+   Every value on the DayOne pages says where it came from. Per task field, the order of
+   precedence is: Jira (linked tasks: status, owner, target date; Jira-only tickets: everything)
+   → a manual Gantt edit → an approved meeting-minutes change → the original plan entered on
+   21 Aug 2026. Numbers the page works out are "Calculated"; text written into the page is
+   "Fixed text"; preview panels are "Sample". Hover any tag, card or row to see the detail. */
+const DS_KIND = {
+  jira:   ['Jira','Jira'],
+  edit:   ['Manual edit','手动修改'],
+  meeting:['Meeting minutes','会议纪要'],
+  plan:   ['Original plan','原始计划'],
+  calc:   ['Calculated','系统计算'],
+  static: ['Fixed text','固定文字'],
+  sample: ['Sample, not live','示例,非真实数据'],
+};
+const DS_NOTE = {
+  jira:   ['Read from Jira by the nightly sync (Mon–Fri 24:00 SGT) or "Sync Jira now". Change it in Jira.','由夜间同步(周一至周五 24:00)或「立即同步 Jira」从 Jira 读取,请在 Jira 中修改。'],
+  edit:   ['Changed on the Roadmap Gantt by an RDA Manager; saved on the server for everyone.','由 RDA 管理员在路线图甘特图上修改,保存在服务器,所有人可见。'],
+  meeting:['Proposed from uploaded meeting minutes and approved on the Meetings page by an RDA Manager; saved on the server for everyone.','由上传的会议纪要提取,由 RDA 管理员在 Meetings 页批准,保存在服务器,所有人可见。'],
+  plan:   ['Entered when this dashboard was built, from the DayOne delivery timeline and the weekly meetings up to 21 Aug 2026. Not updated automatically, so it may be out of date.','建看板时录入,来自 DayOne 交付时间线和截至 2026-08-21 的周会。不会自动更新,可能已过时。'],
+  calc:   ['Worked out by the page from the task data; it changes when the inputs change.','由页面根据任务数据计算,输入变化时随之变化。'],
+  static: ['Text written into the page on 21 Aug 2026. Not updated automatically, so it may be out of date.','2026-08-21 写进页面的文字,不会自动更新,可能已过时。'],
+  sample: ['Placeholder for a feature that is not connected yet. Not real project data.','尚未接通功能的占位内容,不是真实项目数据。'],
+};
+const DS_PAGES = ['overview','blocker','dependency','roadmap','meetings','luna'];
+const DS_FIELDS = [['status','Status','状态'],['owner','Owner','负责人'],['due','Target date','目标日期'],['gs','Start','开始'],['ge','End','结束'],
+  ['progress','Progress','进度'],['next','Next step','下一步'],['health','Health','健康度']];
+const dsK = k => T(DS_KIND[k][0], DS_KIND[k][1]);
+const dsAsOf = () => T('as of 21 Aug 2026','截至 2026-08-21');
+
+function dsField(t, f){
+  const J = t && t.jira, syncAt = PLAN.jira && PLAN.jira.syncedAt;
+  const jira = d => ({k:'jira', d:[J.key, d, J.updated && T(`ticket updated ${J.updated}`,`工单更新于 ${J.updated}`), T('synced','同步于')+' '+fmtDT(syncAt)].filter(Boolean).join(' · ')});
+  if(J && /^BA-/.test(t.id)){   // a DayOne ticket that is not in the original plan
+    if(f==='next' || f==='health') return {k:'calc', d:T('not tracked for tickets outside the plan','原计划外的工单不跟踪此项')};
+    return jira({gs:T('created','创建日期'), ge:T('due, resolved or last-updated date','截止、解决或最近更新日期'), due:T('due, resolved or last-updated date','截止、解决或最近更新日期'),
+      progress:T('done → 100%, otherwise 0%','完成为 100%,否则 0%'), owner:T('assignee','经办人'), status:J.statusName}[f]);
+  }
+  if(J){
+    if(f==='status') return jira(J.statusName);
+    if(f==='owner' && J.owner) return jira(T('assignee','经办人'));
+    if(f==='due' && J.due) return jira(T(`Jira due date ${J.due}`,`Jira 截止日期 ${J.due}`));
+    if(f==='progress' && J.status==='done') return jira(T('done in Jira → 100%','Jira 已完成 → 100%'));
+  }
+  const e = PLAN.edits && PLAN.edits[t.id];
+  if(PLAN.edited.has(t.id) && e && f in e){
+    const h = (PLAN.history||[]).find(x=>x.taskId===t.id && x.changes && x.changes[f]);
+    if(h && h.source && h.source.kind==='meeting') return {k:'meeting', d:`${h.source.title||''} · ${h.source.date||''} · ${T('approved by','批准人')} ${h.by} · ${fmtDT(h.at)}`};
+    return {k:'edit', d: h ? `${h.by} · ${fmtDT(h.at)}` : ''};
+  }
+  const ap = PROPOSALS.filter(p=>p.status==='approved' && p.entityType==='task' && p.entityId===t.id && p.field===f);
+  const p = ap[ap.length-1];
+  if(p && t[f]!=null && String(t[f])===String(p.newValue)){
+    const m = MEETINGS.find(x=>x.id===p.meetingId);
+    return {k:'meeting', d: m ? `${m.title} · ${m.date}` : ''};
+  }
+  return {k:'plan', d: dsAsOf()};
+}
+function dsMsField(){
+  const h = (PLAN.history||[]).find(x=>x.taskId==='milestone');
+  return h ? {k:'edit', d:`${h.by} · ${fmtDT(h.at)}`} : {k:'plan', d:dsAsOf()};
+}
+function dsTaskLabel(t){
+  const ks = new Set(DS_FIELDS.map(([f])=>dsField(t,f).k));
+  if(t.jira) return {k:'jira', label:`Jira ${t.jira.key}`, plus: ks.has('edit') ? 'edit' : (ks.has('meeting') ? 'meeting' : null)};
+  if(ks.has('edit')) return {k:'edit', label:T('Edited','已修改'), plus: ks.has('meeting') ? 'meeting' : null};
+  if(ks.has('meeting')) return {k:'meeting', label:T('Meeting','会议')};
+  return {k:'plan', label:T('Plan · 21 Aug','计划 · 8/21')};
+}
+function dsTag(spec, k, label, plus){
+  return `<span class="ds-tag k-${k}"${spec ? ` data-ds="${esc(spec)}"` : ''}><i></i>${esc(label)}${plus ? `<i class="p k-${plus}"></i>` : ''}</span>`;
+}
+function dsTaskTag(id, fields){
+  const t = TASKS_BY_ID[id]; if(!t) return '';
+  if(fields){   // tag for a few fields only (e.g. an action row: next step / owner / target date)
+    const ks = fields.split(',').map(f=>dsField(t,f).k); const k = ks.includes('jira') ? 'jira' : ks.includes('edit') ? 'edit' : ks.includes('meeting') ? 'meeting' : 'plan';
+    return dsTag(`task:${id}:${fields}`, k, k==='jira' ? `Jira ${t.jira.key}` : k==='plan' ? T('Plan · 21 Aug','计划 · 8/21') : dsK(k));
+  }
+  const l = dsTaskLabel(t); return dsTag('task:'+id, l.k, l.label, l.plus);
+}
+function dsKindTag(k, label){ return dsTag(k, k, label || dsK(k)); }
+
+function dsFieldVal(t, f){
+  const v = t[f];
+  if(f==='status') return STATUS_META[v] ? tr(STATUS_META[v].label) : (v||'—');
+  if(f==='progress') return (v==null ? '—' : v+'%');
+  if(f==='health') return HEALTH_META[v] ? tr(HEALTH_META[v].label) : '—';
+  const s = v==null || v==='' ? '—' : String(v);
+  return s.length > 110 ? s.slice(0,108)+'…' : s;
+}
+function dsRow(label, value, src){
+  return `<div class="ds-row"><span class="ds-f">${esc(label)}</span><span class="ds-v">${esc(value)}</span>${dsTag('', src.k, dsK(src.k))}${src.d ? `<span class="ds-d">${esc(src.d)}</span>` : ''}</div>`;
+}
+function dsLegend(kinds){ return `<div class="ds-legend">${[...new Set(kinds)].map(k=>`<div>${dsTag('', k, dsK(k))} ${esc(T(DS_NOTE[k][0], DS_NOTE[k][1]))}</div>`).join('')}</div>`; }
+
+const DS_KPI = {
+  blocked:      ['Tasks held up by an unfinished upstream dependency (see Dependency View), or blocked in their own status.','被未完成的上游依赖卡住(见依赖视图),或本身状态为阻塞的任务。'],
+  atrisk:       ['Tasks whose status is In Progress.','状态为进行中的任务。'],
+  overdue:      ['Tasks past their target date and not done (blocked ones are counted under Blocked).','已过目标日期且未完成的任务(被阻塞的计入「已阻塞」)。'],
+  duesoon:      ['In-progress tasks whose target date is in the next 7 days.','目标日期在未来 7 天内的进行中任务。'],
+  blockersources:['Blocked or overdue tasks that other tasks depend on.','被其他任务依赖、且自身阻塞或逾期的任务。'],
+  msimpacted:   ['Milestones with a blocked or overdue input.','有输入任务阻塞或逾期的里程碑。'],
+  depblockers:  ['Blocked or overdue tasks that other tasks depend on.','被其他任务依赖、且自身阻塞或逾期的任务。'],
+  depmsimpacted:['Milestones with a blocked or overdue input.','有输入任务阻塞或逾期的里程碑。'],
+  harddeps:     ['Hard dependency links. The links themselves are from the original plan.','硬依赖条数。依赖关系本身来自原始计划。'],
+  softdeps:     ['Soft dependency links. The links themselves are from the original plan.','软依赖条数。依赖关系本身来自原始计划。'],
+  monthtasks:   ['Tasks scheduled in the current phase.','当前阶段排期的任务。'],
+  monthdone:    ['Tasks in the current phase that are done.','当前阶段中已完成的任务。'],
+  monthprog:    ['Tasks in the current phase that are in progress.','当前阶段中进行中的任务。'],
+  snap:         ['Average progress of the tasks listed in this month.','本月所列任务的平均进度。'],
+};
+function dsInputsLine(){
+  const n = TASKS.length, j = TASKS.filter(t=>t.jira).length;
+  return T(`Inputs: ${n} tasks — status of ${j} from Jira, ${n-j} from the original plan or manual edits.`,
+           `输入:${n} 个任务 —— 其中 ${j} 个的状态来自 Jira,${n-j} 个来自原始计划或手动修改。`);
+}
+function dsTipHTML(el){
+  const spec = el.getAttribute('data-ds') || '', note = el.getAttribute('data-ds-note');
+  const [type, a, b] = spec.split(':');
+  const head = (right) => `<div class="st-h"><span>${T('Data source','数据来源')}</span><span>${esc(right||'')}</span></div>` + (note ? `<div class="st-note">${esc(note)}</div>` : '');
+  if(type==='task'){
+    const t = TASKS_BY_ID[a]; if(!t) return '';
+    const fields = b ? DS_FIELDS.filter(([f])=>b.split(',').includes(f)) : DS_FIELDS;
+    const kinds = [];
+    let rows = fields.map(([f,en,zh])=>{ const s = dsField(t,f); kinds.push(s.k); return dsRow(T(en,zh), f==='due' ? (t.due||'—') : dsFieldVal(t,f), s); }).join('');
+    const blocked = isEffectivelyBlocked(t.id), od = isOverdue(t);
+    if(blocked || od){ kinds.push('calc');
+      const up = EDGES.filter(e=>e.to===t.id && (isEffectivelyBlocked(e.from) || isOverdue(TASKS_BY_ID[e.from]||{}))).map(e=>e.from);
+      rows += dsRow(T('Shown as','显示为'), [blocked ? tr('Blocked') : '', od ? tr('Overdue') : ''].filter(Boolean).join(' · '),
+        {k:'calc', d: blocked && up.length ? T(`upstream ${up.join(', ')} not finished`,`上游 ${up.join('、')} 未完成`) : T('target date has passed','已过目标日期')}); }
+    if(t.jira) rows += `<div class="ds-row"><span class="ds-f">${T('Jira ticket','Jira 工单')}</span><span class="ds-v" style="grid-column:2/4">${esc(t.jira.key)} · ${esc(t.jira.statusName||'')}</span><span class="ds-d">${esc(dsJiraDates(t.jira))}</span></div>`;
+    if(t.jira && t.jira.lastComment){ const c = t.jira.lastComment;
+      rows += `<div class="ds-row"><span class="ds-f">${T('Latest Jira comment','Jira 最新评论')}</span><span class="ds-v" style="grid-column:2/4;font-weight:500">${esc(c.text.split('\n')[0].slice(0,160))}</span><span class="ds-d">${esc(c.by||'')} · ${esc(fmtDT(c.at))}</span></div>`; }
+    return head(`${t.id} ${taskName(t)}`) + rows + dsLegend(kinds);
+  }
+  if(type==='ms'){
+    const s = dsMsField();
+    return head(`◆ ${MILESTONE.id} ${msName()}`) + dsRow(T('Date','日期'), MILESTONE.date, s) + dsRow(T('Owner','负责人'), MILESTONE.owner, {k:'plan', d:dsAsOf()}) +
+      dsRow(T('Shown status','显示状态'), T('from its input tasks','由输入任务决定'), {k:'calc', d:''}) + dsLegend([s.k,'plan','calc']);
+  }
+  if(type==='phase'){
+    const ph = dsPhase();
+    return head(dsK(ph.k)) + `<div class="st-note">${esc(dsPhaseNote())}</div>` + dsLegend([ph.k]);
+  }
+  if(type==='kpi'){
+    const x = DS_KPI[a] || ['',''];
+    return head(dsK('calc')) + `<div class="st-note">${esc(T(x[0],x[1]))}</div><div class="st-note">${esc(dsInputsLine())}</div>` +
+      (/^month/.test(a) ? `<div class="st-note">${esc(dsPhaseNote())}</div>` : '') + dsLegend(/^month/.test(a) ? ['calc', dsPhase().k] : ['calc']);
+  }
+  if(DS_KIND[type]) return head(dsK(type)) + `<div class="st-note">${esc(T(DS_NOTE[type][0], DS_NOTE[type][1]))}</div>`;
+  return '';
+}
+
+function dsStripHTML(pid){
+  const linked = TASKS.filter(t=>t.jira), extra = linked.filter(t=>/^BA-/.test(t.id)).length;
+  const edited = TASKS.filter(t=>PLAN.edited.has(t.id)).length, plan = TASKS.length - linked.length;
+  const appr = PROPOSALS.filter(p=>p.status==='approved').length, pend = PROPOSALS.filter(p=>p.status==='pending').length;
+  const mtFields = TASKS.reduce((n,t)=>n + DS_FIELDS.filter(([f])=>dsField(t,f).k==='meeting').length, 0);
+  const J = PLAN.jira;
+  const parts = [];
+  if(pid==='luna'){ parts.push(dsKindTag('sample', T('Sample · whole page is a preview','示例 · 整页为预览'))); }
+  else if(pid==='meetings'){
+    parts.push(dsKindTag('meeting', T(`Meeting minutes · ${MEETINGS.length} meetings · ${appr} changes approved, ${pend} waiting`,`会议纪要 · ${MEETINGS.length} 场会议 · 已批准 ${appr} 条,待审 ${pend} 条`)));
+    parts.push(dsKindTag('plan', T('Current values: original plan / Jira','当前值:原始计划 / Jira')));
+  } else {
+    parts.push(dsKindTag('jira', J ? T(`Jira · ${linked.length} tasks${extra ? ` (${extra} only in Jira)` : ''} · synced ${fmtDT(J.syncedAt)}`,`Jira · ${linked.length} 个任务${extra ? `(${extra} 个仅在 Jira)` : ''} · 同步于 ${fmtDT(J.syncedAt)}`)
+                                    : T('Jira · not synced yet','Jira · 尚未同步')));
+    if(edited) parts.push(dsKindTag('edit', T(`Manual edits · ${edited} tasks`,`手动修改 · ${edited} 个任务`)));
+    if(mtFields) parts.push(dsKindTag('meeting', T(`Meeting minutes · ${mtFields} fields from approved changes`,`会议纪要 · ${mtFields} 个字段来自已批准修改`)));
+    parts.push(dsKindTag('plan', T(`Original plan · ${plan} tasks not in Jira · as of 21 Aug 2026`,`原始计划 · ${plan} 个任务未关联 Jira · 截至 2026-08-21`)));
+    parts.push(dsKindTag('calc', T('Calculated · counts, Blocked / Overdue','系统计算 · 统计数、阻塞/逾期')));
+    if(pid==='overview' || pid==='blocker') parts.push(dsKindTag('static', T('Fixed text · notes, brief, recommendation','固定文字 · 说明、简报、建议')));
+    if(pid==='overview') parts.push(dsKindTag('sample', T('Sample · Luna Queue, Internal Delivery','示例 · Luna 队列、内部交付')));
+  }
+  return `<span class="ds-lbl">${T('Data sources','数据来源')}</span>${parts.join('')}<span class="ds-hint">${T('Hover a tag, card or row for the source of each field','悬停标签、卡片或行可查看每个字段的来源')}</span>`;
+}
+
+function dsMark(el, spec, k, label, where){
+  if(!el) return;
+  el.setAttribute('data-ds', spec);
+  let tag = el.querySelector(':scope > .ds-tag.ds-own, :scope .ds-own');
+  const html = `<span class="ds-tag ds-own k-${k}"><i></i>${esc(label || dsK(k))}</span>`;
+  if(tag){ tag.outerHTML = html; return; }
+  (where ? (el.querySelector(where) || el) : el).insertAdjacentHTML('beforeend', html);
+}
+function dsIsoDue(t){ if(!t.due || t.due==='—') return t.ge || '—'; const [m,d] = t.due.split('/'); return `${(t.ge||'2026').slice(0,4)}-${m}-${d}`; }
+
+function applyDataSources(){
+  // Page strips
+  DS_PAGES.forEach(pid=>{
+    const pg = document.getElementById('page-'+pid); if(!pg) return;
+    let s = pg.querySelector(':scope > .ds-strip');
+    if(!s){ s = document.createElement('div'); s.className = 'ds-strip'; const head = pg.querySelector(':scope > .page-head'); if(head) head.after(s); else pg.prepend(s); }
+    s.innerHTML = dsStripHTML(pid);
+  });
+  // KPI cards
+  DS_PAGES.forEach(pid=>{
+    document.querySelectorAll(`#page-${pid} .stat-card`).forEach(card=>{
+      const kpi = card.querySelector('[data-kpi]:not([data-kpi$="-sub"])');
+      let spec, k, label;
+      if(pid==='luna'){ spec = 'sample'; k = 'sample'; }
+      else if(/Current Phase|当前阶段/.test(card.querySelector('.stat-label')?.textContent||'')){
+        const ph = dsPhase(); spec = 'phase'; k = ph.k; label = ph.k==='jira' ? `Jira ${ph.key}` : T('Plan · 21 Aug','计划 · 8/21');
+        const v = card.querySelector('.stat-value'), sb = card.querySelector('.stat-sub');
+        if(v) v.textContent = dsPhaseLabel();
+        if(sb) sb.textContent = ph.k==='jira' ? T(`Moving to ${phaseTitle(ph.months[ph.months.length-1])}`,`进入「${phaseTitle(ph.months[ph.months.length-1])}」`) : (PHASES_BY_MONTH[2].dateLabel+' · '+phaseTitle(2));
+      }
+      else if(kpi){ spec = `kpi:${kpi.dataset.kpi}`; k = 'calc';
+        if(kpi.dataset.kpi==='monthtasks'){ const l = card.querySelector('.stat-label'); if(l) l.textContent = T(`Tasks in ${dsMonthsWord()}`,`${dsMonthsWord()}任务数`); } }
+      else if(/MS2|milestone|里程碑/i.test(card.textContent)){ const s = dsMsField(); spec = 'ms:MS2'; k = s.k; }
+      else { spec = 'plan'; k = 'plan'; label = T('Plan · 21 Aug','计划 · 8/21'); }
+      card.setAttribute('data-ds', spec);
+      let foot = card.querySelector('.ds-foot'); if(!foot){ foot = document.createElement('div'); foot.className = 'ds-foot'; card.appendChild(foot); }
+      foot.innerHTML = `<span class="ds-tag k-${k}"><i></i>${esc(label || dsK(k))}</span>`;
+    });
+  });
+  // Task cards on the Blocker Impact Map, Dependency View and Overview: meta from live data + tag
+  document.querySelectorAll('.flow-card[data-node], .mini-card[data-node]').forEach(c=>{
+    const id = c.dataset.node, isMs = id==='MS2', t = isMs ? null : TASKS_BY_ID[id];
+    if(!isMs && !t) return;
+    const meta = c.querySelector('.fc-meta, .mc-meta');
+    if(meta){
+      const owner = isMs ? MILESTONE.owner : t.owner, iso = isMs ? MILESTONE.date : dsIsoDue(t), mmdd = isMs ? MILESTONE.due : (t.due||'—');
+      const jd = !isMs && t.jira && dsField(t,'due').k==='jira' ? ` <span class="ds-jd">(Jira ${esc(t.jira.key)} · ${T('updated','更新')} ${esc((t.jira.updated||'').slice(5).replace('-','/'))})</span>` : '';
+      meta.innerHTML = (meta.classList.contains('fc-meta') ? `👤 ${esc(owner)} &nbsp;·&nbsp; 📅 ${T('Due','截止')}: ${esc(iso)}` : `👤 ${esc(owner)} &nbsp; 📅 ${esc(mmdd)}`) + jd;
+    }
+    c.setAttribute('data-ds', isMs ? 'ms:MS2' : 'task:'+id);
+    const bd = c.querySelector('.fc-badges, .mc-badges');
+    if(bd && !bd.querySelector('.ds-tag')){
+      if(isMs){ const s = dsMsField(); bd.insertAdjacentHTML('beforeend', dsTag('ms:MS2', s.k, s.k==='plan' ? T('Plan · 21 Aug','计划 · 8/21') : dsK(s.k))); }
+      else bd.insertAdjacentHTML('beforeend', dsTaskTag(id));
+    }
+    c.querySelectorAll('.fc-desc, .mc-desc').forEach(d=>{ d.setAttribute('data-ds','static'); d.classList.add('ds-static'); });
+  });
+  // Overview roadmap snapshot: per-item tooltip + live month completion
+  document.querySelectorAll('.snap-item').forEach(it=>{
+    const s = it.querySelector('.badge-slot[data-node]'); if(!s) return;
+    const id = s.dataset.node; it.setAttribute('data-ds', id==='MS2' ? 'ms:MS2' : 'task:'+id);
+    const t = TASKS_BY_ID[id], k = id==='MS2' ? dsMsField().k : (t ? dsTaskLabel(t).k : 'plan');
+    let dot = it.querySelector('.ds-dot'); if(!dot){ it.querySelector('.lbl')?.insertAdjacentHTML('afterbegin','<span class="ds-dot"></span>'); dot = it.querySelector('.ds-dot'); }
+    if(dot) dot.className = 'ds-dot k-'+k;
+  });
+  const PH = dsPhase();
+  document.querySelectorAll('.snap-grid .snap-col').forEach((col, i)=>{
+    const m = i + 1, tag = col.querySelector('.snap-tag'); if(!tag) return;
+    const state = PH.months.includes(m) ? 'current' : m < Math.min(...PH.months) ? 'done' : 'next';
+    col.classList.toggle('current', state==='current');
+    tag.textContent = state==='current' ? T('Current','当前') : state==='done' ? T('Completed','已完成') : T('Upcoming','即将开始');
+    tag.setAttribute('data-ds','phase');
+  });
+  document.querySelectorAll('.side-card .info-row').forEach(r=>{
+    if(/Project Phase|项目阶段/.test(r.querySelector('span')?.textContent||'')){ const b = r.querySelector('b'); if(b) b.textContent = T(`${dsPhaseLabel()} / of 9`,`${dsPhaseLabel()} / 共 9 月`); r.setAttribute('data-ds','phase'); }
+  });
+  document.querySelectorAll('.snap-col').forEach(col=>{
+    const ids = [...col.querySelectorAll('.badge-slot[data-node]')].map(s=>s.dataset.node).filter(id=>TASKS_BY_ID[id]);
+    const pw = col.querySelector('.progress-wrap'); if(!pw || !ids.length) return;
+    const avg = Math.round(ids.reduce((a,id)=>a+(+TASKS_BY_ID[id].progress||0),0)/ids.length);
+    const fill = pw.querySelector('.progress-fill'); if(fill) fill.style.width = avg+'%';
+    const lab = pw.querySelector('.progress-label'); if(lab) lab.innerHTML = `${T('Completion','完成度')} ${avg}% <span class="ds-tag k-calc"><i></i>${esc(dsK('calc'))}</span>`;
+    pw.setAttribute('data-ds','kpi:snap');
+  });
+  // Fixed text and preview panels
+  const ov = document.getElementById('page-overview');
+  if(ov){
+    const brief = ov.querySelector('.banner'); if(brief) dsMark(brief, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), '.banner-title');
+    ov.querySelectorAll('.panel').forEach(p=>{
+      const title = p.querySelector('.panel-title'); if(!title) return;
+      const tx = title.textContent;
+      if(/Luna|Internal Delivery|内部交付/.test(tx)) dsMark(p, 'sample', 'sample', null, '.panel-title');
+      else if(/Actions to Follow|待跟进/.test(tx)) title.setAttribute('data-ds-skip','1');
+    });
+  }
+  const reco = document.querySelector('#page-blocker .reco-card'); if(reco) dsMark(reco, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h4');
+  const luna = document.getElementById('page-luna');
+  if(luna) luna.querySelectorAll('.panel-title').forEach(pt=>dsMark(pt, 'sample', 'sample'));
+  // Roadmap side cards
+  document.querySelectorAll('.side-card').forEach(sc=>{
+    const h = sc.querySelector('h3'); if(!h) return; const tx = h.textContent;
+    if(/Current Phase Focus|当前阶段重点/.test(tx)) dsMark(sc, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h3');
+    else if(/Upcoming Milestones|即将到来的里程碑/.test(tx)) dsMark(sc, 'plan', 'plan', T('Plan · 21 Aug','计划 · 8/21'), 'h3');
+    else if(/Project Information|项目信息/.test(tx)) dsMark(sc, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h3');
+  });
+  // Meetings page
+  document.querySelectorAll('#meetList .meet-item').forEach(m=>{ if(!m.querySelector('.ds-tag')) m.querySelector('b')?.insertAdjacentHTML('afterend', ` ${dsTag('meeting','meeting',T('Minutes','纪要'))}`); });
+  document.querySelectorAll('#proposalList .proposal-card').forEach(c=>{ const ev = c.querySelector('.prop-evidence'); if(ev && !ev.querySelector('.ds-tag')) ev.insertAdjacentHTML('afterbegin', dsTag('meeting','meeting',dsK('meeting'))+' '); });
+}
+/* Current phase: from the epic description in Jira when the sync found it, else the original plan (Month 2). */
+function dsPhase(){
+  const P = PLAN.jira && PLAN.jira.phase;
+  if(P && P.months && P.months.length) return {k:'jira', months:P.months, key:P.key, text:P.text, updated:P.updated};
+  return {k:'plan', months:[2]};
+}
+function dsMonthsWord(){ const m = dsPhase().months; return m.length > 1 ? T(`Month ${m[0]}–${m[m.length-1]}`,`第 ${m[0]}–${m[m.length-1]} 月`) : monthWord(m[0]); }
+function dsPhaseLabel(){ const m = dsPhase().months; return m.length > 1 ? T(`Month ${m[0]} → ${m[m.length-1]}`,`第 ${m[0]} → ${m[m.length-1]} 月`) : monthWord(m[0]); }
+function dsPhaseNote(){
+  const ph = dsPhase();
+  return ph.k==='jira' ? T(`Current phase from the Jira epic ${ph.key} (updated ${ph.updated}): "${ph.text}". Counts cover ${dsMonthsWord()}.`,`当前阶段来自 Jira Epic ${ph.key}(${ph.updated} 更新):「${ph.text}」。统计范围为${dsMonthsWord()}。`)
+                       : T('Current phase from the original plan (Month 2); the Jira epic has not been synced yet.','当前阶段来自原始计划(第 2 月),尚未同步 Jira Epic。');
+}
+function dsJiraDates(J){
+  return [J.created && T(`created ${J.created}`,`创建 ${J.created}`), J.updated && T(`updated ${J.updated}`,`更新 ${J.updated}`),
+          T(`due ${J.due||'not set'}`,`截止 ${J.due||'未设置'}`), J.resolved && T(`resolved ${J.resolved}`,`解决 ${J.resolved}`)].filter(Boolean).join(' · ');
+}
+/* ---------- Meetings page ↔ server ----------
+   When signed in, Approve / Reject / Withdraw are saved on the agent (plan.decide / withdraw), so every
+   viewer sees the same decisions and approved task changes become plan edits tagged with the meeting.
+   Proposals match across browsers by content (meeting date + title + what they change), not by id. */
+let MT_LOCAL = false;
+function mtSig(p){ const m = MEETINGS.find(x=>x.id===p.meetingId) || {}; return [m.date||'', m.title||'', p.entityType, p.entityId, p.field||'', JSON.stringify(p.newValue==null?null:p.newValue)].join('|'); }
+function mtValue(p){
+  if(p.entityType!=='task' || p.confidence==='unknown' || p.newValue==null) return null;
+  if(p.field==='due' && /^\d{2}\/\d{2}$/.test(p.newValue)){ const t = TASKS_BY_ID[p.entityId]; return `${((t && t.ge) || '2026').slice(0,4)}-${p.newValue.replace('/','-')}`; }
+  return p.newValue;
+}
+function mtRemote(ids, decision){
+  if(MT_LOCAL || !PMC.token) return false;
+  if(!canEditPlan()){ showToast(T('Not allowed','没有权限'), T('Only RDA Managers can approve or reject meeting changes.','只有 RDA 管理员可以批准或驳回会议纪要的修改。')); return true; }
+  (async ()=>{
+    const done = [];
+    for(const id of ids){
+      const p = PROPOSALS.find(x=>x.id===id); if(!p) continue;
+      const m = MEETINGS.find(x=>x.id===p.meetingId) || {};
+      try{
+        if(decision==='withdraw') await pmcApi('POST', `/api/plan/${PLAN.project}/proposals/withdraw`, {sig: mtSig(p)});
+        else {
+          const value = decision==='approved' ? mtValue(p) : null, t = TASKS_BY_ID[p.entityId];
+          await pmcApi('POST', `/api/plan/${PLAN.project}/proposals/decide`, {sig: mtSig(p), decision,
+            proposal:{meetingTitle:m.title, meetingDate:m.date, meetingSummary:m.summary, entityType:p.entityType, entityId:p.entityId, field:p.field, oldValue:p.oldValue,
+                      newValue:p.newValue, confidence:p.confidence, evidence:p.evidence, reason:p.reason, followupTitle:p.followupTitle, followupOwner:p.followupOwner},
+            taskId: p.entityType==='task' && value!=null ? p.entityId : null, field: p.field, value, before: t ? {[p.field]: t[p.field]} : undefined});
+        }
+        done.push(id);
+      }catch(e){ showToast(T('Not saved','未保存'), `${p.entityId}${p.field ? ' · '+fieldLabel(p.field) : ''}: ${e.message}`); }
+    }
+    MT_LOCAL = true;
+    try{
+      if(ids.length > 1 && decision==='approved'){ done.forEach(id=>{ const p = PROPOSALS.find(x=>x.id===id); if(p && p.status==='pending') applyProposal(p); }); render();
+        if(done.length) showToast(`${done.length} ${tr('Confirmed updates applied')}`, T('Saved for everyone','已保存，所有人可见')); }
+      else done.forEach(id=>({approved:approveProposal, rejected:rejectProposal, withdraw:withdrawProposal})[decision](id));
+    } finally { MT_LOCAL = false; }
+    await planLoad();
+  })();
+  return true;
+}
+/* Bring this browser's proposals in line with the decisions on the server (called from planApply,
+   before plan fields are reset and re-applied). */
+function mtLocalRevert(p){
+  const j = p._applied;
+  if(j){
+    if(j.taskId && j.field && TASKS_BY_ID[j.taskId]) TASKS_BY_ID[j.taskId][j.field] = j.prevValue;
+    (j.actionIds||[]).forEach(id=>{ const i = ACTIONS.findIndex(a=>a.id===id); if(i>=0) ACTIONS.splice(i,1); });
+    (j.logIds||[]).forEach(id=>{ const i = CHANGELOG.findIndex(c=>c._id===id); if(i>=0) CHANGELOG.splice(i,1); });
+    delete p._applied;
+  }
+  p.status = 'pending'; delete p._srv;
+}
+function mtReconcile(decisions){
+  const bySig = new Map(decisions.map(d=>[d.sig, d]));
+  const seen = new Set();
+  PROPOSALS.forEach(p=>{
+    const sig = mtSig(p), d = bySig.get(sig); seen.add(sig);
+    if(d){
+      p._srv = {by:d.by, at:d.at};
+      if(p.status===d.status) return;
+      if(p.status!=='pending') mtLocalRevert(p);
+      if(d.status==='approved') applyProposal(p); else p.status = 'rejected';
+      p._srv = {by:d.by, at:d.at};
+    } else { if(p.status!=='pending') mtLocalRevert(p); delete p._srv; }
+  });
+  // Decisions on meetings imported in another browser: show them here too, with their evidence.
+  decisions.filter(d=>!seen.has(d.sig) && d.proposal).forEach(d=>{
+    const pr = d.proposal;
+    let m = MEETINGS.find(x=>x.title===pr.meetingTitle && x.date===pr.meetingDate);
+    if(!m){ m = {id:'srv-m-'+d.key, title:pr.meetingTitle||T('Meeting','会议'), date:pr.meetingDate||'', summary:pr.meetingSummary||''}; MEETINGS.push(m); }
+    const p = {id:'srv-'+d.key, meetingId:m.id, entityType:pr.entityType, entityId:pr.entityId, field:pr.field, oldValue:pr.oldValue, newValue:pr.newValue,
+      confidence:pr.confidence, evidence:pr.evidence||'', reason:pr.reason||'', followupTitle:pr.followupTitle, followupOwner:pr.followupOwner, status:'pending'};
+    PROPOSALS.push(p);
+    if(d.status==='approved') applyProposal(p); else p.status = 'rejected';
+    p._srv = {by:d.by, at:d.at};
+  });
+}
+function dsActionTag(a){
+  if(a.source){ const m = MEETINGS.find(x=>x.id===a.source); return `<span class="ds-tag k-meeting" data-ds="meeting" data-ds-note="${esc(m ? m.title+' · '+m.date : '')}"><i></i>${esc(dsK('meeting'))}</span>`; }
+  return a.relatedTask ? dsTaskTag(a.relatedTask, 'next,owner,due') : '';
+}
+
+renderPortfolio();
+goPage('portfolio');
+authBoot();
+applyDataSources();
+
 </script>
 </body>
 </html>
