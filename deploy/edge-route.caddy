@@ -1,11 +1,16 @@
-# Delivery Copilot (RDA-Program-Copilot): the DayOne NTPE Program Kanban, a single
-# self-contained static page. Served by HOST nginx on :8091 — not a container — so the
-# upstream is the docker bridge gateway rather than a Docker DNS name.
-# The page knows nothing about the prefix (it is one file with relative/CDN URLs only),
-# so the prefix is stripped and the bare path must redirect to the trailing-slash form.
-# Managed via ~/edge/edgectl set delivery-copilot; see deploy/README.md.
+# Delivery Copilot (RDA-Program-Copilot). The page is served by the pm-copilot-agent process
+# on the HOST (systemd unit delivery-copilot, :8790) — not a container — so the upstream is the
+# docker bridge gateway rather than a Docker DNS name.
+#
+# The prefix is stripped because the agent only knows "/", which also keeps its API under this
+# prefix: /DeliveryCopilot/api/login reaches the agent, while the bare /api/login belongs to the
+# Product Center shell. Caddy orders handle blocks by matcher length, so this one wins over the
+# fallback and cannot shadow another project.
+#
+# Managed via ~/edge/edgectl set delivery-copilot, which touches only routes/delivery-copilot.caddy
+# and hot-reloads. See deploy/README.md.
 handle /DeliveryCopilot* {
 	redir /DeliveryCopilot /DeliveryCopilot/ 301
 	uri strip_prefix /DeliveryCopilot
-	reverse_proxy 172.23.0.1:8091
+	reverse_proxy 172.23.0.1:8790
 }

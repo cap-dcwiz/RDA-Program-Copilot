@@ -1,0 +1,35 @@
+# Delivery Copilot — the PM Copilot agent, which also serves the dashboard page.
+# Installed to /etc/systemd/system/delivery-copilot.service by deploy/deploy-vm.sh.
+#
+# It listens on 127.0.0.1-reachable :8790 and is published only through the shared Caddy edge
+# at https://ai-factory.demo.rda.ai/DeliveryCopilot/. The port is not open to the internet.
+[Unit]
+Description=Delivery Copilot (PM Copilot agent + dashboard)
+Documentation=https://github.com/cap-dcwiz/RDA-Program-Copilot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fofo
+WorkingDirectory=/home/fofo/rda-program-copilot/pm-copilot-agent
+ExecStart=/usr/bin/node src/server.js
+# config.js parses .env itself. Deliberately NOT an EnvironmentFile: systemd's parser would
+# mangle values like JIRA_JQL, which contain spaces and embedded quotes.
+Restart=always
+RestartSec=5
+# The nightly Jira sync lives inside this process, so a crash that goes unnoticed silently stops
+# it. Restarting always, and keeping the journal, is how that stays visible.
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=delivery-copilot
+
+# This service only ever needs to read the repo and write its own data/ directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/fofo/rda-program-copilot/pm-copilot-agent/data
+
+[Install]
+WantedBy=multi-user.target

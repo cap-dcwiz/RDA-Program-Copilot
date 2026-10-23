@@ -1,41 +1,36 @@
 #!/usr/bin/env bash
-# Deploy the Program Kanban static page to the RDA GCP VM and publish its public HTTPS path.
+# Deploy Delivery Copilot to the RDA GCP VM.
 #
-# Two pieces, both idempotent:
-#   1. host nginx on :8091 serves the page out of /var/www/rda-program-copilot
-#   2. the shared Caddy edge (~/edge) maps https://ai-factory.demo.rda.ai/DeliveryCopilot/
-#      onto that port over the docker bridge gateway
-# Port 8091 is NOT open to the internet — the edge is the only public way in.
+# The dashboard is not a static page any more: pm-copilot-agent serves both it and its API, so
+# this installs the repo, runs the agent under systemd on :8790, and points the shared Caddy edge
+# at it. Public URL: https://ai-factory.demo.rda.ai/DeliveryCopilot/ — :8790 is not open to the
+# internet, and the edge is the only way in.
+#
+# This VM hosts many demos, so the work is deliberately narrow — see deploy/remote-install.sh for
+# exactly what it touches. Order matters: the agent is installed and proven healthy BEFORE the
+# route moves to it, so the public path never points at a dead port.
 #
 # Usage: ./deploy/deploy-vm.sh   (run from repo root or anywhere)
 set -euo pipefail
 HOST="${VM_HOST:-fofo@34.177.94.143}"
 KEY="${VM_KEY:-$HOME/.ssh/gcloud}"
 DIR="$(cd "$(dirname "$0")" && pwd)"
-SITE="rda-program-copilot"
-EDGE_PROJECT="delivery-copilot"
+REPO="${REPO_URL:-https://github.com/cap-dcwiz/RDA-Program-Copilot.git}"
+BRANCH="${BRANCH:-main}"
+STAGE="/tmp/rda-program-copilot-deploy"
 
-# The page is tracked once, in docs/. The two copies under site/ are what nginx and the
-# Cloud Run image actually serve, so they are generated here rather than committed —
-# a hand-copied duplicate of a 280KB file is a drift waiting to happen.
-PAGE="$DIR/../docs/DayOne_NTPE_Program_Kanban_EN.html"
-cp "$PAGE" "$DIR/site/index.html"
-cp "$PAGE" "$DIR/site/DayOne_NTPE_Program_Kanban_EN.html"
+echo "==> uploading unit, route and installer"
+ssh -i "$KEY" "$HOST" "rm -rf '$STAGE' && mkdir -p '$STAGE'"
+scp -q -i "$KEY" "$DIR/delivery-copilot.service" "$DIR/edge-route.caddy" "$DIR/remote-install.sh" "$HOST:$STAGE/"
+ssh -i "$KEY" "$HOST" "bash '$STAGE/remote-install.sh' '$REPO' '$BRANCH' '$STAGE'"
 
-ssh -i "$KEY" "$HOST" "mkdir -p /tmp/$SITE"
-scp -i "$KEY" "$DIR/site/"*.html "$DIR/nginx-vm.conf" "$DIR/edge-route.caddy" "$HOST:/tmp/$SITE/"
-ssh -i "$KEY" "$HOST" bash -s <<REMOTE
-set -euo pipefail
-sudo mkdir -p /var/www/$SITE
-sudo cp /tmp/$SITE/*.html /var/www/$SITE/
-sudo chown -R www-data:www-data /var/www/$SITE
-sudo cp /tmp/$SITE/nginx-vm.conf /etc/nginx/sites-available/$SITE
-sudo ln -sf /etc/nginx/sites-available/$SITE /etc/nginx/sites-enabled/$SITE
-sudo nginx -t
-sudo systemctl reload nginx
-# Reinstall this project's edge route. Touches only routes/$EDGE_PROJECT.caddy and
-# hot-reloads Caddy; it can never clobber another project's routes.
-~/edge/edgectl set $EDGE_PROJECT /tmp/$SITE/edge-route.caddy
-rm -rf /tmp/$SITE
-REMOTE
+echo
+echo "==> verifying from outside"
+code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://ai-factory.demo.rda.ai/DeliveryCopilot/)
+echo "    /DeliveryCopilot/ -> $code"
+[ "$code" = "200" ] || { echo "Expected 200." >&2; exit 1; }
+# A neighbour check, because this path shares one Caddy with every other demo on the box.
+for p in /DCBI/ /PM/ /ROI; do
+  printf '    %-10s -> %s\n' "$p" "$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://ai-factory.demo.rda.ai$p")"
+done
 echo "Deployed: https://ai-factory.demo.rda.ai/DeliveryCopilot/"
