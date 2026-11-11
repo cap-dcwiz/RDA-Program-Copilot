@@ -38,18 +38,25 @@ async function syncGranola(by) {
   if (syncing) return syncing;
   syncing = (async () => {
     const db = store.load();
-    const since = db.sync.lastGranolaSync || new Date(Date.now() - cfg.granola.lookbackDays * 86400000).toISOString();
+    // Re-list the whole lookback window every time, not just "updated since the last sync".
+    // A note can become visible to the API key later than its last edit — moved into a shared
+    // folder, or shared to the workspace — and keep its old updated_at, so an
+    // updated_after=<last sync> cursor would never return it. Notes we already analysed at the
+    // same updated_at are skipped before the per-note fetch, so the wider window only costs list calls.
+    const since = new Date(Date.now() - cfg.granola.lookbackDays * 86400000).toISOString();
     const startedAt = new Date().toISOString();
     const list = (await granola.listNotes(since)).filter(n => granola.wanted(n.title));
+    const known = (n) => db.meetings.some(x => x.source === 'granola' && x.sourceId === n.id && x.status === 'analysed' && n.updated_at && x.updatedAt === n.updated_at);
+    const fresh = list.filter(n => !known(n));
     const results = [];
-    for (const n of list) {
+    for (const n of fresh) {
       const full = await granola.getNote(n.id);
       results.push(await ingest(granola.toMeeting(full), by));
     }
     db.sync.lastGranolaSync = startedAt;
-    store.audit(by, 'sync', 'granola', `${list.length} notes since ${since}`);
+    store.audit(by, 'sync', 'granola', `${list.length} notes visible since ${since}, ${fresh.length} new or changed`);
     store.save();
-    return { since, notes: list.length, analysed: results.filter(r => !r.skipped).length };
+    return { since, listed: list.length, notes: fresh.length, analysed: results.filter(r => !r.skipped).length };
   })();
   try { return await syncing; } finally { syncing = null; }
 }
