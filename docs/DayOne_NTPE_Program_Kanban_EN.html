@@ -821,7 +821,16 @@ body.gated{padding-left:0;}
 .sug-edit input,.sug-edit textarea,.pmc-form input,.pmc-form textarea,.sug-reject input{background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);
   padding:7px 10px;font-size:12.5px;font-family:inherit;resize:vertical;}
 .sug-edit textarea{min-height:70px;}
-.sug-reject{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;} .sug-reject input{flex:1;min-width:200px;}
+.rj-scrim{position:fixed;inset:0;background:rgba(4,6,14,.6);z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;}
+.rj-modal{width:min(480px,100%);background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.rj-modal h3{margin:0 0 4px;font-size:17px;font-weight:800;}
+.rj-modal .rj-sub{font-size:12.5px;color:var(--text-dim);margin:0 0 14px;line-height:1.45;}
+.rj-modal textarea{width:100%;box-sizing:border-box;min-height:90px;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;color:var(--text);
+  padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;}
+.rj-modal .rj-hint{font-size:11px;color:var(--text-dimmer);margin-top:6px;}
+.rj-modal .rj-err{color:var(--red);font-size:12px;margin-top:8px;min-height:1em;}
+.rj-modal .rj-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+.rj-modal .btn-reject:disabled{opacity:.6;cursor:default;}
 .mh-card{border:1px solid var(--border);border-radius:12px;background:var(--panel);padding:14px 16px;margin-bottom:12px;
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);}
 .mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
@@ -4225,14 +4234,12 @@ function sugHTML(s){
         <label>${T('Due date','截止日')}<input id="ed_newDueDate" type="date" value="${esc(s.newDueDate||'')}"></label>
         <label>${T('Owner','负责人')}<input id="ed_owner" value="${esc(s.owner||'')}"></label>
       </div><div class="sug-actions"><button class="btn-primary" onclick="pmcSaveEdit('${s.id}')">${T('Save changes','保存修改')}</button><button class="btn-ghost" onclick="PMC.editing=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
-    } else if(PMC.rejecting===s.id){
-      actions = `<div class="sug-reject"><input id="rj_reason" placeholder="${T('Why? (optional, kept in the audit log)','原因(可选,记入审计日志)')}"><button class="btn-reject" onclick="pmcReject('${s.id}')">${T('Confirm reject','确认驳回')}</button><button class="btn-ghost" onclick="PMC.rejecting=null;pmcRender()">${T('Cancel','取消')}</button></div>`;
     } else {
       const dis = can('approve') ? '' : 'disabled';
       actions = `<div class="sug-actions">
         <button class="btn-approve" ${dis} onclick="pmcApprove('${s.id}')">${(PMC.health&&PMC.health.jiraDryRun)?T('Approve (dry run)','批准(演练)'):T('Approve to Jira','批准并写入 Jira')}</button>
         <button class="btn-ghost" ${dis} onclick="PMC.editing='${s.id}';PMC.rejecting=null;pmcRender()">${T('Edit','编辑')}</button>
-        <button class="btn-reject" ${dis} onclick="PMC.rejecting='${s.id}';PMC.editing=null;pmcRender()">${T('Reject','驳回')}</button>
+        <button class="btn-reject" ${dis} onclick="pmcOpenReject('${s.id}')">${T('Reject','驳回')}</button>
         ${can('approve') ? '' : `<span class="hint">${T('Your role can read to-dos but not approve them.','你的角色可以查看待办,但不能审批。')}</span>`}
       </div>`;
     }
@@ -4291,11 +4298,54 @@ async function pmcApprove(id){
   }catch(e){ showToast(T('Could not approve','审批失败'), e.message); }
   PMC.busy = false; pmcRefresh();
 }
+/* Reject asks for its reason in a dialog. The old inline box looked finished after typing, but
+   nothing was sent until a second click on "Confirm reject" — Enter did nothing — so rejections
+   were silently lost. Here Enter confirms (Shift+Enter is a new line), Esc or a click outside
+   cancels, and a failure stays in the dialog instead of vanishing with a toast. */
+function pmcOpenReject(id){
+  const s = PMC.suggestions.find(x=>x.id===id); if(!s) return;
+  pmcCloseReject(true);
+  PMC.rejecting = id; PMC.editing = null;           // also pauses the 60 s auto-refresh
+  const el = document.createElement('div'); el.className = 'rj-scrim'; el.id = 'rjModal';
+  el.innerHTML = `<div class="rj-modal" role="dialog" aria-modal="true" aria-labelledby="rjTitle">
+    <h3 id="rjTitle">${T('Reject this to-do?','驳回这条待办?')}</h3>
+    <p class="rj-sub">${esc(s.title)}</p>
+    <textarea id="rj_reason" placeholder="${T('Why? (optional, kept in the audit log)','原因(可选,记入审计日志)')}"></textarea>
+    <div class="rj-hint">${T('Enter to confirm · Shift+Enter for a new line · Esc to cancel','回车确认 · Shift+回车换行 · Esc 取消')}</div>
+    <div class="rj-err" id="rj_err" role="alert"></div>
+    <div class="rj-actions">
+      <button class="btn-ghost" onclick="pmcCloseReject()">${T('Cancel','取消')}</button>
+      <button class="btn-reject" id="rj_ok" onclick="pmcReject('${s.id}')">${T('Confirm reject','确认驳回')}</button>
+    </div></div>`;
+  el.addEventListener('mousedown', e=>{ if(e.target===el) pmcCloseReject(); });
+  el.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ e.preventDefault(); pmcCloseReject(); }
+    // isComposing / 229: Enter that only confirms a Chinese IME candidate must not submit.
+    else if(e.key==='Enter' && !e.shiftKey && !e.isComposing && e.keyCode!==229){ e.preventDefault(); pmcReject(id); }
+  });
+  document.body.appendChild(el);
+  setTimeout(()=>{ const t = document.getElementById('rj_reason'); if(t) t.focus(); }, 0);
+}
+function pmcCloseReject(keepState){
+  const el = document.getElementById('rjModal'); if(el) el.remove();
+  if(!keepState) PMC.rejecting = null;
+}
 async function pmcReject(id){
-  const r = (document.getElementById('rj_reason')||{}).value || '';
-  try{ await pmcApi('POST',`/api/suggestions/${id}/reject`, {reason:r}); PMC.rejecting = null; showToast(T('Rejected','已驳回'), r||''); }
-  catch(e){ showToast(T('Could not reject','驳回失败'), e.message); }
-  pmcRefresh();
+  const btn = document.getElementById('rj_ok'); if(btn && btn.disabled) return;
+  const r = ((document.getElementById('rj_reason')||{}).value || '').trim();
+  const errEl = document.getElementById('rj_err');
+  if(btn){ btn.disabled = true; btn.textContent = T('Rejecting…','正在驳回…'); }
+  if(errEl) errEl.textContent = '';
+  try{
+    const s = await pmcApi('POST',`/api/suggestions/${id}/reject`, {reason:r});
+    const i = PMC.suggestions.findIndex(x=>x.id===id); if(i>=0) PMC.suggestions[i] = Object.assign(PMC.suggestions[i], s);
+    pmcCloseReject();
+    showToast(T('Rejected','已驳回'), s.title || '');
+    pmcRender(); pmcRefresh();
+  }catch(e){
+    if(errEl) errEl.textContent = T('Could not reject: ','驳回失败:') + e.message;
+    if(btn){ btn.disabled = false; btn.textContent = T('Confirm reject','确认驳回'); }
+  }
 }
 async function pmcSaveEdit(id){
   const v = k => (document.getElementById('ed_'+k)||{}).value;
