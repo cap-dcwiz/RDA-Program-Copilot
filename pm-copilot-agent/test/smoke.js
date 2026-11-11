@@ -6,6 +6,7 @@ let p = jira.plan({ kind: 'due_date', jiraKey: 'BA-1864', newDueDate: '2026-10-3
 assert.equal(p[0].method, 'PUT'); assert.equal(p[0].body.fields.duedate, '2026-10-31'); assert.equal(p.length, 2);
 p = jira.plan({ kind: 'new_ticket', project: 'bdc', title: 'Send list', detail: 'd', newDueDate: '2026-10-16' }, m, 'Sherry');
 assert.equal(p[0].body.fields.customfield_10034.id, '10029'); assert.equal(p[0].body.fields.issuetype.id, '10006');
+assert.match(p[0].body.fields.fixVersions[0].name, /^Q[1-4] \d{4}$/); // BA requires a fix version
 p = jira.plan({ kind: 'comment', jiraKey: 'BA-2034', detail: 'd' }, m, 'Sherry');
 assert.match(p[0].path, /BA-2034\/comment$/);
 console.log('smoke ok');

@@ -52,6 +52,9 @@ function plan(s, meeting, approver) {
     const fields = { project: { key: cfg.projectKey }, issuetype: { id: cfg.issueTypeId }, summary: s.title,
       description: adf(`${s.detail || ''}${s.owner ? `\nOwner named in meeting: ${s.owner}` : ''}${quote}${footer}`) };
     if (s.newDueDate) fields.duedate = s.newDueDate;
+    // BA rejects a create without one ("修复版本 是必需的"). Quarter taken in Singapore time.
+    const sg = new Date(Date.now() + 8 * 3600000);
+    fields.fixVersions = [{ name: cfg.fixVersion || `Q${Math.floor(sg.getUTCMonth() / 3) + 1} ${sg.getUTCFullYear()}` }];
     const opt = cfgAll.CLIENT_OPTIONS[s.project];
     if (opt) fields[cfg.clientField] = { id: opt.id };
     return [{ method: 'POST', path: '/rest/api/3/issue', body: { fields } }];
