@@ -42,6 +42,7 @@ const auth = require('./auth');
 const P = require('./permissions');
 const plan = require('./plan');
 const jirasync = require('./jirasync');
+const projects = require('./projects');
 
 const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -93,7 +94,8 @@ async function route(req, res, user) {
     const db = store.load();
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
       signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url },
-      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), lastGranolaSync: db.sync.lastGranolaSync,
+      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(),
+      jiraProjects: projects.list().map(p => ({ id: p.id, client: p.client || p.label, filter: p.filterName || null })), jiraFiltersRefreshedAt: projects.refreshedAt(), lastGranolaSync: db.sync.lastGranolaSync,
       lastJiraSync: db.sync.lastJiraSync ? { at: db.sync.lastJiraSync.at, ok: db.sync.lastJiraSync.ok, error: db.sync.lastJiraSync.error || null } : null,
       nextJiraSync: db.sync.nextJiraSync || null });
   }
@@ -173,7 +175,7 @@ async function route(req, res, user) {
     if (m[1] === 'dayone') out.jira = jirasync.readDayone();
     return send(res, 200, out);
   }
-  if (req.method === 'GET' && p === '/api/admin/catalog') { page(user, 'users'); return send(res, 200, { pages: P.PAGES, actions: P.ACTIONS, projects: P.PROJECTS }); }
+  if (req.method === 'GET' && p === '/api/admin/catalog') { page(user, 'users'); return send(res, 200, { pages: P.PAGES, actions: P.ACTIONS, projects: P.projectCatalog() }); }
   if (req.method === 'GET' && p === '/api/admin/roles') { page(user, 'users'); return send(res, 200, { roles: auth.roles() }); }
   if (req.method === 'GET' && p === '/api/admin/access') {
     page(user, 'users');
@@ -266,6 +268,7 @@ if (require.main === module) {
   server.listen(cfg.port, () => {
     console.log(`PM Copilot agent on :${cfg.port} · dashboard at / · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
     console.log(`Sign-in: ${cfg.productCenter.label} at ${cfg.productCenter.url} — accounts and passwords live there`);
+    if (jira.hasCreds()) jira.refreshProjects().then(r => console.log('[jira] project filters:', r)).catch(e => console.warn('[jira] project filters:', e.message));
     const nj = jirasync.schedule();
     console.log(nj ? `Jira sync: next run ${nj.toISOString()} (Mon–Fri 24:00 SGT)${jira.hasCreds() ? '' : ' — needs JIRA_EMAIL and JIRA_API_TOKEN'}` : 'Jira sync: off');
     if (granola.configured() && cfg.granola.syncMinutes > 0) {

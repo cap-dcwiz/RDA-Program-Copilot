@@ -52,6 +52,9 @@ module.exports = {
     // Writes go out under the one JIRA_EMAIL account; the approver is set as the new ticket's
     // reporter, found by their sign-in email. Where that email is not their Jira email, map it:
     // "zhangzhaoning=selena.zhang@rda.ai,someone@gmail.com=712020:abcd…" (Jira email or accountId).
+    // Project filters (see projects.js): only filters owned by these people count, by Jira display
+    // name or accountId. Empty = every visible filter of the form "client[dropdown]" = "X".
+    filterOwners: env('JIRA_FILTER_OWNERS').split(',').map(x => x.trim()).filter(Boolean),
     userMap: Object.fromEntries(env('JIRA_USER_MAP').split(',').map(p => p.split('=').map(x => x.trim()))
       .filter(([k, v]) => k && v).map(([k, v]) => [k.toLowerCase(), v])),
     clientField: env('JIRA_CLIENT_FIELD', 'customfield_10034'),

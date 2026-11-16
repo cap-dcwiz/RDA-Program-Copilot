@@ -1,17 +1,20 @@
 /* One Claude call per meeting: summary + Jira suggestions, returned through a forced tool call
    so the output is always valid structured JSON. */
 const cfg = require('./config');
+const projects = require('./projects');
 
-const PROJECTS = 'dayone (DayOne NTP-E, Johor), bdc (BDC MY2, Bridge Data Centres Malaysia), bdx (BDx SIN1, Singapore chiller plant), cmide (CMI-DE1 Germany), cmisg (CMI-SG Singapore), imdc (Iron Mountain SIN1), internal (RDA-internal work, no client)';
+/* Projects come from the Jira project filters (projects.js), so a new filter is a new choice here. */
+const PROJECT_IDS = () => [...projects.list().map(p => p.id), 'internal'];
+const PROJECTS = () => `${projects.promptList()}, internal (RDA-internal work, no client)`;
 
-const TOOL = {
+const TOOL_ = () => ({
   name: 'record_meeting_analysis',
   description: 'Record the meeting summary and the Jira suggestions a PM should review.',
   input_schema: {
     type: 'object', required: ['summary', 'projects', 'suggestions'],
     properties: {
       summary: { type: 'array', items: { type: 'string' }, description: '3-6 bullets: decisions and changes in status, one sentence each.' },
-      projects: { type: 'array', items: { type: 'string', enum: ['dayone', 'bdc', 'bdx', 'cmide', 'cmisg', 'imdc', 'internal'] } },
+      projects: { type: 'array', items: { type: 'string', enum: PROJECT_IDS() } },
       suggestions: {
         type: 'array',
         items: {
@@ -20,7 +23,7 @@ const TOOL = {
           properties: {
             kind: { type: 'string', enum: ['comment', 'due_date', 'new_ticket'],
               description: 'comment = status update on an existing ticket; due_date = the meeting set or moved a date for an existing ticket; new_ticket = a new action with an owner that no open ticket covers.' },
-            project: { type: 'string', enum: ['dayone', 'bdc', 'bdx', 'cmide', 'cmisg', 'imdc', 'internal'] },
+            project: { type: 'string', enum: PROJECT_IDS(), description: 'The project whose Jira filter the ticket belongs in.' },
             jiraKey: { type: ['string', 'null'], description: 'Existing ticket key (BA-1234). Required for comment and due_date, null for new_ticket.' },
             title: { type: 'string', description: 'Short imperative line a PM can scan, e.g. "Send BDC the missing-data list".' },
             detail: { type: 'string', description: 'For comment: the update text to post. For new_ticket: the ticket description. Plain English, 1-4 sentences.' },
@@ -34,9 +37,9 @@ const TOOL = {
       },
     },
   },
-};
+});
 
-const SYSTEM = `You are PM Copilot, the project-management agent for RDA's delivery team. You read meeting notes and propose Jira updates that a human admin will approve or reject. Nothing you propose is written until they approve it.
+const SYSTEM_ = () => `You are PM Copilot, the project-management agent for RDA's delivery team. You read meeting notes and propose Jira updates that a human admin will approve or reject. Nothing you propose is written until they approve it.
 
 Rules:
 - Propose only what the notes actually say. Never invent dates, owners or numbers.
@@ -46,11 +49,12 @@ Rules:
 - Use new_ticket for concrete actions with an owner or a deadline that no open ticket covers. Skip vague intentions and pure discussion.
 - Skip anything that is not a change: a status that merely repeats what the ticket already says is not a suggestion.
 - One suggestion per distinct change. Usually 3-12 per meeting; zero is fine for a meeting with no project decisions.
-- Projects: ${PROJECTS}.
+- Projects: ${PROJECTS()}.
 - Write in clear, plain English even when the notes mix languages.`;
 
 async function analyseMeeting(meeting, tickets) {
   if (!cfg.anthropic.apiKey) throw new Error('ANTHROPIC_API_KEY is not set');
+  const TOOL = TOOL_(), SYSTEM = SYSTEM_();
   const ticketLines = tickets.map(t => `${t.key} | ${t.client || '-'} | ${t.status || '-'} | ${t.assignee || '-'} | due ${t.due || '-'} | ${t.summary}`).join('\n');
   const notes = String(meeting.notesText || '').slice(0, 180000);
   const user = `Meeting: ${meeting.title}

@@ -80,6 +80,14 @@ function effective(roles, roleIds) {
   return { pages: PAGES.map(p => p.id).filter(p => out.pages.has(p)), actions: [...out.actions], projects, roles: mine.map(r => r.name) };
 }
 
+/* Built-in projects plus any added since through a Jira project filter (projects.js). Required
+   lazily: projects.js needs config only, but keeping permissions.js free of it at load time keeps the tests simple. */
+function projectCatalog() {
+  const out = PROJECTS.slice();
+  try { for (const p of require('./projects').list()) if (!out.some(x => x.id === p.id)) out.splice(out.length - 1, 0, { id: p.id, en: p.client || p.label }); } catch {}
+  return out;
+}
+
 const canSeeProject = (perms, project) => perms.projects.includes('*') || perms.projects.includes(project);
 
-module.exports = { PAGES, ACTIONS, PROJECTS, DEFAULT_ROLES, DEFAULT_ACCESS, rolesFor, effective, canSeeProject };
+module.exports = { PAGES, ACTIONS, PROJECTS, projectCatalog, DEFAULT_ROLES, DEFAULT_ACCESS, rolesFor, effective, canSeeProject };

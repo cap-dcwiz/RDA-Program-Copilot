@@ -12,6 +12,7 @@ const path = require('path');
 const cfg = require('./config');
 const jira = require('./jira');
 const store = require('./store');
+const projects = require('./projects');
 
 const F = (n) => path.join(cfg.DATA_DIR, n);
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
@@ -81,8 +82,7 @@ async function syncPortfolio() {
   // data/portfolio.json is the committed seed; the sync writes portfolio.live.json (git-ignored) so a
   // `git pull` on the server never conflicts with synced data.
   const pf = readJson(F('portfolio.live.json'), null) || readJson(F('portfolio.json'), null); if (!pf) return { skipped: 'no portfolio data' };
-  const clientToProj = Object.fromEntries(Object.entries(cfg.CLIENT_OPTIONS).map(([proj, o]) => [o.label.toLowerCase(), proj]));
-  clientToProj['dayone'] = 'dayone'; clientToProj['bdx sin1-chiller plant'] = 'bdx';
+  const clientToProj = (client) => { const p = client && projects.byClient(client); return p ? p.id : (/^dayone$/i.test(client || '') ? 'dayone' : null); };
   const issues = await jira.searchAll(cfg.jira.jql, FIELDS);
   const old = Object.fromEntries((pf.tickets || []).map(t => [t.key, t]));
   const ST = { done: 'todo', inprogress: 'inprogress', blocked: 'blocked', planned: 'todo', notstarted: 'todo' };
@@ -90,7 +90,7 @@ async function syncPortfolio() {
   for (const i of issues) {
     const r = ticketRow(i), f = i.fields || {};
     const client = f[cfg.jira.clientField] && f[cfg.jira.clientField].value;
-    const proj = (old[r.key] && old[r.key].proj) || clientToProj[String(client || '').toLowerCase()] || null;
+    const proj = (old[r.key] && old[r.key].proj) || clientToProj(client);
     if (!proj) continue;
     const name = String(r.statusName || '').toLowerCase();
     const status = /review|审查/.test(name) ? 'review' : ST[r.status] || 'inprogress';
@@ -115,6 +115,8 @@ async function runAll(by) {
     const res = { at: new Date().toISOString(), by: by || 'scheduler' };
     if (!jira.hasCreds()) { res.ok = false; res.error = 'JIRA_EMAIL / JIRA_API_TOKEN are not set'; }
     else {
+      // Project filters first: a filter added since the last run decides which tickets the portfolio keeps.
+      try { res.filters = await jira.refreshProjects(); } catch (e) { res.filters = { error: e.message }; }
       try { res.dayone = await syncDayone(); res.portfolio = await syncPortfolio(); res.ok = true; }
       catch (e) { res.ok = false; res.error = e.message; }
     }
