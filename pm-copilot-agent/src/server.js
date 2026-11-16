@@ -96,7 +96,15 @@ async function route(req, res, user) {
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
       signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url },
       jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(),
-      jiraProjects: projects.list().map(p => ({ id: p.id, client: p.client || p.label, filter: p.filterName || null })), jiraFiltersRefreshedAt: projects.refreshedAt(), dayonePlanFeed: (feed.merged('dayone') || {}).feed || null, lastGranolaSync: db.sync.lastGranolaSync,
+      // The sign-in screen reads this before anyone has signed in, so it stays public — but only
+      // for operational status. The client roster is not status: on a public URL it is a list of
+      // who we work for, readable by anyone who knows the path. whoIs() gives null without a token.
+      ...(user ? {
+        jiraProjects: projects.list().map(p => ({ id: p.id, client: p.client || p.label, filter: p.filterName || null })),
+        jiraFiltersRefreshedAt: projects.refreshedAt(),
+        dayonePlanFeed: (feed.merged('dayone') || {}).feed || null,
+      } : {}),
+      lastGranolaSync: db.sync.lastGranolaSync,
       lastJiraSync: db.sync.lastJiraSync ? { at: db.sync.lastJiraSync.at, ok: db.sync.lastJiraSync.ok, error: db.sync.lastJiraSync.error || null } : null,
       nextJiraSync: db.sync.nextJiraSync || null });
   }
