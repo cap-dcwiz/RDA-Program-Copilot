@@ -46,6 +46,9 @@ module.exports = {
     projectKey: env('JIRA_PROJECT_KEY', 'BA'),
     jql: env('JIRA_JQL', 'project = BA AND "client[dropdown]" != RDA AND status NOT IN (Done, Backlog) ORDER BY cf[10019] ASC'),
     issueTypeId: env('JIRA_ISSUE_TYPE_ID', '10006'),
+    // Project BA requires a fix version on every new issue. Blank = the current quarter's
+    // "Q<n> <yyyy>" version (e.g. "Q4 2026"); set a version name to pin one instead.
+    fixVersion: env('JIRA_FIX_VERSION'),
     clientField: env('JIRA_CLIENT_FIELD', 'customfield_10034'),
     dryRun: bool('JIRA_DRY_RUN', true),
     // Nightly read sync. Default: the end of every working day, Mon–Fri 24:00 Singapore time
