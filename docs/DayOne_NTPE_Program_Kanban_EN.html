@@ -4273,8 +4273,9 @@ function sugHTML(s){
     actions = s.status==='approved'
       ? `<div class="sug-result"><b>${j.dryRun ? T('Approved · dry run, not written to Jira','已批准 · 演练模式,未写入 Jira') : T('Written to Jira','已写入 Jira')}</b> · ${when}
           ${j.url ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.createdKey||s.jiraKey||T('Open','打开'))}</a>` : ''}
+          ${j.dryRun && can('approve') ? ` · <a href="#" onclick="pmcReopen('${s.id}');return false">${T('Back to pending','退回待批准')}</a>` : ''}
           ${j.steps ? `<details><summary>${T('Jira request','Jira 请求')}</summary><pre>${esc(JSON.stringify(j.steps,null,2))}</pre></details>` : ''}</div>`
-      : `<div class="sug-result"><b>${T('Rejected','已驳回')}</b> · ${when}${s.rejectReason?` · ${esc(s.rejectReason)}`:''}</div>`;
+      : `<div class="sug-result"><b>${T('Rejected','已驳回')}</b> · ${when}${s.rejectReason?` · ${esc(s.rejectReason)}`:''}${can('approve') ? ` · <a href="#" onclick="pmcReopen('${s.id}');return false">${T('Back to pending','退回待批准')}</a>` : ''}</div>`;
   }
   return `<div class="sug ${s.status}">
     <div class="sug-top"><span class="sug-kind">${esc(L(k))}</span>${keyHTML}<span class="proj-tag">${esc(projName(s.project))}</span>${conf}</div>
@@ -4312,6 +4313,14 @@ function renderTodo(){
       ${g.m.url?`<a href="${esc(g.m.url)}" target="_blank" rel="noopener">${T('Open in Granola','在 Granola 打开')}</a>`:''}</div>
       ${g.items.map(sugHTML).join('')}</div>`).join('');
   box.innerHTML = html;
+}
+async function pmcReopen(id){
+  try{
+    const s = await pmcApi('POST',`/api/suggestions/${id}/reopen`);
+    const i = PMC.suggestions.findIndex(x=>x.id===id); if(i>=0){ const o = PMC.suggestions[i]; ['jira','decidedBy','decidedAt','rejectReason'].forEach(k=>delete o[k]); Object.assign(o, s); }
+    showToast(T('Back in the pending list','已退回待批准'), s.title);
+  }catch(e){ showToast(T('Could not reopen','退回失败'), e.message); }
+  pmcRefresh();
 }
 async function pmcApprove(id){
   PMC.busy = true;
