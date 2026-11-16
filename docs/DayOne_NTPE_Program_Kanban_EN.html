@@ -1840,6 +1840,9 @@ function miniBadge(b){ return `<span class="badge ${b.color}" style="padding:2px
 
 let TASKS = [];
 let MILESTONE = {};
+// Set from the plan data in initProgram(); declared here because the sidebars render before sign-in.
+let PROGRAM_ASOF = '2026-08-21';
+let OVERVIEW = null;   // brief, recommendation, phase focus: PM text kept with the plan data so a refresh is a data edit
 const TODAY = new Date(new Date(Date.now()+8*3600e3).toISOString().slice(0,10));   // today, Singapore
 
 /* ===================== i18n (EN / ZH switch) =====================
@@ -2172,7 +2175,7 @@ function goPage(id){
     : 'DayOne NTP-E';
   const upd = document.getElementById('updatedTime');
   if(upd) upd.textContent = ALL_SCOPE.includes(id) ? (typeof PF_ASOF_LABEL!=='undefined' ? PF_ASOF_LABEL : '')
-    : ((typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.syncedAt) ? `${fmtDT(PLAN.jira.syncedAt)} (Jira)` : '2026-08-21 09:15');
+    : ((typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.syncedAt) ? `${fmtDT(PLAN.jira.syncedAt)} (Jira)` : PROGRAM_ASOF);
   const tabsEl = document.querySelector('.tabs'); if(tabsEl) tabsEl.classList.toggle('mode-all', ALL_SCOPE.includes(id));
   if(typeof renderProjMenu==='function') renderProjMenu();
   if(id==='portfolio' && typeof renderPortfolio==='function') renderPortfolio();
@@ -2362,20 +2365,25 @@ document.querySelectorAll('.pill[data-depfilter]').forEach(btn=>{
 });
 
 /* ===================== SIDEBAR (shared across roadmap subviews) ===================== */
+const FOCUS_ICON = { ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>', warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' };
+const FOCUS_PLAN = [{ok:true,en:'Complete API integration and historical data preparation'},{ok:true,en:'Advance the Digital Twin framework and calibration workflow build-out'},
+  {ok:true,en:'Single Data Hall pilot calibration and model calibration prep'},{warn:true,en:'Historical BMS data delivery is delayed, impacting progress'}];
+const phaseNow = () => typeof dsPhase==='function' ? dsPhase().months.slice(-1)[0] : ((OVERVIEW && OVERVIEW.phaseMonths) || [2]).slice(-1)[0];
+function focusHTML(){
+  const items = (OVERVIEW && OVERVIEW.focus) || FOCUS_PLAN;
+  return items.map(x=>`<li class="${x.warn?'warn':'ok'}">${x.warn?FOCUS_ICON.warn:FOCUS_ICON.ok}${esc(x.zh ? (LANG==='zh' ? x.zh : x.en) : tr(x.en))}</li>`).join('');
+}
 function sidebarHTML(){ return `
   <div class="side-card">
     <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24" fill="var(--purple)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${tr('Current Phase Focus')}<span style="margin-left:auto;color:var(--text-dimmer)">⌃</span></h3>
     <ul class="checklist">
-      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${tr('Complete API integration and historical data preparation')}</li>
-      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${tr('Advance the Digital Twin framework and calibration workflow build-out')}</li>
-      <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${tr('Single Data Hall pilot calibration and model calibration prep')}</li>
-      <li class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${tr('Historical BMS data delivery is delayed, impacting progress')}</li>
+      ${focusHTML()}
     </ul>
   </div>
   <div class="side-card">
     <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>${tr('Upcoming Milestones')}<span style="margin-left:auto;color:var(--text-dimmer)">⌃</span></h3>
     <ul class="ms-list">
-      <li><span class="ms-date">08/28</span><span class="ms-name">MS2 ${msName()}</span><span class="ms-month">${monthWord(2)}</span></li>
+      <li><span class="ms-date">${esc(MILESTONE.due||'08/28')}</span><span class="ms-name">MS2 ${msName()}</span><span class="ms-month">${monthWord(2)}</span></li>
       <li><span class="ms-date">09/30</span><span class="ms-name">${tr('MS3 AI Optimization Policy v1 Complete')}</span><span class="ms-month">${monthWord(3)}</span></li>
       <li><span class="ms-date">10/31</span><span class="ms-name">${tr('MS4 DCVerse/DCWiz Integration Complete')}</span><span class="ms-month">${monthWord(4)}</span></li>
       <li><span class="ms-date">11/30</span><span class="ms-name">${tr('MS5 Human-in-the-Loop Rollout')}</span><span class="ms-month">${monthWord(5)}</span></li>
@@ -2386,7 +2394,7 @@ function sidebarGanttExtra(){ return `
   <div class="side-card">
     <h3><svg class="i" style="width:15px;height:15px;color:var(--purple)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>${tr('Project Information')}</h3>
     <div class="info-row"><span>${tr('Project Duration')}</span><b>${tr('Jul 2026 – Mar 2027 (9 months)')}</b></div>
-    <div class="info-row"><span>${tr('Project Phase')}</span><b>${tr('Month 2 / of 9')}</b></div>
+    <div class="info-row"><span>${tr('Project Phase')}</span><b>${LANG==='zh' ? `第 ${phaseNow()} / 9 月` : `Month ${phaseNow()} / of 9`}</b></div>
     <div class="info-row"><span>${tr('Current Progress')}</span><b>28.6%</b></div>
     <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:28.6%;background:var(--purple)"></div></div></div>
   </div>`; }
@@ -3611,10 +3619,15 @@ function render(){
    role may see the project (GET /api/program/dayone), so an unauthenticated visitor gets a sign-in
    screen and nothing else. That makes the first paint depend on the network, so everything that
    used to run here now runs in initProgram(), called from onSignedIn(). */
+const asOfShort = () => asOfEn().replace(/ \d{4}$/,'');
+const asOfZh = () => PROGRAM_ASOF.slice(5).replace(/^0/,'').replace('-0','-').replace('-','/');
+const asOfEn = () => { const d = new Date(PROGRAM_ASOF + 'T00:00:00'); return isNaN(d) ? PROGRAM_ASOF : d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); };
 function initProgram(data){
   PHASES = data.PHASES || []; TASKS = data.TASKS || []; MILESTONE = data.MILESTONE || {};
   EDGES = data.EDGES || []; TASK_ALIASES = data.TASK_ALIASES || {};
   CHANGELOG = data.CHANGELOG || []; MEETINGS = data.MEETINGS || []; PROPOSALS = data.PROPOSALS || [];
+  PROGRAM_ASOF = data.asOf || '2026-08-21';   // when the plan data (tasks, milestone, changelog) was last brought up to date
+  OVERVIEW = data.OVERVIEW || null;
 
   // Derived indexes: rebuilt from scratch, never patched, so a re-init cannot leave stale rows.
   for (const k of Object.keys(PHASES_BY_MONTH)) delete PHASES_BY_MONTH[k];
@@ -3631,6 +3644,8 @@ function initProgram(data){
   currentMeetingId = (MEETINGS[0] || {}).id || null;
 
   loadState();
+  applyOverview();
+  renderSidebars();
   render();
   renderList();
   buildGantt();
@@ -3638,6 +3653,15 @@ function initProgram(data){
   applyDataSources();   // reads PROPOSALS, so it waits for them too
 }
 
+/* Brief and recommendation are static spans with data-i18n-en/zh; swap in the data file's text so
+   the language toggle keeps working. */
+function applyOverview(){
+  if(!OVERVIEW) return;
+  const set = (el, v) => { if(!el || !v) return; el.setAttribute('data-i18n-en', v.en); el.setAttribute('data-i18n-zh', v.zh || v.en); el.textContent = T(v.en, v.zh || v.en); };
+  set(document.querySelector('#page-overview .banner .banner-text span'), OVERVIEW.brief);
+  set(document.querySelector('#page-blocker .reco-card p span'), OVERVIEW.reco);
+  const u = document.getElementById('updatedTime'); if(u && !(typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.syncedAt)) u.textContent = PROGRAM_ASOF;
+}
 /* ===================== i18n: static HTML switch + language toggle ===================== */
 // Walks every element marked with data-i18n-en/zh (added by a build-time pass over the
 // static page chrome) and sets its text to the current LANG. JS-generated content (tables,
@@ -3686,7 +3710,7 @@ applyI18n();
 updateLangToggleUI();
 
 /* set updated timestamp to now (Singapore) */
-document.getElementById('updatedTime').textContent = '2026-08-21 09:15';
+document.getElementById('updatedTime').textContent = PROGRAM_ASOF;
 </script>
 <script>
 /* =====================================================================================
@@ -3887,7 +3911,7 @@ function renderPortfolio(){
         <div class="pf-next"><span class="d">${esc(fmtD(nx.date))}${nx.tentative?'?':''}</span><span class="t">${esc(L(nx))}</span></div>
         ${open}
       </div>
-      ${p.drill?`<div class="pf-drillnote">${T('Project view holds DayOne data as of 21 Aug 2026','项目视图中的 DayOne 数据截至 2026-08-21')}</div>`:''}
+      ${p.drill?`<div class="pf-drillnote">${T(`Project view holds DayOne data as of ${asOfEn()}`,`项目视图中的 DayOne 数据截至 ${PROGRAM_ASOF}`)}</div>`:''}
     </div>`;
   }).join('');
 
@@ -4737,7 +4761,7 @@ function planApply(data){
   // The agent is the source of truth for plan fields: start from the shipped plan, then apply its edits,
   // so a reset or another manager's change is not masked by an older copy cached in this browser.
   if(Array.isArray(data.decisions)) mtReconcile(data.decisions);
-  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next','targetOriginal'];
+  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next','health','targetOriginal'];
   TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; else if(k==='targetOriginal') delete t[k]; }); });
   // 2) Jira (nightly sync): status, owner and target date of linked tasks; Jira-only tickets become tasks.
   const J = data.jira; PLAN.jira = J || null;
@@ -4925,7 +4949,7 @@ const DS_PAGES = ['overview','blocker','dependency','roadmap','meetings','luna']
 const DS_FIELDS = [['status','Status','状态'],['owner','Owner','负责人'],['due','Target date','目标日期'],['gs','Start','开始'],['ge','End','结束'],
   ['progress','Progress','进度'],['next','Next step','下一步'],['health','Health','健康度']];
 const dsK = k => T(DS_KIND[k][0], DS_KIND[k][1]);
-const dsAsOf = () => T('as of 21 Aug 2026','截至 2026-08-21');
+const dsAsOf = () => T(`as of ${asOfEn()}`,`截至 ${PROGRAM_ASOF}`);
 
 function dsField(t, f){
   const J = t && t.jira, syncAt = PLAN.jira && PLAN.jira.syncedAt;
@@ -4964,7 +4988,7 @@ function dsTaskLabel(t){
   if(t.jira) return {k:'jira', label:`Jira ${t.jira.key}`, plus: ks.has('edit') ? 'edit' : (ks.has('meeting') ? 'meeting' : null)};
   if(ks.has('edit')) return {k:'edit', label:T('Edited','已修改'), plus: ks.has('meeting') ? 'meeting' : null};
   if(ks.has('meeting')) return {k:'meeting', label:T('Meeting','会议')};
-  return {k:'plan', label:T('Plan · 21 Aug','计划 · 8/21')};
+  return {k:'plan', label:T(`Plan · ${asOfShort()}`,`计划 · ${asOfZh()}`)};
 }
 function dsTag(spec, k, label, plus){
   return `<span class="ds-tag k-${k}"${spec ? ` data-ds="${esc(spec)}"` : ''}><i></i>${esc(label)}${plus ? `<i class="p k-${plus}"></i>` : ''}</span>`;
@@ -4973,7 +4997,7 @@ function dsTaskTag(id, fields){
   const t = TASKS_BY_ID[id]; if(!t) return '';
   if(fields){   // tag for a few fields only (e.g. an action row: next step / owner / target date)
     const ks = fields.split(',').map(f=>dsField(t,f).k); const k = ks.includes('jira') ? 'jira' : ks.includes('edit') ? 'edit' : ks.includes('meeting') ? 'meeting' : 'plan';
-    return dsTag(`task:${id}:${fields}`, k, k==='jira' ? `Jira ${t.jira.key}` : k==='plan' ? T('Plan · 21 Aug','计划 · 8/21') : dsK(k));
+    return dsTag(`task:${id}:${fields}`, k, k==='jira' ? `Jira ${t.jira.key}` : k==='plan' ? T(`Plan · ${asOfShort()}`,`计划 · ${asOfZh()}`) : dsK(k));
   }
   const l = dsTaskLabel(t); return dsTag('task:'+id, l.k, l.label, l.plus);
 }
@@ -5066,7 +5090,7 @@ function dsStripHTML(pid){
                                     : T('Jira · not synced yet','Jira · 尚未同步')));
     if(edited) parts.push(dsKindTag('edit', T(`Manual edits · ${edited} tasks`,`手动修改 · ${edited} 个任务`)));
     if(mtFields) parts.push(dsKindTag('meeting', T(`Meeting minutes · ${mtFields} fields from approved changes`,`会议纪要 · ${mtFields} 个字段来自已批准修改`)));
-    parts.push(dsKindTag('plan', T(`Original plan · ${plan} tasks not in Jira · as of 21 Aug 2026`,`原始计划 · ${plan} 个任务未关联 Jira · 截至 2026-08-21`)));
+    parts.push(dsKindTag('plan', T(`Plan · ${plan} tasks not in Jira · as of ${asOfEn()}`,`计划 · ${plan} 个任务未关联 Jira · 截至 ${PROGRAM_ASOF}`)));
     parts.push(dsKindTag('calc', T('Calculated · counts, Blocked / Overdue','系统计算 · 统计数、阻塞/逾期')));
     if(pid==='overview' || pid==='blocker') parts.push(dsKindTag('static', T('Fixed text · notes, brief, recommendation','固定文字 · 说明、简报、建议')));
     if(pid==='overview') parts.push(dsKindTag('sample', T('Sample · Luna Queue, Internal Delivery','示例 · Luna 队列、内部交付')));
@@ -5099,15 +5123,15 @@ function applyDataSources(){
       let spec, k, label;
       if(pid==='luna'){ spec = 'sample'; k = 'sample'; }
       else if(/Current Phase|当前阶段/.test(card.querySelector('.stat-label')?.textContent||'')){
-        const ph = dsPhase(); spec = 'phase'; k = ph.k; label = ph.k==='jira' ? `Jira ${ph.key}` : T('Plan · 21 Aug','计划 · 8/21');
+        const ph = dsPhase(); spec = 'phase'; k = ph.k; label = ph.k==='jira' ? `Jira ${ph.key}` : T(`Plan · ${asOfShort()}`,`计划 · ${asOfZh()}`);
         const v = card.querySelector('.stat-value'), sb = card.querySelector('.stat-sub');
         if(v) v.textContent = dsPhaseLabel();
-        if(sb) sb.textContent = ph.k==='jira' ? T(`Moving to ${phaseTitle(ph.months[ph.months.length-1])}`,`进入「${phaseTitle(ph.months[ph.months.length-1])}」`) : (PHASES_BY_MONTH[2].dateLabel+' · '+phaseTitle(2));
+        if(sb) sb.textContent = ph.k==='jira' ? T(`Moving to ${phaseTitle(ph.months[ph.months.length-1])}`,`进入「${phaseTitle(ph.months[ph.months.length-1])}」`) : (()=>{ const m = dsPhase().months[0]; return (PHASES_BY_MONTH[m]||{}).dateLabel+' · '+phaseTitle(m); })();
       }
       else if(kpi){ spec = `kpi:${kpi.dataset.kpi}`; k = 'calc';
         if(kpi.dataset.kpi==='monthtasks'){ const l = card.querySelector('.stat-label'); if(l) l.textContent = T(`Tasks in ${dsMonthsWord()}`,`${dsMonthsWord()}任务数`); } }
       else if(/MS2|milestone|里程碑/i.test(card.textContent)){ const s = dsMsField(); spec = 'ms:MS2'; k = s.k; }
-      else { spec = 'plan'; k = 'plan'; label = T('Plan · 21 Aug','计划 · 8/21'); }
+      else { spec = 'plan'; k = 'plan'; label = T(`Plan · ${asOfShort()}`,`计划 · ${asOfZh()}`); }
       card.setAttribute('data-ds', spec);
       let foot = card.querySelector('.ds-foot'); if(!foot){ foot = document.createElement('div'); foot.className = 'ds-foot'; card.appendChild(foot); }
       foot.innerHTML = `<span class="ds-tag k-${k}"><i></i>${esc(label || dsK(k))}</span>`;
@@ -5126,7 +5150,7 @@ function applyDataSources(){
     c.setAttribute('data-ds', isMs ? 'ms:MS2' : 'task:'+id);
     const bd = c.querySelector('.fc-badges, .mc-badges');
     if(bd && !bd.querySelector('.ds-tag')){
-      if(isMs){ const s = dsMsField(); bd.insertAdjacentHTML('beforeend', dsTag('ms:MS2', s.k, s.k==='plan' ? T('Plan · 21 Aug','计划 · 8/21') : dsK(s.k))); }
+      if(isMs){ const s = dsMsField(); bd.insertAdjacentHTML('beforeend', dsTag('ms:MS2', s.k, s.k==='plan' ? T(`Plan · ${asOfShort()}`,`计划 · ${asOfZh()}`) : dsK(s.k))); }
       else bd.insertAdjacentHTML('beforeend', dsTaskTag(id));
     }
     c.querySelectorAll('.fc-desc, .mc-desc').forEach(d=>{ d.setAttribute('data-ds','static'); d.classList.add('ds-static'); });
@@ -5161,7 +5185,7 @@ function applyDataSources(){
   // Fixed text and preview panels
   const ov = document.getElementById('page-overview');
   if(ov){
-    const brief = ov.querySelector('.banner'); if(brief) dsMark(brief, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), '.banner-title');
+    const brief = ov.querySelector('.banner'); if(brief) dsMark(brief, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), '.banner-title');
     ov.querySelectorAll('.panel').forEach(p=>{
       const title = p.querySelector('.panel-title'); if(!title) return;
       const tx = title.textContent;
@@ -5169,15 +5193,15 @@ function applyDataSources(){
       else if(/Actions to Follow|待跟进/.test(tx)) title.setAttribute('data-ds-skip','1');
     });
   }
-  const reco = document.querySelector('#page-blocker .reco-card'); if(reco) dsMark(reco, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h4');
+  const reco = document.querySelector('#page-blocker .reco-card'); if(reco) dsMark(reco, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), 'h4');
   const luna = document.getElementById('page-luna');
   if(luna) luna.querySelectorAll('.panel-title').forEach(pt=>dsMark(pt, 'sample', 'sample'));
   // Roadmap side cards
   document.querySelectorAll('.side-card').forEach(sc=>{
     const h = sc.querySelector('h3'); if(!h) return; const tx = h.textContent;
-    if(/Current Phase Focus|当前阶段重点/.test(tx)) dsMark(sc, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h3');
-    else if(/Upcoming Milestones|即将到来的里程碑/.test(tx)) dsMark(sc, 'plan', 'plan', T('Plan · 21 Aug','计划 · 8/21'), 'h3');
-    else if(/Project Information|项目信息/.test(tx)) dsMark(sc, 'static', 'static', T('Fixed text · 21 Aug','固定文字 · 8/21'), 'h3');
+    if(/Current Phase Focus|当前阶段重点/.test(tx)) dsMark(sc, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), 'h3');
+    else if(/Upcoming Milestones|即将到来的里程碑/.test(tx)) dsMark(sc, 'plan', 'plan', T(`Original plan · 21 Aug · MS2 ${asOfShort()}`,`原始计划 · 8/21 · MS2 ${asOfZh()}`), 'h3');   // MS3–MS6 have not been re-planned
+    else if(/Project Information|项目信息/.test(tx)) dsMark(sc, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), 'h3');
   });
   // Meetings page
   document.querySelectorAll('#meetList .meet-item').forEach(m=>{ if(!m.querySelector('.ds-tag')) m.querySelector('b')?.insertAdjacentHTML('afterend', ` ${dsTag('meeting','meeting',T('Minutes','纪要'))}`); });
@@ -5185,16 +5209,16 @@ function applyDataSources(){
 }
 /* Current phase: from the epic description in Jira when the sync found it, else the original plan (Month 2). */
 function dsPhase(){
-  const P = PLAN.jira && PLAN.jira.phase;
+  const P = typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.phase;
   if(P && P.months && P.months.length) return {k:'jira', months:P.months, key:P.key, text:P.text, updated:P.updated};
-  return {k:'plan', months:[2]};
+  return {k:'plan', months:(OVERVIEW && OVERVIEW.phaseMonths) || [2]};
 }
 function dsMonthsWord(){ const m = dsPhase().months; return m.length > 1 ? T(`Month ${m[0]}–${m[m.length-1]}`,`第 ${m[0]}–${m[m.length-1]} 月`) : monthWord(m[0]); }
 function dsPhaseLabel(){ const m = dsPhase().months; return m.length > 1 ? T(`Month ${m[0]} → ${m[m.length-1]}`,`第 ${m[0]} → ${m[m.length-1]} 月`) : monthWord(m[0]); }
 function dsPhaseNote(){
   const ph = dsPhase();
   return ph.k==='jira' ? T(`Current phase from the Jira epic ${ph.key} (updated ${ph.updated}): "${ph.text}". Counts cover ${dsMonthsWord()}.`,`当前阶段来自 Jira Epic ${ph.key}(${ph.updated} 更新):「${ph.text}」。统计范围为${dsMonthsWord()}。`)
-                       : T('Current phase from the original plan (Month 2); the Jira epic has not been synced yet.','当前阶段来自原始计划(第 2 月),尚未同步 Jira Epic。');
+                       : T(`Current phase from the plan data (${dsPhaseLabel()}, as of ${asOfEn()}); the Jira epic has not been synced yet.`,`当前阶段来自计划数据(${dsPhaseLabel()},截至 ${PROGRAM_ASOF}),尚未同步 Jira Epic。`);
 }
 function dsJiraDates(J){
   return [J.created && T(`created ${J.created}`,`创建 ${J.created}`), J.updated && T(`updated ${J.updated}`,`更新 ${J.updated}`),

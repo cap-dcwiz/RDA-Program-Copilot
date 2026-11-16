@@ -12,6 +12,7 @@ const path = require('path');
 const cfg = require('./config');
 const jira = require('./jira');
 const store = require('./store');
+const projects = require('./projects');
 
 const F = (n) => path.join(cfg.DATA_DIR, n);
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
@@ -30,6 +31,8 @@ function planStatus(st) {
 const code = (summary) => { const m = String(summary).match(/\[DayOne-NTPE\]\[(\d+)(?:\.(\d+))*\]/i); return m ? Number(m[1]) : null; };
 const cleanTitle = (summary) => String(summary).replace(/^\s*(\[[^\]]+\]\s*)+/, '').trim() || summary;
 const day = (iso) => iso ? String(iso).slice(0, 10) : null;
+/* Plan month (1 = the start month) of a date; null before the start or without one. Capped at 9. */
+const planMonth = (iso, start) => { if (!iso || !start) return null; const [y, m] = String(iso).split('-').map(Number), [sy, sm] = String(start).split('-').map(Number); const n = (y - sy) * 12 + (m - sm) + 1; return n >= 1 ? Math.min(n, 9) : null; };
 
 function ticketRow(i) {
   const f = i.fields || {};
@@ -63,8 +66,10 @@ async function syncDayone() {
       r.lastComment = await jira.lastComment(r.key).catch(() => null);
       tasks[byKey[r.key]] = r;
     } else if (!ignore.has(r.key) && !byKey[r.parent] && !(r.parent && r.parent !== map.epic && rows.some(x => x.key === r.parent))) {
-      const month = code(r.summary);
-      if (!month) continue;            // not part of the numbered DayOne plan (old 2025 tickets, other epics)
+      // Placed by its "[x.y]" code; a child of the epic without one (e.g. a task created from a
+      // meeting) by the month it was created in. Anything else is not part of the plan (old 2025 tickets).
+      const month = code(r.summary) || (r.parent === map.epic ? planMonth(r.created, map.start) : null);
+      if (!month) continue;
       r.month = month;
       r.lastComment = await jira.lastComment(r.key).catch(() => null);
       extra.push(r);
@@ -80,9 +85,8 @@ async function syncDayone() {
 async function syncPortfolio() {
   // data/portfolio.json is the committed seed; the sync writes portfolio.live.json (git-ignored) so a
   // `git pull` on the server never conflicts with synced data.
-  const pf = readJson(F('portfolio.live.json'), null) || readJson(F('portfolio.json'), null); if (!pf) return { skipped: 'no portfolio data' };
-  const clientToProj = Object.fromEntries(Object.entries(cfg.CLIENT_OPTIONS).map(([proj, o]) => [o.label.toLowerCase(), proj]));
-  clientToProj['dayone'] = 'dayone'; clientToProj['bdx sin1-chiller plant'] = 'bdx';
+  const pf = readPortfolio(); if (!pf) return { skipped: 'no portfolio data' };
+  const clientToProj = (client) => { const p = client && projects.byClient(client); return p ? p.id : (/^dayone$/i.test(client || '') ? 'dayone' : null); };
   const issues = await jira.searchAll(cfg.jira.jql, FIELDS);
   const old = Object.fromEntries((pf.tickets || []).map(t => [t.key, t]));
   const ST = { done: 'todo', inprogress: 'inprogress', blocked: 'blocked', planned: 'todo', notstarted: 'todo' };
@@ -90,7 +94,7 @@ async function syncPortfolio() {
   for (const i of issues) {
     const r = ticketRow(i), f = i.fields || {};
     const client = f[cfg.jira.clientField] && f[cfg.jira.clientField].value;
-    const proj = (old[r.key] && old[r.key].proj) || clientToProj[String(client || '').toLowerCase()] || null;
+    const proj = (old[r.key] && old[r.key].proj) || clientToProj(client);
     if (!proj) continue;
     const name = String(r.statusName || '').toLowerCase();
     const status = /review|审查/.test(name) ? 'review' : ST[r.status] || 'inprogress';
@@ -115,6 +119,8 @@ async function runAll(by) {
     const res = { at: new Date().toISOString(), by: by || 'scheduler' };
     if (!jira.hasCreds()) { res.ok = false; res.error = 'JIRA_EMAIL / JIRA_API_TOKEN are not set'; }
     else {
+      // Project filters first: a filter added since the last run decides which tickets the portfolio keeps.
+      try { res.filters = await jira.refreshProjects(); } catch (e) { res.filters = { error: e.message }; }
       try { res.dayone = await syncDayone(); res.portfolio = await syncPortfolio(); res.ok = true; }
       catch (e) { res.ok = false; res.error = e.message; }
     }
@@ -144,5 +150,14 @@ function schedule() {
   return at;
 }
 
-const readPortfolio = () => readJson(F('portfolio.live.json'), null) || readJson(F('portfolio.json'), null);
-module.exports = { readPortfolio, runAll, schedule, nextRun, syncDayone, syncPortfolio, planStatus, readDayone: () => readJson(F('dayone-jira.json'), null) };
+/* The PM's analysis (projects, asks, events, text) lives in the committed portfolio.json and changes
+   with a deploy; the sync only owns the ticket list. The live file used to be read whole, so after its
+   first sync it froze the analysis it was copied from and no later edit to portfolio.json ever showed.
+   Merge on read instead: analysis from the seed, tickets and sync time from the live file. */
+function readPortfolio() {
+  const seed = readJson(F('portfolio.json'), null), live = readJson(F('portfolio.live.json'), null);
+  if (!seed || !live) return live || seed;
+  return { ...seed, tickets: live.tickets || seed.tickets, asOf: String(live.asOf || '') > String(seed.asOf || '') ? live.asOf : seed.asOf,
+    syncedAt: live.syncedAt || seed.syncedAt };
+}
+module.exports = { planMonth, readPortfolio, runAll, schedule, nextRun, syncDayone, syncPortfolio, planStatus, readDayone: () => readJson(F('dayone-jira.json'), null) };

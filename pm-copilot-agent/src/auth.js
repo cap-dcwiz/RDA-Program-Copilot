@@ -25,7 +25,7 @@ function roles() {
   return r;
 }
 function saveRoles(next) {
-  const pages = new Set(P.PAGES.map(p => p.id)), actions = new Set(P.ACTIONS.map(a => a.id)), projects = new Set(P.PROJECTS.map(p => p.id).concat('*'));
+  const pages = new Set(P.PAGES.map(p => p.id)), actions = new Set(P.ACTIONS.map(a => a.id)), projects = new Set(P.projectCatalog().map(p => p.id).concat('*'));
   const seen = new Set();
   const clean = next.map(r => {
     const id = String(r.id || r.name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

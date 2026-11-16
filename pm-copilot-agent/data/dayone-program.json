@@ -1,5 +1,42 @@
 {
   "project": "dayone",
+  "asOf": "2026-11-16",
+  "OVERVIEW": {
+    "phaseMonths": [
+      3
+    ],
+    "brief": {
+      "en": "All six ground-floor halls are validated and are being merged into one ground-floor model (validation due 27 Nov). The live BMS API and Level 1 data are both due 20 Nov; upper-floor data is about a month late. The best AI result so far is about 8% total energy saving, and the baseline must be agreed from historical data before any on-site trial.",
+      "zh": "一层 6 个机房均已验证,正合并为一层整体模型(11 月 27 日完成验证)。实时 BMS API 与 Level 1 数据均定于 11 月 20 日;上层楼层数据约晚一个月。目前 AI 最佳结果约 8% 总节能,现场试运行前须先基于历史数据确定节能基线。"
+    },
+    "reco": {
+      "en": "Close out 02 (live BMS API, 20 Nov) and 03 (Level 1 data, 20 Nov): 32 edge ingestion, 13 closed-loop control and the upper-floor twins all wait on them. In parallel, agree the 31 baseline with DayOne before any trial.",
+      "zh": "优先收尾 02(实时 BMS API,11/20)和 03(Level 1 数据,11/20):32 边缘数据接入、13 闭环控制和上层楼层孪生都依赖它们。同时在试运行前与 DayOne 对齐 31 节能基线。"
+    },
+    "focus": [
+      {
+        "ok": true,
+        "en": "Ground-floor digital twins validated for all six halls",
+        "zh": "一层 6 个机房数字孪生全部完成验证"
+      },
+      {
+        "ok": false,
+        "en": "Merge into one ground-floor model and validate by 27 Nov",
+        "zh": "合并为一层整体模型,11 月 27 日前完成验证"
+      },
+      {
+        "ok": false,
+        "en": "AI training on the holistic model; about 8% total saving so far",
+        "zh": "基于整体模型训练 AI;目前约 8% 总节能"
+      },
+      {
+        "ok": false,
+        "warn": true,
+        "en": "Live BMS API and Level 1 data due 20 Nov; BMS write access unconfirmed",
+        "zh": "实时 BMS API 与 Level 1 数据 11/20 到期;BMS 写权限未确认"
+      }
+    ]
+  },
   "PHASES": [
     {
       "month": 1,
@@ -235,9 +272,9 @@
       "monthLabel": "Month 1 · Jul 2026 · Project Kick-Off",
       "owner": "RDA + DayOne On-site Team",
       "status": "unconfirmed",
-      "health": "none",
-      "progress": 0,
-      "next": "Confirm whether the 08/14 alignment session has been completed",
+      "health": "good",
+      "progress": 100,
+      "next": "On-site visit held 28 Oct (false ceiling, CRAH control logic, rack heights confirmed); BA-2362 still \"planned\" in Jira — close it there",
       "due": "08/14",
       "ms": "—",
       "gs": "2026-08-12",
@@ -252,9 +289,9 @@
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
       "owner": "Anurag / Istofa",
       "status": "inprogress",
-      "health": "fine",
-      "progress": 65,
-      "next": "Complete remaining API endpoint integration",
+      "health": "risk",
+      "progress": 70,
+      "next": "Live BMS API for NTP-E targeted 20 Nov (Istofa with the BMS contractor and Kianonn Tan); Sherry to send the BMS point list; BMS is read-only for now",
       "due": "08/21",
       "ms": "MS2",
       "gs": "2026-08-12",
@@ -267,15 +304,15 @@
       "en": "6-month historical extraction",
       "month": 2,
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
-      "owner": "Hong Qing / Justin",
+      "owner": "Justin / Hong Qing",
       "status": "inprogress",
       "health": "risk",
-      "progress": 50,
-      "next": "Continue providing remaining historical data (Justin, target 21 Aug)",
-      "due": "08/21",
+      "progress": 75,
+      "next": "Ground floor (all 6 halls) and chiller plants A/B received; Justin to extract Level 1 data by 20 Nov with the batch templates; upper floors about a month late",
+      "due": "11/20",
       "ms": "MS2",
       "gs": "2026-07-31",
-      "ge": "2026-08-21",
+      "ge": "2026-11-20",
       "targetOriginal": "2026-08-14"
     },
     {
@@ -288,8 +325,8 @@
       "owner": "Valdy",
       "status": "inprogress",
       "health": "fine",
-      "progress": 70,
-      "next": "Complete remaining module integration; calibration depends on historical data",
+      "progress": 85,
+      "next": "Merge the three models into one holistic ground-floor model (6 halls + chiller plants A/B), validate the whole ground floor by 27 Nov, then Valdy review",
       "due": "08/21",
       "ms": "MS2",
       "gs": "2026-08-26",
@@ -304,9 +341,9 @@
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
       "owner": "Mingchen / Valdy",
       "status": "inprogress",
-      "health": "risk",
-      "progress": 40,
-      "next": "Start calibration for the first Data Hall using available historical data",
+      "health": "good",
+      "progress": 90,
+      "next": "All six ground-floor halls (E-GA to E-GF) validated; reuse as the template for upper floors once their data arrives",
       "due": "08/20",
       "ms": "MS2",
       "gs": "2026-08-17",
@@ -321,14 +358,14 @@
       "month": 2,
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
       "owner": "RDA Modelling Team",
-      "status": "notstarted",
-      "health": "none",
-      "progress": 0,
-      "next": "Use confirmed topology and available BMS data to prepare for fine-tuning and calibration",
-      "due": "08/25",
+      "status": "done",
+      "health": "good",
+      "progress": 100,
+      "next": "Calibration method settled: 71.5% of airflow to racks, 28.5% bypass to the false ceiling; 0.28 °C mean error over Jan–Jun",
+      "due": "10/16",
       "ms": "MS2",
       "gs": "2026-09-01",
-      "ge": "2026-09-05"
+      "ge": "2026-10-16"
     },
     {
       "id": "07",
@@ -338,14 +375,14 @@
       "month": 2,
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
       "owner": "Valdy",
-      "status": "inprogress",
-      "health": "fine",
-      "progress": 55,
-      "next": "Confirm detection rules and thresholds",
-      "due": "08/25",
+      "status": "done",
+      "health": "good",
+      "progress": 100,
+      "next": "Air infiltration and false-ceiling bypass modelled; site visit on 28 Oct found no significant leakage at doors or floor",
+      "due": "10/30",
       "ms": "MS2",
       "gs": "2026-09-06",
-      "ge": "2026-09-20"
+      "ge": "2026-10-30"
     },
     {
       "id": "08",
@@ -354,15 +391,15 @@
       "en": "3D visualization model",
       "month": 2,
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
-      "owner": "Valdy",
+      "owner": "Valdy / Mingchen",
       "status": "inprogress",
-      "health": "risk",
-      "progress": 55,
-      "next": "Fix chiller plant model geometry (currently flagged as not correct)",
-      "due": "08/25",
+      "health": "fine",
+      "progress": 60,
+      "next": "Chiller plant A validation in progress inside the holistic model; plant B and chiller-side AI training to follow",
+      "due": "11/27",
       "ms": "MS2",
       "gs": "2026-09-05",
-      "ge": "2026-10-15"
+      "ge": "2026-11-27"
     },
     {
       "id": "09",
@@ -374,7 +411,7 @@
       "owner": "Valdy",
       "status": "inprogress",
       "health": "fine",
-      "progress": 45,
+      "progress": 100,
       "next": "Prepare demo script and data",
       "due": "08/26",
       "ms": "—",
@@ -390,9 +427,9 @@
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
       "owner": "Mingchen",
       "status": "inprogress",
-      "health": "fine",
-      "progress": 80,
-      "next": "Confirm baseline model correctness with Justin / DayOne",
+      "health": "risk",
+      "progress": 85,
+      "next": "Agree the baseline from historical data before any on-site trial (decided 16 Nov), so later chiller changes cannot reset it",
       "due": "09/30",
       "ms": "—",
       "gs": "2026-08-20",
@@ -407,9 +444,9 @@
       "monthLabel": "Month 2 · Aug 2026 · Digital Twin Construction",
       "owner": "Valdy",
       "status": "inprogress",
-      "health": "fine",
+      "health": "risk",
       "progress": 30,
-      "next": "Configure alerting and monitoring (ingestion outage would block prototype model improvement)",
+      "next": "Waits on the live BMS API (task 02) and on deploying edge services to the NTP-E VMs (VMs ready, services not yet deployed)",
       "due": "09/05",
       "ms": "—",
       "gs": "2026-08-20",
@@ -423,11 +460,11 @@
       "month": 3,
       "monthLabel": "Month 3 · Sep 2026 · AI Optimization Training",
       "owner": "Valdy",
-      "status": "notstarted",
-      "health": "none",
-      "progress": 0,
-      "next": "Collect training dataset",
-      "due": "09/10",
+      "status": "inprogress",
+      "health": "fine",
+      "progress": 55,
+      "next": "Holistic ground-floor training results due within two weeks of 13 Nov; best so far about 8% total energy saving, E-GA alone 30.9% fan energy with no SLA-breach hours",
+      "due": "12/10",
       "ms": "—",
       "gs": "2026-10-20",
       "ge": "2026-12-10"
@@ -440,10 +477,10 @@
       "month": 3,
       "monthLabel": "Month 3 · Sep 2026 · AI Optimization Training",
       "owner": "Valdy",
-      "status": "notstarted",
-      "health": "none",
-      "progress": 0,
-      "next": "Define validation plan",
+      "status": "inprogress",
+      "health": "fine",
+      "progress": 25,
+      "next": "Backtest on Apr–Jun data running; preliminary figures to DayOne next week, framed as not final",
       "due": "09/15",
       "ms": "—",
       "gs": "2026-12-10",
@@ -457,10 +494,10 @@
       "month": 3,
       "monthLabel": "Month 3 · Sep 2026 · AI Optimization Training",
       "owner": "Valdy",
-      "status": "notstarted",
-      "health": "none",
-      "progress": 0,
-      "next": "Define limits and alerting policy",
+      "status": "inprogress",
+      "health": "fine",
+      "progress": 45,
+      "next": "Per-sensor buffers set from RMSE (23 °C ground floor, 24 °C upper floors); next: stress-test with bad inputs (drift, spikes, COV data) and add a data filter once the API is live",
       "due": "09/20",
       "ms": "—",
       "gs": "2027-01-10",
@@ -475,9 +512,9 @@
       "monthLabel": "Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)",
       "owner": "Valdy",
       "status": "notstarted",
-      "health": "none",
+      "health": "risk",
       "progress": 0,
-      "next": "Complete system integration testing",
+      "next": "Waits on the live BMS API (task 02); no new date agreed",
       "due": "10/05",
       "ms": "—",
       "gs": "2026-10-05",
@@ -494,7 +531,7 @@
       "status": "notstarted",
       "health": "none",
       "progress": 0,
-      "next": "Phased rollout and monitoring",
+      "next": "First step: on-site manual test plan (condenser-water setpoint step test, 2-chiller run, fan-speed low limit) to Justin and Jackie; BMS write access still unconfirmed",
       "due": "10/15",
       "ms": "—",
       "gs": "2026-10-15",
@@ -511,7 +548,7 @@
       "status": "notstarted",
       "health": "none",
       "progress": 0,
-      "next": "Design validation scenarios",
+      "next": "Dry-run simulation and what-if analysis once the holistic model is trained (RDA roadmap, 30 Oct)",
       "due": "10/20",
       "ms": "—",
       "gs": "2026-10-20",
@@ -524,8 +561,8 @@
     "nameZh": "数字孪生标定完成",
     "en": "Digital Twin Calibrated",
     "owner": "Valdy",
-    "due": "08/28",
-    "date": "2026-08-28",
+    "due": "11/27",
+    "date": "2026-11-27",
     "month": 2
   },
   "EDGES": [
@@ -731,6 +768,50 @@
   },
   "CHANGELOG": [
     {
+      "date": "2026-11-16",
+      "text": "Best AI result so far is about <b>8% total energy saving</b> (5% from running 2 of 3 chillers in Plants A and C, 3% from optimised setpoints); the baseline will be fixed from historical data before any on-site trial (source: Project implement 1116)."
+    },
+    {
+      "date": "2026-11-13",
+      "text": "Data for all six ground-floor halls (E-GA to E-GF) and chiller plants A+B received. Per-hall AI training dropped for one holistic ground-floor model; <b>04 Digital Twin Framework</b> ground-floor validation targeted 27 Nov, Level 1 data due 20 Nov (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-11-06",
+      "text": "<b>03 Historical BMS Data</b> batch-retrieval templates tested and working. E-GA AI policy saves about 30% fan power with no SLA breach; DayOne confirmed the third chiller per plant is redundancy, not load (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-10-30",
+      "text": "Site visit findings: about 3.5 m conductive false ceiling with a 2 °C drop to the return; floor 1A hot aisle is 53U, not 45U. Chiller plant A/B data uploaded (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-10-23",
+      "text": "GA to GF historical data received; GD and GE twins validated. Ground-floor SLA confirmed at 23 °C (24 °C upper floors). BMS is read-only and fan-speed writability is unconfirmed (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-10-16",
+      "text": "Multi-zone calibration reached <b>0.28 °C mean error</b> over Jan–Jun, down from about 3 °C on the first run; site visit set for 28 Oct (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-10-02",
+      "text": "GA and GB digital twins validated; chiller system A data complete; GC data still being checked (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-09-25",
+      "text": "GB validation only partial (GB1 has power readings only). Simulation under-predicts about 0.25 °C at 28–30 °C, so the AI applies a safety buffer; one agent per hall plus one per chiller plant agreed (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-09-11",
+      "text": "<b>05 Single Data Hall Pilot</b>: first hall (GA) digital twin fully validated. NTP-E API still unconfirmed by the vendor, so connect to NDP first (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-09-04",
+      "text": "Cold-aisle validation: RMSE 0.05 °C on average, about 0.1 °C per aisle; per-sensor safety buffers based on RMSE agreed (source: DayOne Weekly Meeting)."
+    },
+    {
+      "date": "2026-08-28",
+      "text": "Reduced-order thermal model built for the first data hall; return-air control kept for now, direct fan-speed override to be revisited (source: DayOne Weekly Meeting)."
+    },
+    {
       "date": "2026-08-14",
       "text": "<b>03 Historical BMS Data</b> missed its original 08/14 target date; latest forecast has slipped to 08/21 (source: DayOne Weekly Meeting)."
     },
@@ -740,6 +821,72 @@
     }
   ],
   "MEETINGS": [
+    {
+      "id": "m14",
+      "title": "Project implement (RDA internal)",
+      "date": "2026-11-16",
+      "summary": "Three models being merged into one; best result about 8% energy saving (5% chiller, 3% setpoints) across about ten trained strategies, with fewer hotspot hours. Baseline to be agreed from historical data before customer trials; a manual test plan for fan speed, chilled-water and condenser-water setpoints to go to Justin."
+    },
+    {
+      "id": "m13",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-11-13",
+      "summary": "All six ground-floor halls and chiller plants A+B received and validated per hall; switch to a holistic ground-floor model, validation by 27 Nov. E-GA AI saves 30.9% fan energy with no hours outside 18–23 °C. Level 1 data and live BMS API both targeted 20 Nov; condenser-water step test proposed; COV data flagged as a robustness risk."
+    },
+    {
+      "id": "m12",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-11-06",
+      "summary": "Batch data-retrieval templates work; live BMS API 1–2 weeks out. Ground-floor validation complete; E-GA AI cuts fan power about 30% within the 23 °C limit. BI shows 3 chillers per plant where 2 suffice; scenario list for fan-speed experiments to go to Justin."
+    },
+    {
+      "id": "m11",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-10-30",
+      "summary": "Site visit: conductive false ceiling at about 3.5 m with a 2 °C drop, hot aisle 53U in floor 1A, CRAH logic clarified. Chiller plant A/B data uploaded; real-time API comes from the Edge agent and will be trialled jointly once DayOne trusts the BMS data."
+    },
+    {
+      "id": "m10",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-10-23",
+      "summary": "GA–GF historical data in; GD/GE twins validated, GF next. Twin over-predicts about 0.5 °C (safe side). AI on GD/GE settles fans near 52% for about 38% air-side saving; BMS is read-only, so fan-speed writability must be confirmed before tests."
+    },
+    {
+      "id": "m9",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-10-16",
+      "summary": "GD and GE data received, GF best effort. Multi-zone model calibrated to 0.28 °C mean error over six months; site visit to Data Hall 1G set for 28 Oct; API still waiting on the vendor."
+    },
+    {
+      "id": "m8",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-10-02",
+      "summary": "GA and GB twins trained and validated; Mingchen explained how fan speed and supply-air setpoints save energy while holding heat balance. Chiller system A data complete; GC data to be double-checked."
+    },
+    {
+      "id": "m7",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-09-25",
+      "summary": "Partial GB validation because GB1 lacks unit-level data. Hot aisle matches on trend; power matches the fan affinity law. Multi-agent AI design (one per hall, one per chiller plant) with human-in-the-loop recommendations; first GA training results next week."
+    },
+    {
+      "id": "m6",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-09-11",
+      "summary": "First hall (GA) digital twin fully validated; halls differ in temperature spread and valve response, GC shows an unexplained heat source. AI training starts on GA with safety as the binding constraint; DayOne wants full GA/GB/GC data before scenario runs."
+    },
+    {
+      "id": "m5",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-09-04",
+      "summary": "Cold-aisle validation RMSE 0.05 °C average; per-sensor buffers from RMSE agreed. System A data-hall data prioritised over the chiller plant; PDU-to-aisle mapping clarified for the BI tool."
+    },
+    {
+      "id": "m4",
+      "title": "DayOne Weekly Meeting",
+      "date": "2026-08-28",
+      "summary": "Reduced-order thermal model built for the first hall; temperature patterns show local cold-air stagnation rather than a hall-wide issue. Return-air control kept for now; fan-speed override capability to be confirmed."
+    },
     {
       "id": "m3",
       "title": "DayOne Weekly Meeting",
