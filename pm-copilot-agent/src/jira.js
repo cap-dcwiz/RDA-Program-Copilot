@@ -58,32 +58,13 @@ async function openTickets() {
   return { live: false, takenAt: snap.takenAt, tickets: snap.tickets };
 }
 
-/* Who approved, as Jira knows them. Every write is sent with the shared JIRA_EMAIL account, so the
-   approver can't author it; instead a new ticket's reporter is set to them, and every comment and
-   description carries their name and email. Lookup order: JIRA_USER_MAP by username, then by
-   email, then the sign-in email itself. A miss returns null and the write goes ahead without it. */
-const accountCache = new Map();
-async function accountIdFor(user) {
-  if (!user || !hasCreds()) return null;
-  const keys = [user.username, user.email].filter(Boolean).map(k => String(k).toLowerCase());
-  const target = keys.map(k => cfg.userMap[k]).find(Boolean) || user.email;
-  if (!target) return null;
-  if (!target.includes('@')) return target;                                   // already an accountId
-  if (accountCache.has(target)) return accountCache.get(target);
-  let id = null;
-  try {
-    const r = await call('GET', `/rest/api/3/user/search?query=${encodeURIComponent(target)}&maxResults=5`);
-    const hit = (r || []).find(u => u.active && u.accountType === 'atlassian' && (!u.emailAddress || u.emailAddress.toLowerCase() === target.toLowerCase()));
-    id = hit ? hit.accountId : null;
-  } catch (e) { console.warn('[jira] user lookup failed:', e.message); }
-  accountCache.set(target, id);
-  return id;
-}
+/* Every write is sent with the shared JIRA_EMAIL account, which is therefore the author, creator
+   and reporter. Who approved is named in the footer of every description and comment. */
 const approverLabel = (u) => typeof u === 'string' ? u : `${u.displayName || u.name || u.username}${u.email ? ` (${u.email})` : ''}`;
 
 /* Build the exact requests an approval sends, so dry-run shows what live mode would do.
    `approver` is the signed-in user (or a plain name, for older callers). */
-function plan(s, meeting, approver, reporterId, mention) {
+function plan(s, meeting, approver, mention) {
   const footer = `\n— PM Copilot · from "${meeting.title}" (${String(meeting.date).slice(0, 10)}) · approved by ${approverLabel(approver)}`;
   const quote = s.evidence ? `\nMeeting note: "${s.evidence}"` : '';
   // Existing ticket: a comment that @mentions its assignee. New work: a new task, the content in its description.
@@ -102,7 +83,6 @@ function plan(s, meeting, approver, reporterId, mention) {
     // The client value is what the project's Jira filter selects on, so the new task lands in it.
     const p = projects.byId(s.project);
     if (p) fields[cfg.clientField] = p.optionId ? { id: p.optionId } : { value: p.client || p.label };
-    if (reporterId) fields.reporter = { id: reporterId };
     if (cfg.projectEpics[s.project]) fields.parent = { key: cfg.projectEpics[s.project] };
     return [{ method: 'POST', path: '/rest/api/3/issue', body: { fields } }];
   }
@@ -110,33 +90,27 @@ function plan(s, meeting, approver, reporterId, mention) {
 }
 
 async function apply(s, meeting, approver) {
-  const reporterId = s.kind === 'new_ticket' ? await accountIdFor(approver) : null;
   const mention = s.kind === 'new_ticket' ? null : await assigneeOf(s.jiraKey);
-  const steps = plan(s, meeting, approver, reporterId, mention);
+  const steps = plan(s, meeting, approver, mention);
   const live = !cfg.dryRun && hasCreds();
   if (!live) return { dryRun: true, steps, url: s.jiraKey ? browse(s.jiraKey) : null,
     note: cfg.dryRun ? 'JIRA_DRY_RUN=true: nothing was written to Jira' : 'No Jira credentials: nothing was written to Jira' };
-  const results = []; let reporterNote = null;
+  const results = []; let note;
   for (const st of steps) {
     try { results.push(await call(st.method, st.path, st.body)); }
     catch (e) {
-      // Setting the reporter needs "Modify Reporter" for the JIRA_EMAIL account. Without it, still
-      // create the ticket — the approver stays named in the description — and say why.
-      // Same for the epic link: a parent Jira refuses (wrong hierarchy, epic closed) is dropped, the task still created.
+      // An epic link Jira refuses (wrong hierarchy, epic closed) is dropped; the task is still created.
       const f = st.body && st.body.fields;
-      const bad = f && ['reporter', 'parent'].filter(k => f[k] && new RegExp(k, 'i').test(e.message));
-      if (!bad || !bad.length) throw e;
-      bad.forEach(k => delete f[k]);
-      reporterNote = bad.map(k => k === 'reporter' ? 'Reporter not set: the Jira account needs the "Modify Reporter" permission in this project'
-        : 'Not filed under the project epic: Jira refused the parent').join('; ');
+      if (!(f && f.parent && /parent/i.test(e.message))) throw e;
+      delete f.parent;
+      note = 'Not filed under the project epic: Jira refused the parent';
       results.push(await call(st.method, st.path, st.body));
     }
   }
   const createdKey = s.kind === 'new_ticket' ? results[0].key : null;
   return { dryRun: false, steps: steps.map(x => ({ method: x.method, path: x.path })), createdKey, url: browse(createdKey || s.jiraKey),
     mentioned: mention ? mention.name : undefined,
-    reporter: s.kind === 'new_ticket' ? (reporterNote ? null : reporterId) : undefined,
-    note: reporterNote || (s.kind === 'new_ticket' && !reporterId ? 'Reporter not set: no Jira account found for the approver (see JIRA_USER_MAP)' : undefined) };
+    note };
 }
 
 /* ---------- read helpers for the nightly sync ---------- */
@@ -173,4 +147,4 @@ async function lastComment(key) {
 }
 
 const refreshProjects = () => projects.refresh(call);
-module.exports = { refreshProjects, assigneeOf, searchAll, issue, lastComment, adfText, openTickets, apply, plan, accountIdFor, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
+module.exports = { refreshProjects, assigneeOf, searchAll, issue, lastComment, adfText, openTickets, apply, plan, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
