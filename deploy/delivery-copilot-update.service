@@ -1,0 +1,18 @@
+# Checks GitHub for a new commit on main and, if there is one, redeploys Delivery Copilot.
+# Started by delivery-copilot-update.timer, never enabled on its own.
+#
+# Deliberately unsandboxed, unlike delivery-copilot.service: this one has to run git, sudo and
+# ~/edge/edgectl. What it is allowed to touch is enforced in the script, not by systemd.
+[Unit]
+Description=Delivery Copilot — check GitHub and redeploy if main moved
+Documentation=https://github.com/cap-dcwiz/RDA-Program-Copilot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=fofo
+# The script re-execs from a private copy, so an update may safely rewrite it mid-run.
+ExecStart=/home/fofo/rda-program-copilot/deploy/auto-update.sh
+# Its own log is ~/delivery-copilot-update.log; the journal keeps only systemd's view of the run.
+TimeoutStartSec=15min

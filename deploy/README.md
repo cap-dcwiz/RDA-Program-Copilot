@@ -52,6 +52,43 @@ After deploying, compare the neighbouring paths against a baseline taken beforeh
 (`edgectl check --all`, plus a `curl` of each public path) — `deploy-vm.sh` spot-checks
 `/DCBI/`, `/PM/` and `/ROI` on its way out.
 
+## Daily auto-deploy
+
+A systemd timer on the VM checks GitHub once a day and redeploys only if `main` has moved.
+
+```bash
+systemctl list-timers delivery-copilot-update      # when it next runs
+tail -40 ~/delivery-copilot-update.log             # what the last runs did
+sudo systemctl start delivery-copilot-update       # run the check right now
+sudo systemctl disable --now delivery-copilot-update.timer   # stop auto-deploying
+```
+
+It runs at **19:30 UTC (03:30 Singapore)**, which is clear of the agent's own nightly Jira sync at
+00:00 SGT, so a restart never lands mid-sync. `Persistent=true` means a run missed because the VM
+was off happens on the next boot instead of being skipped.
+
+The timer lives on the VM rather than in a laptop crontab or a cloud runner because the VM is the
+only place that already has the checkout, `sudo` and `~/edge/edgectl` — and because it is awake at
+03:30. `deploy/auto-update.sh` is what it runs, and it differs from a hand-run `deploy-vm.sh` in
+three ways that matter when nobody is watching:
+
+- **It rolls back.** If the new commit will not answer `/api/health` within 30s, the previous
+  commit is checked out, its unit reinstalled, and the service restarted. A bad push costs a
+  restart, not an outage. If the rollback is *also* unhealthy, the log says so in those words.
+- **It proves the neighbours are untouched.** Seven public paths are fetched and hashed before the
+  update and again after; the log either says they are byte-identical or prints the diff. A
+  changed neighbour is reported, not rolled back — our code is not what would have changed it.
+- **It survives updating itself.** The script re-execs from a private copy, so a commit that
+  rewrites `auto-update.sh` cannot make bash resume at a byte offset in the new text.
+
+It takes the route through `edgectl` only when `deploy/edge-route.caddy` itself changed, and it
+leaves `.env` and `pm-copilot-agent/data/` alone — both are git-ignored, so `git reset --hard`
+does not see them. A failed run exits non-zero, so `systemctl status delivery-copilot-update`
+shows it.
+
+What this does **not** do: review the commit. Anything merged to `main` is live by 03:30 the next
+morning, on a public URL. The rollback catches a crash, not a mistake.
+
 ## Cloud Run — retired
 
 The `rda-program-copilot` service in `asia-southeast1` served a **static copy** of the page. That

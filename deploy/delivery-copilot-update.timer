@@ -1,0 +1,18 @@
+# Daily auto-deploy check. 19:30 UTC = 03:30 Singapore — clear of the agent's own nightly Jira
+# sync, which runs at 00:00 SGT (16:00 UTC) Tue–Sat, so a restart never lands mid-sync.
+#
+# Install: systemctl enable --now delivery-copilot-update.timer
+# Inspect: systemctl list-timers delivery-copilot-update
+[Unit]
+Description=Daily check for new Delivery Copilot commits on main
+
+[Timer]
+OnCalendar=*-*-* 19:30:00 UTC
+# A few minutes of jitter so this does not collide with anything else on the box at 19:30 sharp.
+RandomizedDelaySec=5min
+# If the VM was off at 19:30, run once it is back rather than waiting a whole day.
+Persistent=true
+Unit=delivery-copilot-update.service
+
+[Install]
+WantedBy=timers.target
