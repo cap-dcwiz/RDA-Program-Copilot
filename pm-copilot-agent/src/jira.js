@@ -39,9 +39,33 @@ async function openTickets() {
   return { live: false, takenAt: snap.takenAt, tickets: snap.tickets };
 }
 
-/* Build the exact requests an approval sends, so dry-run shows what live mode would do. */
-function plan(s, meeting, approver) {
-  const footer = `\n— PM Copilot · from "${meeting.title}" (${String(meeting.date).slice(0, 10)}) · approved by ${approver}`;
+/* Who approved, as Jira knows them. Every write is sent with the shared JIRA_EMAIL account, so the
+   approver can't author it; instead a new ticket's reporter is set to them, and every comment and
+   description carries their name and email. Lookup order: JIRA_USER_MAP by username, then by
+   email, then the sign-in email itself. A miss returns null and the write goes ahead without it. */
+const accountCache = new Map();
+async function accountIdFor(user) {
+  if (!user || !hasCreds()) return null;
+  const keys = [user.username, user.email].filter(Boolean).map(k => String(k).toLowerCase());
+  const target = keys.map(k => cfg.userMap[k]).find(Boolean) || user.email;
+  if (!target) return null;
+  if (!target.includes('@')) return target;                                   // already an accountId
+  if (accountCache.has(target)) return accountCache.get(target);
+  let id = null;
+  try {
+    const r = await call('GET', `/rest/api/3/user/search?query=${encodeURIComponent(target)}&maxResults=5`);
+    const hit = (r || []).find(u => u.active && u.accountType === 'atlassian' && (!u.emailAddress || u.emailAddress.toLowerCase() === target.toLowerCase()));
+    id = hit ? hit.accountId : null;
+  } catch (e) { console.warn('[jira] user lookup failed:', e.message); }
+  accountCache.set(target, id);
+  return id;
+}
+const approverLabel = (u) => typeof u === 'string' ? u : `${u.displayName || u.name || u.username}${u.email ? ` (${u.email})` : ''}`;
+
+/* Build the exact requests an approval sends, so dry-run shows what live mode would do.
+   `approver` is the signed-in user (or a plain name, for older callers). */
+function plan(s, meeting, approver, reporterId) {
+  const footer = `\n— PM Copilot · from "${meeting.title}" (${String(meeting.date).slice(0, 10)}) · approved by ${approverLabel(approver)}`;
   const quote = s.evidence ? `\nMeeting note: "${s.evidence}"` : '';
   if (s.kind === 'comment') return [{ method: 'POST', path: `/rest/api/3/issue/${s.jiraKey}/comment`, body: { body: adf(s.detail + quote + footer) } }];
   if (s.kind === 'due_date') return [
@@ -57,20 +81,34 @@ function plan(s, meeting, approver) {
     fields.fixVersions = [{ name: cfg.fixVersion || `Q${Math.floor(sg.getUTCMonth() / 3) + 1} ${sg.getUTCFullYear()}` }];
     const opt = cfgAll.CLIENT_OPTIONS[s.project];
     if (opt) fields[cfg.clientField] = { id: opt.id };
+    if (reporterId) fields.reporter = { id: reporterId };
     return [{ method: 'POST', path: '/rest/api/3/issue', body: { fields } }];
   }
   throw new Error(`Unknown suggestion kind: ${s.kind}`);
 }
 
 async function apply(s, meeting, approver) {
-  const steps = plan(s, meeting, approver);
+  const reporterId = s.kind === 'new_ticket' ? await accountIdFor(approver) : null;
+  const steps = plan(s, meeting, approver, reporterId);
   const live = !cfg.dryRun && hasCreds();
   if (!live) return { dryRun: true, steps, url: s.jiraKey ? browse(s.jiraKey) : null,
     note: cfg.dryRun ? 'JIRA_DRY_RUN=true: nothing was written to Jira' : 'No Jira credentials: nothing was written to Jira' };
-  const results = [];
-  for (const st of steps) results.push(await call(st.method, st.path, st.body));
+  const results = []; let reporterNote = null;
+  for (const st of steps) {
+    try { results.push(await call(st.method, st.path, st.body)); }
+    catch (e) {
+      // Setting the reporter needs "Modify Reporter" for the JIRA_EMAIL account. Without it, still
+      // create the ticket — the approver stays named in the description — and say why.
+      if (!(st.body && st.body.fields && st.body.fields.reporter && /reporter/i.test(e.message))) throw e;
+      delete st.body.fields.reporter;
+      reporterNote = 'Reporter not set: the Jira account needs the "Modify Reporter" permission in this project';
+      results.push(await call(st.method, st.path, st.body));
+    }
+  }
   const createdKey = s.kind === 'new_ticket' ? results[0].key : null;
-  return { dryRun: false, steps: steps.map(x => ({ method: x.method, path: x.path })), createdKey, url: browse(createdKey || s.jiraKey) };
+  return { dryRun: false, steps: steps.map(x => ({ method: x.method, path: x.path })), createdKey, url: browse(createdKey || s.jiraKey),
+    reporter: s.kind === 'new_ticket' ? (reporterNote ? null : reporterId) : undefined,
+    note: reporterNote || (s.kind === 'new_ticket' && !reporterId ? 'Reporter not set: no Jira account found for the approver (see JIRA_USER_MAP)' : undefined) };
 }
 
 /* ---------- read helpers for the nightly sync ---------- */
@@ -106,4 +144,4 @@ async function lastComment(key) {
   return { at: c.created, by: c.author ? c.author.displayName : null, text: text.slice(0, 600) };
 }
 
-module.exports = { searchAll, issue, lastComment, adfText, openTickets, apply, plan, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
+module.exports = { searchAll, issue, lastComment, adfText, openTickets, apply, plan, accountIdFor, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
