@@ -86,8 +86,55 @@ leaves `.env` and `pm-copilot-agent/data/` alone — both are git-ignored, so `g
 does not see them. A failed run exits non-zero, so `systemctl status delivery-copilot-update`
 shows it.
 
-What this does **not** do: review the commit. Anything merged to `main` is live by 03:30 the next
-morning, on a public URL. The rollback catches a crash, not a mistake.
+### The review gate
+
+The timer does not deploy security-sensitive changes on its own. Before anything is touched,
+`deploy/review-gate.js` classifies the incoming diff; if any rule trips, the run **holds**: no
+reset, no restart, no route move, and the service stays exactly where it is.
+
+| Rule | Why it holds |
+|---|---|
+| identity & access code | `auth.js`, `productcenter.js`, `permissions.js`, or any path naming oauth / token / session / secret / crypt |
+| cryptography | new `createCipheriv`, `createHmac`, `randomBytes`, `timingSafeEqual`, `scrypt`, … |
+| new secret-shaped config | a new `*_SECRET`, `*_TOKEN`, `*_API_KEY`, `*_CLIENT_ID`, `*_ENCRYPTION_KEY` |
+| new outbound host | a URL host that appears nowhere in the current tree |
+| request authorisation | lines in `server.js` touching `signedIn`, `whoIs`, `Authorization`, `Bearer`, `/api/login` |
+| deploy mechanism | anything under `deploy/` |
+| new dependency | a first third-party package in a service that has none |
+
+Two of those deserve their reasons stated. **`deploy/` holds** because without that rule a commit
+could delete the gate and everything after it would flow through unread. And the gate that runs is
+always the one in the **current** checkout, never the incoming commit's copy — a commit does not
+get to supply the rules it is judged by.
+
+Line-level rules read code, not prose: scanning `.md` made the gate quote a markdown table in a
+README as evidence of an authorisation change, which is how a log teaches people to stop reading it.
+
+A hold exits **75**, so `systemctl status delivery-copilot-update` shows it and the log carries the
+full report with the matching lines quoted. Later nights print one line instead of repeating it.
+
+Being held is **not** a verdict on the code. Several of these rules fire on changes that are
+perfectly good — it means only that a person should read this one before it serves the public.
+
+To deploy a held commit after reading it, approve that exact sha:
+
+```bash
+echo <full-sha> > ~/.delivery-copilot-approved && sudo systemctl start delivery-copilot-update
+```
+
+The approval is consumed on use and matches one sha, so it cannot sit there approving whatever
+lands next. `deploy/deploy-vm.sh` from a laptop does not consult the gate at all: a person running
+a deploy by hand is the thing the gate is trying to get.
+
+To see what the gate makes of a range without deploying anything:
+
+```bash
+node deploy/review-gate.js . origin/main <branch-or-sha>
+```
+
+What the gate does **not** do: judge whether the code is correct. It routes changes to a human; it
+does not replace one. An ordinary-looking commit can still be wrong, and the rollback is what
+catches that.
 
 ## Cloud Run — retired
 

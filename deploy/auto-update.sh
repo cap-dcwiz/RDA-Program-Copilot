@@ -32,6 +32,9 @@ SERVICE="delivery-copilot"
 EDGE_PROJECT="delivery-copilot"
 LOG="$HOME/delivery-copilot-update.log"
 LOCK="$HOME/.delivery-copilot-update.lock"
+GATE="$APP_DIR/deploy/review-gate.js"
+APPROVED="$HOME/.delivery-copilot-approved"   # one sha, put there by a person who read the commit
+HELD="$HOME/.delivery-copilot-held"           # so a held commit is reported once, not every night
 BASE="https://ai-factory.demo.rda.ai"
 # Neighbours. Not ours, never written — curled only to prove this deploy left them alone.
 NEIGHBOURS=(/ /DCBI/ /PM/ /ROI /AISOP/ /NTPEModel/ /DSXPID/)
@@ -84,6 +87,41 @@ fi
 say "update: ${PREV:0:7} -> ${NEXT:0:7}"
 git -C "$APP_DIR" log --oneline "$PREV..$NEXT" | sed 's/^/           /'
 CHANGED=$(git -C "$APP_DIR" diff --name-only "$PREV" "$NEXT")
+
+# ---- review gate: may this be deployed with nobody reading it first? ----
+# The gate that runs is the one in the CURRENT checkout, never the incoming commit's copy — a
+# commit must not get to supply the rules it is judged by. That is also why any change under
+# deploy/ holds: otherwise a commit could delete this block and everything after it would flow
+# through unread. A hold changes nothing on the box: no reset, no restart, no route move.
+approved=""
+if [ -f "$APPROVED" ] && grep -qx "$NEXT" "$APPROVED" 2>/dev/null; then
+  approved=1; rm -f "$APPROVED"
+  say "${NEXT:0:7} was approved by sha by a person — gate skipped, approval consumed"
+fi
+if [ -z "$approved" ]; then
+  if [ ! -f "$GATE" ]; then
+    say "HOLD: no review gate in this checkout ($GATE) — refusing to deploy unread"
+    exit 75
+  fi
+  # Any non-zero exit holds, not just the gate's own 10: a gate that cannot run is not a pass.
+  report=$(node "$GATE" "$APP_DIR" "$PREV" "$NEXT" 2>&1); verdict=$?
+  if [ "$verdict" != "0" ]; then
+    if [ "$(cut -d' ' -f1 "$HELD" 2>/dev/null)" = "$NEXT" ]; then
+      say "still holding ${NEXT:0:7}, first held $(cut -d' ' -f2- "$HELD" 2>/dev/null) — $(printf '%s' "$report" | sed -n '2p')"
+      exit 75
+    fi
+    echo "$NEXT $(date -u '+%Y-%m-%dT%H:%M:%SZ')" > "$HELD"
+    say "HOLD: not deploying ${NEXT:0:7} unattended. The service stays on ${PREV:0:7}."
+    printf '%s\n' "$report" | sed 's/^/           /'
+    say "After reading it, to deploy exactly this commit:"
+    say "    echo $NEXT > $APPROVED && sudo systemctl start delivery-copilot-update"
+    say "Or deploy from a laptop with deploy/deploy-vm.sh, which does not consult the gate."
+    exit 75
+  fi
+  printf '%s\n' "$report" | sed 's/^/           /'
+fi
+rm -f "$HELD"
+
 say "baselining ${#NEIGHBOURS[@]} neighbour paths"
 BEFORE=$(snapshot)
 
