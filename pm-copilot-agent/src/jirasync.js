@@ -81,7 +81,7 @@ async function syncDayone() {
 async function syncPortfolio() {
   // data/portfolio.json is the committed seed; the sync writes portfolio.live.json (git-ignored) so a
   // `git pull` on the server never conflicts with synced data.
-  const pf = readJson(F('portfolio.live.json'), null) || readJson(F('portfolio.json'), null); if (!pf) return { skipped: 'no portfolio data' };
+  const pf = readPortfolio(); if (!pf) return { skipped: 'no portfolio data' };
   const clientToProj = (client) => { const p = client && projects.byClient(client); return p ? p.id : (/^dayone$/i.test(client || '') ? 'dayone' : null); };
   const issues = await jira.searchAll(cfg.jira.jql, FIELDS);
   const old = Object.fromEntries((pf.tickets || []).map(t => [t.key, t]));
@@ -146,5 +146,14 @@ function schedule() {
   return at;
 }
 
-const readPortfolio = () => readJson(F('portfolio.live.json'), null) || readJson(F('portfolio.json'), null);
+/* The PM's analysis (projects, asks, events, text) lives in the committed portfolio.json and changes
+   with a deploy; the sync only owns the ticket list. The live file used to be read whole, so after its
+   first sync it froze the analysis it was copied from and no later edit to portfolio.json ever showed.
+   Merge on read instead: analysis from the seed, tickets and sync time from the live file. */
+function readPortfolio() {
+  const seed = readJson(F('portfolio.json'), null), live = readJson(F('portfolio.live.json'), null);
+  if (!seed || !live) return live || seed;
+  return { ...seed, tickets: live.tickets || seed.tickets, asOf: String(live.asOf || '') > String(seed.asOf || '') ? live.asOf : seed.asOf,
+    syncedAt: live.syncedAt || seed.syncedAt };
+}
 module.exports = { readPortfolio, runAll, schedule, nextRun, syncDayone, syncPortfolio, planStatus, readDayone: () => readJson(F('dayone-jira.json'), null) };

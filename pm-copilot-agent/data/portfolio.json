@@ -253,12 +253,12 @@
    "gate": "client",
    "drill": true,
    "phase": {
-    "en": "Month 3 of 9 · AI optimisation training",
-    "zh": "第 3/9 月 · AI 优化训练"
+    "en": "Month 3 of 9 · AI optimisation training (ground-floor model)",
+    "zh": "第 3/9 月 · AI 优化训练(一层整体模型)"
    },
    "headline": {
-    "en": "Twin is calibrated for hall GA only. GB, GC and GD data are still incomplete, so Month 3 is running behind plan.",
-    "zh": "数字孪生仅完成 GA 机房标定,GB/GC/GD 数据仍不完整,第 3 月进度落后于计划。"
+    "en": "All six ground-floor halls are validated and being merged into one ground-floor model (due 27 Nov). Live BMS API and Level 1 data are both due 20 Nov; upper floors are about a month late.",
+    "zh": "一层 6 个机房均已验证,正合并为一层整体模型(11 月 27 日完成)。实时 BMS API 与一层以上数据均定于 11 月 20 日;上层楼层数据约晚一个月。"
    },
    "owners": "Xu Mingchen · Valdy · Sherry",
    "tickets": [
@@ -271,36 +271,36 @@
    "stages": {
     "data": {
      "s": "risk",
-     "en": "GA complete; GB/GC/GD partial; live BMS at 1 of 14 halls",
-     "zh": "GA 完成;GB/GC/GD 部分到位;实时 BMS 仅 1/14 个机房",
+     "en": "Ground floor (6 halls) and chiller plants A/B in; Level 1 due 20 Nov; live BMS API due 20 Nov",
+     "zh": "一层 6 个机房与冷站 A/B 数据已到;Level 1 数据 11/20;实时 BMS API 11/20",
      "src": [
       "BA-2380",
-      "BA-2384"
+      "BA-2384",
+      "MTG"
      ]
     },
     "model": {
      "s": "wip",
-     "en": "GA calibrated; per-hall rack-level model in build",
-     "zh": "GA 已标定;机房级(机柜粒度)模型构建中",
+     "en": "All six halls validated (0.28 °C mean error); holistic ground-floor model by 27 Nov",
+     "zh": "6 个机房均已验证(平均误差 0.28 °C);一层整体模型 11/27 完成",
      "src": [
       "BA-2386",
       "BA-2447",
-      "BA-2387"
+      "MTG"
      ]
     },
     "ai": {
      "s": "wip",
-     "en": "Single-zone RL agreed as default; IPMVP gate before savings claims",
-     "zh": "已确定单区 RL 为默认版本;节能结论须先过 IPMVP 验证",
+     "en": "Best result about 8% total energy saving; E-GA 30.9% fan energy with no SLA breach",
+     "zh": "目前最佳约 8% 总节能;E-GA 风机节能 30.9%,无 SLA 越限",
      "src": [
-      "MTG",
-      "BA-2380"
+      "MTG"
      ]
     },
     "deploy": {
      "s": "todo",
-     "en": "Control-parameter scope to confirm on site",
-     "zh": "控制参数范围待现场确认",
+     "en": "Manual test plan to Justin; BMS is read-only, write access unconfirmed",
+     "zh": "人工测试方案交 Justin;BMS 只读,写权限未确认",
      "src": [
       "MTG"
      ]
@@ -314,55 +314,64 @@
    },
    "risks": [
     {
-     "en": "GB is missing exports and has 2 sensors with wrong start dates; only half of GC/GD has arrived.",
-     "zh": "GB 缺少导出数据且有 2 个传感器起始日期错误;GC/GD 仅到位一半。",
+     "en": "Live BMS API not yet delivered; edge services and closed-loop control wait on it (target 20 Nov).",
+     "zh": "实时 BMS API 尚未交付,边缘服务与闭环控制均依赖它(目标 11 月 20 日)。",
      "src": [
-      "BA-2380"
+      "BA-2384",
+      "MTG"
      ]
     },
     {
-     "en": "Live BMS connectivity covers 1 of 14 data halls.",
-     "zh": "实时 BMS 连接仅覆盖 14 个机房中的 1 个。",
-     "src": [
-      "BA-2384"
-     ]
-    },
-    {
-     "en": "ECU status data reports repair state instead of on/off, likely a client data-entry error. Justin asked to verify.",
-     "zh": "ECU 状态数据给的是维修状态而非开关状态,疑似客户录入错误,已请 Justin 核实。",
+     "en": "BMS is read-only; fan-speed and setpoint write access is still unconfirmed for on-site tests.",
+     "zh": "BMS 只读,现场测试所需的风机转速与设定点写权限仍未确认。",
      "src": [
       "MTG"
      ]
     },
     {
-     "en": "Single-zone simulation shows a 6 °C deviation; root cause due within 1–2 days of 12 Oct.",
-     "zh": "单区仿真出现 6°C 偏差,10 月 12 日起 1–2 天内给出原因。",
+     "en": "Upper-floor data is about a month behind the ground floor.",
+     "zh": "上层楼层数据比一层晚约一个月。",
      "src": [
       "MTG"
      ]
     },
     {
-     "en": "Calibration ticket is 83 days past its 23 Jul due date.",
-     "zh": "标定任务已超过 7 月 23 日截止日 83 天。",
+     "en": "Savings baseline must be agreed from historical data before any trial, or later chiller changes can reset it.",
+     "zh": "试运行前须基于历史数据确定节能基线,否则后续冷机调整会使基线失效。",
      "src": [
-      "BA-2386"
+      "MTG"
+     ]
+    },
+    {
+     "en": "COV-style BMS data may weaken model robustness; stress tests with bad inputs still to run.",
+     "zh": "BMS 的 COV 式数据可能影响模型稳健性;异常输入压力测试尚未进行。",
+     "src": [
+      "MTG"
      ]
     }
    ],
    "next": [
     {
-     "date": "2026-10-23",
-     "en": "Face-to-face with Zach (content pre-brief 19 Oct)",
-     "zh": "与 Zach 面对面会议(10 月 19 日预演内容)",
+     "date": "2026-11-20",
+     "en": "Live BMS API and Level 1 data from DayOne",
+     "zh": "DayOne 提供实时 BMS API 与 Level 1 数据",
      "src": [
       "MTG"
      ]
     },
     {
-     "date": "2026-10-28",
+     "date": "2026-11-27",
+     "en": "Holistic ground-floor model validated",
+     "zh": "一层整体模型验证完成",
+     "src": [
+      "MTG"
+     ]
+    },
+    {
+     "date": "2026-11-27",
      "tentative": true,
-     "en": "JB site visit: confirm controllable equipment and ranges",
-     "zh": "JB 现场考察:确认可控设备与参数范围",
+     "en": "Preliminary backtest savings (Apr–Jun) shared with DayOne, marked not final",
+     "zh": "向 DayOne 分享回测初步节能结果(4–6 月),注明非最终",
      "src": [
       "MTG"
      ]
@@ -983,26 +992,6 @@
    }
   },
   {
-   "proj": "dayone",
-   "kind": "align",
-   "src": [
-    "MTG",
-    "BA-2380"
-   ],
-   "t": {
-    "en": "Agree the message for Zach on 23 Oct",
-    "zh": "对齐 10 月 23 日与 Zach 的沟通口径"
-   },
-   "w": {
-    "en": "Single-zone AI is the default path; multi-zone is still in development and IPMVP validation comes before any savings claim.",
-    "zh": "单区 AI 为默认路径;多区仍在开发,任何节能结论须先通过 IPMVP 验证。"
-   },
-   "a": {
-    "en": "Present multi-zone as the planned upgrade and avoid committing a savings date at this meeting.",
-    "zh": "将多区定位为后续升级版本,本次会议不承诺节能结论时间。"
-   }
-  },
-  {
    "proj": "cmisg",
    "kind": "opportunity",
    "src": [
@@ -1019,6 +1008,25 @@
    "a": {
     "en": "Price it before the visit and pair it with the leak-check result as evidence of value.",
     "zh": "在会前定价,并以泄漏排查结论作为价值佐证。"
+   }
+  },
+  {
+   "proj": "dayone",
+   "kind": "align",
+   "src": [
+    "MTG"
+   ],
+   "t": {
+    "en": "Agree the savings baseline with DayOne",
+    "zh": "与 DayOne 对齐节能基线"
+   },
+   "w": {
+    "en": "The baseline has to come from historical data before any on-site trial; otherwise later chiller changes reset it and the 8% figure cannot be defended.",
+    "zh": "基线须在现场试运行前基于历史数据确定,否则后续冷机调整会使其失效,8% 的结果无法成立。"
+   },
+   "a": {
+    "en": "Propose the baseline method with the backtest results, and present 8% as preliminary.",
+    "zh": "随回测结果一起提出基线方法,8% 作为初步结果呈现。"
    }
   }
  ],
@@ -1042,10 +1050,19 @@
    ]
   },
   {
-   "date": "2026-10-21",
+   "date": "2026-11-20",
    "proj": "dayone",
-   "en": "Single-zone AI training work targeted",
-   "zh": "单区 AI 训练工作目标完成日",
+   "en": "Live BMS API and Level 1 data due",
+   "zh": "实时 BMS API 与 Level 1 数据到期",
+   "src": [
+    "MTG"
+   ]
+  },
+  {
+   "date": "2026-11-27",
+   "proj": "dayone",
+   "en": "Ground-floor model validation due",
+   "zh": "一层整体模型验证到期",
    "src": [
     "MTG"
    ]
