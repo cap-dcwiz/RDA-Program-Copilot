@@ -100,7 +100,10 @@ install_from_checkout || say "WARNING: unit install or restart reported an error
 
 if ! healthy; then
   say "FAILED: ${NEXT:0:7} never became healthy. Rolling back to ${PREV:0:7}."
-  sudo journalctl -u "$SERVICE" -n 30 --no-pager | sed 's/^/           /'
+  # Only this run's lines. The service may have started fine and merely failed its health
+  # check, in which case an unbounded -n 30 reaches back days and buries the one line that
+  # matters — and this log is the only place a failed night gets reported.
+  sudo journalctl -u "$SERVICE" --since "-90s" -n 20 --no-pager | sed 's/^/           /'
   git -C "$APP_DIR" reset --hard --quiet "$PREV"
   install_from_checkout
   if healthy; then say "rolled back to ${PREV:0:7}; it is healthy. The edge route was not moved."
