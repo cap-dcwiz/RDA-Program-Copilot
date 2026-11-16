@@ -87,21 +87,6 @@ async function decide(id, decision, user, extra = {}) {
   return s;
 }
 
-/* Back to the pending list. Only for decisions that left nothing in Jira: a dry-run approval or a
-   rejection. A real write cannot be taken back from here. */
-function reopen(id, user) {
-  const db = store.load();
-  const s = db.suggestions.find(x => x.id === id);
-  if (!s) throw Object.assign(new Error('Suggestion not found'), { status: 404 });
-  if (s.status === 'pending') return s;
-  if (s.status === 'approved' && !(s.jira && s.jira.dryRun)) throw Object.assign(new Error('Already written to Jira; it cannot be reopened'), { status: 409 });
-  store.audit(user.name, 'reopen', s.id, `was ${s.status}${s.status === 'approved' ? ' (dry run)' : ''} by ${s.decidedBy || '?'}: ${s.title}`);
-  s.status = 'pending';
-  for (const k of ['jira', 'decidedBy', 'decidedAt', 'rejectReason']) delete s[k];
-  store.save();
-  return s;
-}
-
 const EDITABLE = ['title', 'detail', 'newDueDate', 'owner', 'jiraKey', 'kind', 'project'];
 function edit(id, patch, user) {
   const db = store.load();
@@ -132,4 +117,4 @@ async function backfillPlanFeed(by = 'backfill') {
   return { meetings: todo.length };
 }
 
-module.exports = { ingest, syncGranola, decide, edit, reopen, backfillPlanFeed };
+module.exports = { ingest, syncGranola, decide, edit, backfillPlanFeed };

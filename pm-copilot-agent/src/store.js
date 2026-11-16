@@ -13,7 +13,28 @@ function load() {
   if (db) return db;
   try { db = JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch { db = EMPTY(); }
   db = Object.assign(EMPTY(), db);
+  migrate(db);
   return db;
+}
+
+/* One-off data fixes, each applied once and recorded in db.migrations.
+
+   reopen-dry-run-2026-11-16: six suggestions were approved on 16 Nov while JIRA_DRY_RUN was still
+   true, so nothing reached Jira (checked against the tickets). Put them back in the pending list
+   so they can be approved for real. Dry-run approvals from 11 Nov stay approved: those were
+   written to Jira by hand at the time, and reopening them would post duplicates. */
+function migrate(d) {
+  d.migrations = d.migrations || {};
+  if (!d.migrations['reopen-dry-run-2026-11-16']) {
+    const hit = d.suggestions.filter(s => s.status === 'approved' && s.jira && s.jira.dryRun === true && String(s.decidedAt || '') >= '2026-11-16');
+    for (const s of hit) {
+      d.audit.unshift({ at: new Date().toISOString(), by: 'system', action: 'reopen', target: s.id, detail: `dry-run approval by ${s.decidedBy || '?'} at ${s.decidedAt} returned to pending: ${s.title}` });
+      s.status = 'pending';
+      for (const k of ['jira', 'decidedBy', 'decidedAt']) delete s[k];
+    }
+    d.migrations['reopen-dry-run-2026-11-16'] = { at: new Date().toISOString(), reopened: hit.map(s => s.id) };
+    if (hit.length) { db = d; save(); }
+  }
 }
 function save() {
   fs.mkdirSync(DATA_DIR, { recursive: true });

@@ -15,7 +15,7 @@
    GET  /api/suggestions?status=            page: todo      (only projects the user may see)
    GET  /api/meetings, /api/meetings/:id    page: history
    GET  /api/audit                          page: history
-   POST /api/suggestions/:id/approve|reject|edit|reopen     action: approve
+   POST /api/suggestions/:id/approve|reject|edit     action: approve
    POST /api/sync, /api/meetings/import, /api/meetings/:id/reanalyse   action: ingest
    GET  /api/program/:project               the project's plan data (phases, tasks, dependencies)
    GET  /api/plan/:project                  plan edits (Gantt) for a project the user may see
@@ -247,12 +247,11 @@ async function route(req, res, user) {
     const r = await agent.ingest({ ...mt, updatedAt: `re-${Date.now()}` }, user.name);
     return send(res, 200, meetingCard(r.meeting, store.load(), user));
   }
-  if ((m = p.match(/^\/api\/suggestions\/([\w-]+)\/(approve|reject|edit|reopen)$/))) {
+  if ((m = p.match(/^\/api\/suggestions\/([\w-]+)\/(approve|reject|edit)$/))) {
     action(user, 'approve');
     const s = db.suggestions.find(x => x.id === m[1]);
     if (!s || !P.canSeeProject(user.perms, s.project)) throw err(404, 'Suggestion not found');
     if (m[2] === 'edit') { if (body.project && !P.canSeeProject(user.perms, body.project)) throw err(403, 'You cannot move a to-do to a project you cannot see'); return send(res, 200, agent.edit(m[1], body, user)); }
-    if (m[2] === 'reopen') return send(res, 200, agent.reopen(m[1], user));
     return send(res, 200, await agent.decide(m[1], m[2], user, body));
   }
   throw err(404, 'Not found');
