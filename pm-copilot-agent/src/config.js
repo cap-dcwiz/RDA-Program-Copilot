@@ -49,6 +49,11 @@ module.exports = {
     // Project BA requires a fix version on every new issue. Blank = the current quarter's
     // "Q<n> <yyyy>" version (e.g. "Q4 2026"); set a version name to pin one instead.
     fixVersion: env('JIRA_FIX_VERSION'),
+    // Writes go out under the one JIRA_EMAIL account; the approver is set as the new ticket's
+    // reporter, found by their sign-in email. Where that email is not their Jira email, map it:
+    // "zhangzhaoning=selena.zhang@rda.ai,someone@gmail.com=712020:abcd…" (Jira email or accountId).
+    userMap: Object.fromEntries(env('JIRA_USER_MAP').split(',').map(p => p.split('=').map(x => x.trim()))
+      .filter(([k, v]) => k && v).map(([k, v]) => [k.toLowerCase(), v])),
     clientField: env('JIRA_CLIENT_FIELD', 'customfield_10034'),
     dryRun: bool('JIRA_DRY_RUN', true),
     // Nightly read sync. Default: the end of every working day, Mon–Fri 24:00 Singapore time

@@ -68,7 +68,7 @@ async function decide(id, decision, user, extra = {}) {
   if (s.status !== 'pending') throw Object.assign(new Error(`Already ${s.status}`), { status: 409 });
   const m = db.meetings.find(x => x.id === s.meetingId) || { title: 'Unknown meeting', date: '' };
   if (decision === 'approve') {
-    s.jira = await jira.apply(s, m, user.name);
+    s.jira = await jira.apply(s, m, user);
     s.status = 'approved';
   } else {
     s.status = 'rejected'; s.rejectReason = extra.reason || null;
