@@ -103,6 +103,7 @@ function plan(s, meeting, approver, reporterId, mention) {
     const p = projects.byId(s.project);
     if (p) fields[cfg.clientField] = p.optionId ? { id: p.optionId } : { value: p.client || p.label };
     if (reporterId) fields.reporter = { id: reporterId };
+    if (cfg.projectEpics[s.project]) fields.parent = { key: cfg.projectEpics[s.project] };
     return [{ method: 'POST', path: '/rest/api/3/issue', body: { fields } }];
   }
   throw new Error(`Unknown suggestion kind: ${s.kind}`);
@@ -121,9 +122,13 @@ async function apply(s, meeting, approver) {
     catch (e) {
       // Setting the reporter needs "Modify Reporter" for the JIRA_EMAIL account. Without it, still
       // create the ticket — the approver stays named in the description — and say why.
-      if (!(st.body && st.body.fields && st.body.fields.reporter && /reporter/i.test(e.message))) throw e;
-      delete st.body.fields.reporter;
-      reporterNote = 'Reporter not set: the Jira account needs the "Modify Reporter" permission in this project';
+      // Same for the epic link: a parent Jira refuses (wrong hierarchy, epic closed) is dropped, the task still created.
+      const f = st.body && st.body.fields;
+      const bad = f && ['reporter', 'parent'].filter(k => f[k] && new RegExp(k, 'i').test(e.message));
+      if (!bad || !bad.length) throw e;
+      bad.forEach(k => delete f[k]);
+      reporterNote = bad.map(k => k === 'reporter' ? 'Reporter not set: the Jira account needs the "Modify Reporter" permission in this project'
+        : 'Not filed under the project epic: Jira refused the parent').join('; ');
       results.push(await call(st.method, st.path, st.body));
     }
   }

@@ -54,6 +54,9 @@ module.exports = {
     // "zhangzhaoning=selena.zhang@rda.ai,someone@gmail.com=712020:abcd…" (Jira email or accountId).
     // Project filters (see projects.js): only filters owned by these people count, by Jira display
     // name or accountId. Empty = every visible filter of the form "client[dropdown]" = "X".
+    // New tasks for these projects go under the epic, so they also show in the project view
+    // (the DayOne sync reads the epic's children). "dayone=BA-2380,other=BA-1".
+    projectEpics: Object.fromEntries(env('JIRA_PROJECT_EPICS', 'dayone=BA-2380').split(',').map(p => p.split('=').map(x => x.trim())).filter(([k, v]) => k && v)),
     filterOwners: env('JIRA_FILTER_OWNERS').split(',').map(x => x.trim()).filter(Boolean),
     userMap: Object.fromEntries(env('JIRA_USER_MAP').split(',').map(p => p.split('=').map(x => x.trim()))
       .filter(([k, v]) => k && v).map(([k, v]) => [k.toLowerCase(), v])),

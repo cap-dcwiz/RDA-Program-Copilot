@@ -4,6 +4,7 @@ const granola = require('./granola');
 const jira = require('./jira');
 const { analyseMeeting } = require('./claude');
 const cfg = require('./config');
+const feed = require('./programfeed');
 
 let syncing = null;
 
@@ -25,6 +26,13 @@ async function ingest(meeting, by) {
     for (const s of a.suggestions) db.suggestions.push({ id: store.id('sug'), meetingId: m.id, status: 'pending', createdAt: now, ...s });
     m.status = 'analysed'; m.suggestionCount = a.suggestions.length;
     store.audit(by, 'analyse', m.id, `${a.suggestions.length} suggestions from "${m.title}"`);
+    // A meeting about a project with a plan view also updates that view (meetings, change proposals,
+    // change log, brief). A failure here leaves the Jira suggestions in place.
+    const planProjects = (m.projects || []).includes('dayone') || /day\s*one/i.test(m.title || '') ? ['dayone'] : [];
+    for (const project of planProjects) {
+      try { const r = await feed.analyse(project, m); m.planFeed = { [project]: r }; store.audit(by, 'plan-feed', m.id, `${project}: ${r.relevant === false ? 'not relevant' : `${r.proposals} plan proposals`}`); }
+      catch (e) { m.planFeed = { [project]: { error: e.message } }; store.audit(by, 'plan-feed-failed', m.id, e.message); }
+    }
   } catch (e) {
     m.status = 'failed'; m.error = e.message;
     store.audit(by, 'analyse-failed', m.id, e.message);
@@ -93,4 +101,20 @@ function edit(id, patch, user) {
   return s;
 }
 
-module.exports = { ingest, syncGranola, decide, edit };
+/* Meetings analysed before the plan feed existed (or while it failed): give them the plan pass
+   once, newest last so the latest brief wins. Only meetings after the shipped plan's asOf. */
+async function backfillPlanFeed(by = 'backfill') {
+  const db = store.load();
+  const asOf = (feed.baselineAsOf && feed.baselineAsOf('dayone')) || '';
+  const todo = db.meetings.filter(m => m.status === 'analysed' && m.notesText && String(m.date || '').slice(0, 10) > asOf
+    && ((m.projects || []).includes('dayone') || /day\s*one/i.test(m.title || '')) && !(m.planFeed && m.planFeed.dayone && !m.planFeed.dayone.error))
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  for (const m of todo) {
+    try { m.planFeed = { dayone: await feed.analyse('dayone', m) }; store.audit(by, 'plan-feed', m.id, `dayone: ${m.planFeed.dayone.proposals || 0} plan proposals`); }
+    catch (e) { m.planFeed = { dayone: { error: e.message } }; }
+    store.save();
+  }
+  return { meetings: todo.length };
+}
+
+module.exports = { ingest, syncGranola, decide, edit, backfillPlanFeed };

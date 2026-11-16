@@ -4761,7 +4761,7 @@ function planApply(data){
   // The agent is the source of truth for plan fields: start from the shipped plan, then apply its edits,
   // so a reset or another manager's change is not masked by an older copy cached in this browser.
   if(Array.isArray(data.decisions)) mtReconcile(data.decisions);
-  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next','targetOriginal'];
+  const EDITABLE = ['name','nameZh','gs','ge','due','owner','status','progress','next','health','targetOriginal'];
   TASKS.forEach(t=>{ const b = TASK_BASELINE[t.id]; if(b) EDITABLE.forEach(k=>{ if(k in b) t[k] = b[k]; else if(k==='targetOriginal') delete t[k]; }); });
   // 2) Jira (nightly sync): status, owner and target date of linked tasks; Jira-only tickets become tasks.
   const J = data.jira; PLAN.jira = J || null;

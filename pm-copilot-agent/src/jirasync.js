@@ -31,6 +31,8 @@ function planStatus(st) {
 const code = (summary) => { const m = String(summary).match(/\[DayOne-NTPE\]\[(\d+)(?:\.(\d+))*\]/i); return m ? Number(m[1]) : null; };
 const cleanTitle = (summary) => String(summary).replace(/^\s*(\[[^\]]+\]\s*)+/, '').trim() || summary;
 const day = (iso) => iso ? String(iso).slice(0, 10) : null;
+/* Plan month (1 = the start month) of a date; null before the start or without one. Capped at 9. */
+const planMonth = (iso, start) => { if (!iso || !start) return null; const [y, m] = String(iso).split('-').map(Number), [sy, sm] = String(start).split('-').map(Number); const n = (y - sy) * 12 + (m - sm) + 1; return n >= 1 ? Math.min(n, 9) : null; };
 
 function ticketRow(i) {
   const f = i.fields || {};
@@ -64,8 +66,10 @@ async function syncDayone() {
       r.lastComment = await jira.lastComment(r.key).catch(() => null);
       tasks[byKey[r.key]] = r;
     } else if (!ignore.has(r.key) && !byKey[r.parent] && !(r.parent && r.parent !== map.epic && rows.some(x => x.key === r.parent))) {
-      const month = code(r.summary);
-      if (!month) continue;            // not part of the numbered DayOne plan (old 2025 tickets, other epics)
+      // Placed by its "[x.y]" code; a child of the epic without one (e.g. a task created from a
+      // meeting) by the month it was created in. Anything else is not part of the plan (old 2025 tickets).
+      const month = code(r.summary) || (r.parent === map.epic ? planMonth(r.created, map.start) : null);
+      if (!month) continue;
       r.month = month;
       r.lastComment = await jira.lastComment(r.key).catch(() => null);
       extra.push(r);
@@ -156,4 +160,4 @@ function readPortfolio() {
   return { ...seed, tickets: live.tickets || seed.tickets, asOf: String(live.asOf || '') > String(seed.asOf || '') ? live.asOf : seed.asOf,
     syncedAt: live.syncedAt || seed.syncedAt };
 }
-module.exports = { readPortfolio, runAll, schedule, nextRun, syncDayone, syncPortfolio, planStatus, readDayone: () => readJson(F('dayone-jira.json'), null) };
+module.exports = { planMonth, readPortfolio, runAll, schedule, nextRun, syncDayone, syncPortfolio, planStatus, readDayone: () => readJson(F('dayone-jira.json'), null) };

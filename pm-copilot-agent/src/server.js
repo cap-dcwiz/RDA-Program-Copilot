@@ -43,6 +43,7 @@ const P = require('./permissions');
 const plan = require('./plan');
 const jirasync = require('./jirasync');
 const projects = require('./projects');
+const feed = require('./programfeed');
 
 const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -95,7 +96,7 @@ async function route(req, res, user) {
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
       signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url },
       jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(),
-      jiraProjects: projects.list().map(p => ({ id: p.id, client: p.client || p.label, filter: p.filterName || null })), jiraFiltersRefreshedAt: projects.refreshedAt(), lastGranolaSync: db.sync.lastGranolaSync,
+      jiraProjects: projects.list().map(p => ({ id: p.id, client: p.client || p.label, filter: p.filterName || null })), jiraFiltersRefreshedAt: projects.refreshedAt(), dayonePlanFeed: (feed.merged('dayone') || {}).feed || null, lastGranolaSync: db.sync.lastGranolaSync,
       lastJiraSync: db.sync.lastJiraSync ? { at: db.sync.lastJiraSync.at, ok: db.sync.lastJiraSync.ok, error: db.sync.lastJiraSync.error || null } : null,
       nextJiraSync: db.sync.nextJiraSync || null });
   }
@@ -166,7 +167,7 @@ async function route(req, res, user) {
     if (!P.canSeeProject(user.perms, m[1])) throw err(404, 'Project not found');
     const file = path.join(cfg.DATA_DIR, `${m[1]}-program.json`);
     if (!fs.existsSync(file)) throw err(404, 'Project not found');
-    return send(res, 200, JSON.parse(fs.readFileSync(file, 'utf8')));
+    return send(res, 200, feed.merged(m[1]));   // baseline + what Granola meetings added since
   }
 
   if (req.method === 'GET' && (m = p.match(/^\/api\/plan\/([a-z0-9-]+)$/))) {
@@ -271,6 +272,7 @@ if (require.main === module) {
     if (jira.hasCreds()) jira.refreshProjects().then(r => console.log('[jira] project filters:', r)).catch(e => console.warn('[jira] project filters:', e.message));
     const nj = jirasync.schedule();
     console.log(nj ? `Jira sync: next run ${nj.toISOString()} (Mon–Fri 24:00 SGT)${jira.hasCreds() ? '' : ' — needs JIRA_EMAIL and JIRA_API_TOKEN'}` : 'Jira sync: off');
+    if (cfg.anthropic.apiKey) setTimeout(() => agent.backfillPlanFeed().then(r => r.meetings && console.log('[plan-feed] backfilled', r)).catch(e => console.warn('[plan-feed]', e.message)), 10000);
     if (granola.configured() && cfg.granola.syncMinutes > 0) {
       const tick = () => agent.syncGranola('scheduler').then(r => r.notes && console.log('[sync]', r)).catch(e => console.warn('[sync]', e.message));
       setTimeout(tick, 3000); setInterval(tick, cfg.granola.syncMinutes * 60000);

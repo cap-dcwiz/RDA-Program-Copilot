@@ -16,6 +16,7 @@ const validDate = (v) => DATE.test(v) && !isNaN(new Date(v + 'T00:00:00Z'));
 const str = (max) => (v) => { if (typeof v !== 'string') throw err(400, 'Expected text'); const t = v.trim(); if (!t) throw err(400, 'Text cannot be empty'); if (t.length > max) throw err(400, `Keep it under ${max} characters`); return t; };
 const FIELDS = {
   name: str(120), nameZh: str(120), owner: str(80), next: str(300),
+  health: (v) => { if (!['good', 'fine', 'risk', 'none'].includes(v)) throw err(400, 'Unknown health'); return v; },
   gs: (v) => { if (!validDate(v)) throw err(400, 'Start date must be YYYY-MM-DD'); return v; },
   ge: (v) => { if (!validDate(v)) throw err(400, 'End date must be YYYY-MM-DD'); return v; },
   due: (v) => { if (!validDate(v)) throw err(400, 'Target date must be YYYY-MM-DD'); return v; },
