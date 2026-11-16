@@ -4,6 +4,7 @@ data/store.json
 data/users.json
 data/*.tmp
 data/roles.json
+data/access.json
 data/sessions.json
 data/initial-passwords.txt
 data/plan.json
