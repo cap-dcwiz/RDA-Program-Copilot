@@ -126,11 +126,15 @@ The approval is consumed on use and matches one sha, so it cannot sit there appr
 lands next. `deploy/deploy-vm.sh` from a laptop does not consult the gate at all: a person running
 a deploy by hand is the thing the gate is trying to get.
 
-To see what the gate makes of a range without deploying anything:
+To see what the gate makes of a branch or PR before it is merged, without deploying anything:
 
 ```bash
 node deploy/review-gate.js . origin/main <branch-or-sha>
 ```
+
+That diffs from the **merge base**, so main's own newer commits are not counted as the branch's
+work. Diffing straight against main would hold a data-only PR for "changing the deploy mechanism"
+it never touched.
 
 What the gate does **not** do: judge whether the code is correct. It routes changes to a human; it
 does not replace one. An ordinary-looking commit can still be wrong, and the rollback is what

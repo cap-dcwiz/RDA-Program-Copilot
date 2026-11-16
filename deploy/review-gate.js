@@ -22,7 +22,14 @@ const [repo, prev, next] = process.argv.slice(2);
 if (!repo || !prev || !next) { console.error('usage: review-gate.js <repo-dir> <prev-sha> <next-sha>'); process.exit(1); }
 const git = (...a) => execFileSync('git', ['-C', repo, ...a], { encoding: 'utf8', maxBuffer: 64 << 20 });
 
-const files = git('diff', '--name-only', prev, next).split('\n').filter(Boolean);
+/* Diff from the merge base, not from `prev` directly. On the timer's path main only fast-forwards,
+   so the base IS prev and nothing changes. It matters when checking a branch by hand before it is
+   merged: diffing straight against main counts main's own newer commits as the branch's changes,
+   and the gate then holds a data-only PR for "changing the deploy mechanism" it never touched. */
+let base = prev;
+try { base = git('merge-base', prev, next).trim() || prev; } catch { /* unrelated histories */ }
+
+const files = git('diff', '--name-only', base, next).split('\n').filter(Boolean);
 
 /* Line-level rules read code, not prose. Scanning .md too made the gate quote a markdown table
    in a README as evidence of an authorisation change, which is the kind of noise that teaches
@@ -30,7 +37,7 @@ const files = git('diff', '--name-only', prev, next).split('\n').filter(Boolean)
 const CODE = /\.(js|json|caddy|service|timer|sh|example)$|(^|\/)\.env/;
 const linesOf = (paths, keep) => {
   if (!paths.length) return [];
-  const d = git('diff', '-U0', prev, next, '--', ...paths);
+  const d = git('diff', '-U0', base, next, '--', ...paths);
   return d.split('\n').filter(l => keep.test(l) && !/^(\+\+\+|---)/.test(l)).map(l => l.slice(1));
 };
 const codeFiles = files.filter(f => CODE.test(f));
@@ -53,15 +60,19 @@ hit('cryptography', 'new cryptographic code — key handling and modes need read
   addedLines.filter(l => /\b(createCipheriv|createDecipheriv|createHmac|createSign|createVerify|privateDecrypt|publicEncrypt|generateKeyPair|randomBytes|timingSafeEqual|scrypt|pbkdf2)\b/.test(l))
     .map(l => l.trim().slice(0, 100)));
 
-// 3. New secret-shaped configuration. A new secret means a new thing that can leak.
+// 3. New secret-shaped configuration. A new secret means a new thing that can leak — but only
+//    where configuration is declared. Scanning every file made this fire on a test that sets a
+//    fake JIRA_API_TOKEN, and a rule that cries wolf over test scaffolding gets ignored.
+const CONFIG_FILES = /(^|\/)\.env(\.example)?$|(^|\/)config\.js$|\.(service|timer|caddy)$/;
 hit('new secret-shaped config', 'introduces configuration that holds a credential',
-  addedLines.filter(l => /\b[A-Z][A-Z0-9_]*(SECRET|_TOKEN|API_KEY|CLIENT_ID|PASSWORD|ENCRYPTION_KEY|PRIVATE_KEY)\b/.test(l))
+  linesOf(files.filter(f => CONFIG_FILES.test(f)), /^\+/)
+    .filter(l => /\b[A-Z][A-Z0-9_]*(SECRET|_TOKEN|API_KEY|CLIENT_ID|PASSWORD|ENCRYPTION_KEY|PRIVATE_KEY)\b/.test(l))
     .map(l => (l.trim().split('=')[0] || l.trim()).slice(0, 80)));
 
 // 4. A new place the server talks to. Where data goes matters as much as what the code does.
 const hostsIn = (text) => (text.match(/https?:\/\/[a-z0-9.-]+/gi) || []).map(h => h.toLowerCase());
 let knownHosts = new Set();
-try { knownHosts = new Set(hostsIn(git('grep', '-h', '-I', '-E', 'https?://', prev, '--', '*.js', '*.json', '*.caddy'))); } catch { /* no matches */ }
+try { knownHosts = new Set(hostsIn(git('grep', '-h', '-I', '-E', 'https?://', base, '--', '*.js', '*.json', '*.caddy'))); } catch { /* no matches */ }
 hit('new outbound host', 'the server would start talking to somewhere it has not before',
   hostsIn(added).filter(h => !knownHosts.has(h)));
 
@@ -81,7 +92,7 @@ const depsAdded = addedLines.some(l => /"dependencies"\s*:/.test(l)) || files.so
 hit('new dependency', 'adds third-party code to a service that currently has none',
   depsAdded ? files.filter(f => /package(-lock)?\.json$/.test(f)) : []);
 
-const commits = git('log', '--oneline', `${prev}..${next}`).trim().split('\n').filter(Boolean);
+const commits = git('log', '--oneline', `${base}..${next}`).trim().split('\n').filter(Boolean);
 console.log(`${commits.length} commit(s), ${files.length} file(s) changed`);
 if (!rules.length) { console.log('gate: clear — no security-sensitive change detected'); process.exit(0); }
 
