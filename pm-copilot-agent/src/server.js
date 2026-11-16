@@ -25,6 +25,10 @@
    POST /api/plan/:project/proposals/decide {sig, decision, proposal, taskId, field, value}  action: edit_plan
    POST /api/plan/:project/proposals/withdraw {sig}            action: edit_plan
    POST /api/jira/sync                      run the Jira read sync now                    action: edit_plan
+   GET  /api/jira/connection                is my Jira account connected (per-person sign-in)
+   POST /api/jira/connect                   → {url} to Atlassian's consent page             action: approve
+   POST /api/jira/disconnect                forget my Jira tokens
+   GET  /api/jira/oauth/callback            Atlassian's redirect back (public; trusted via signed state)
    Roles & Access (page: users)
    GET  /api/admin/catalog                  pages, actions, projects that roles can grant
    GET  /api/admin/roles  | POST /api/admin/roles   {roles:[...]} replaces the matrix
@@ -42,6 +46,7 @@ const auth = require('./auth');
 const P = require('./permissions');
 const plan = require('./plan');
 const jirasync = require('./jirasync');
+const jiraoauth = require('./jiraoauth');
 
 const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -93,7 +98,7 @@ async function route(req, res, user) {
     const db = store.load();
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
       signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url },
-      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), lastGranolaSync: db.sync.lastGranolaSync,
+      jiraCredentials: jira.canRead(), jiraDryRun: jira.dryRun(), jiraAuth: jira.mode(), lastGranolaSync: db.sync.lastGranolaSync,
       lastJiraSync: db.sync.lastJiraSync ? { at: db.sync.lastJiraSync.at, ok: db.sync.lastJiraSync.ok, error: db.sync.lastJiraSync.error || null } : null,
       nextJiraSync: db.sync.nextJiraSync || null });
   }
@@ -110,8 +115,28 @@ async function route(req, res, user) {
     }
   }
 
+  /* Atlassian sends the browser back here after consent. It carries no dashboard token — the
+     signed `state` from /api/jira/connect says whose account this is — so it sits before signedIn. */
+  if (req.method === 'GET' && p === '/api/jira/oauth/callback') {
+    const back = cfg.atlassian.publicUrl.replace(/\/$/, '') + '/';
+    try {
+      if (url.searchParams.get('error')) throw err(400, url.searchParams.get('error_description') || 'Jira access was not granted');
+      const r = await jiraoauth.callback(url.searchParams.get('code'), url.searchParams.get('state'));
+      store.audit(r.user, 'jira-connect', r.user, r.name || ''); store.save();
+      res.writeHead(302, { Location: back + '?jira=connected', 'Cache-Control': 'no-store' }); return res.end();
+    } catch (e) {
+      res.writeHead(302, { Location: back + '?jira_error=' + encodeURIComponent(e.message), 'Cache-Control': 'no-store' }); return res.end();
+    }
+  }
+
   signedIn(user);
   const db = store.load();
+  if (req.method === 'GET' && p === '/api/jira/connection') return send(res, 200, { ...jiraoauth.status(user), mode: jira.mode(), dryRun: jira.dryRun() });
+  if (req.method === 'POST' && p === '/api/jira/connect') { action(user, 'approve'); return send(res, 200, { url: jiraoauth.connectUrl(user) }); }
+  if (req.method === 'POST' && p === '/api/jira/disconnect') {
+    const had = jiraoauth.disconnect(user); if (had) { store.audit(user.name, 'jira-disconnect', user.id, ''); store.save(); }
+    return send(res, 200, jiraoauth.status(user));
+  }
   if (req.method === 'POST' && p === '/api/logout') { auth.logout(user.token); return send(res, 200, { ok: true }); }
   if (req.method === 'GET' && p === '/api/me') { const { token, ...u } = user; return send(res, 200, u); }
 
@@ -258,7 +283,7 @@ const server = http.createServer(async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   try { await route(req, res, await auth.whoIs(req)); }
-  catch (e) { if (!e.status) console.error(e); if (!res.headersSent) send(res, e.status || 500, { error: e.message }); }
+  catch (e) { if (!e.status) console.error(e); if (!res.headersSent) send(res, e.status || 500, { error: e.message, ...(e.code ? { code: e.code } : {}) }); }
 });
 
 if (require.main === module) {
@@ -267,7 +292,8 @@ if (require.main === module) {
     console.log(`PM Copilot agent on :${cfg.port} · dashboard at / · model ${cfg.anthropic.model} · Granola ${granola.configured() ? 'on' : 'off'} · Jira ${jira.dryRun() ? 'dry-run' : 'LIVE writes'}`);
     console.log(`Sign-in: ${cfg.productCenter.label} at ${cfg.productCenter.url} — accounts and passwords live there`);
     const nj = jirasync.schedule();
-    console.log(nj ? `Jira sync: next run ${nj.toISOString()} (Mon–Fri 24:00 SGT)${jira.hasCreds() ? '' : ' — needs JIRA_EMAIL and JIRA_API_TOKEN'}` : 'Jira sync: off');
+    console.log(`Jira writes: ${jira.mode() === 'per-person' ? `as each approver (Atlassian sign-in, callback ${jiraoauth.redirectUri()})` : jira.mode() === 'shared' ? 'as the shared JIRA_EMAIL account' : 'none configured'}`);
+    console.log(nj ? `Jira sync: next run ${nj.toISOString()} (Mon–Fri 24:00 SGT)${jira.canRead() ? '' : ' — needs JIRA_EMAIL/JIRA_API_TOKEN, or someone to connect their Jira'}` : 'Jira sync: off');
     if (granola.configured() && cfg.granola.syncMinutes > 0) {
       const tick = () => agent.syncGranola('scheduler').then(r => r.notes && console.log('[sync]', r)).catch(e => console.warn('[sync]', e.message));
       setTimeout(tick, 3000); setInterval(tick, cfg.granola.syncMinutes * 60000);

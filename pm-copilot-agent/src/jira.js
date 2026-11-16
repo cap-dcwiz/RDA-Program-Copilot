@@ -5,13 +5,21 @@ const path = require('path');
 const cfgAll = require('./config');
 const cfg = cfgAll.jira;
 
-const hasCreds = () => !!(cfg.email && cfg.token);
+const oauth = require('./jiraoauth');
+
+const hasCreds = () => !!(cfg.email && cfg.token);                 // the shared JIRA_EMAIL account
+const canRead = () => hasCreds() || (oauth.configured() && !!oauth.backgroundUser());
 const auth = () => 'Basic ' + Buffer.from(`${cfg.email}:${cfg.token}`).toString('base64');
 const browse = (key) => `${cfg.baseUrl}/browse/${key}`;
 
-async function call(method, pathname, body) {
-  const res = await fetch(cfg.baseUrl + pathname, {
-    method, headers: { Authorization: auth(), Accept: 'application/json', 'Content-Type': 'application/json' },
+/* `as` = a person's OAuth access ({accessToken, cloudId}); those calls go through Atlassian's API
+   gateway. Without it: the shared account, or for reads with no shared account, a connected
+   person's access (see jiraoauth.backgroundUser). */
+async function call(method, pathname, body, as) {
+  if (!as && !hasCreds() && oauth.configured() && oauth.backgroundUser()) as = await oauth.tokenFor(oauth.backgroundUser());
+  const base = as ? `https://api.atlassian.com/ex/jira/${as.cloudId}` : cfg.baseUrl;
+  const res = await fetch(base + pathname, {
+    method, headers: { Authorization: as ? `Bearer ${as.accessToken}` : auth(), Accept: 'application/json', 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });
   const text = await res.text();
@@ -25,7 +33,7 @@ const adf = (text) => ({ type: 'doc', version: 1, content: String(text).split(/\
 
 /* Open tickets the model may map suggestions onto. Live when credentials exist, else the snapshot. */
 async function openTickets() {
-  if (hasCreds()) {
+  if (canRead()) {
     try {
       const q = new URLSearchParams({ jql: cfg.jql, maxResults: '100', fields: `summary,status,assignee,duedate,updated,${cfg.clientField}` });
       const r = await call('GET', `/rest/api/3/search/jql?${q}`);
@@ -88,6 +96,18 @@ function plan(s, meeting, approver, reporterId) {
 }
 
 async function apply(s, meeting, approver) {
+  // Per-person sign-in: the write is made with the approver's own Jira access, so Jira shows them
+  // as the comment author and the ticket's reporter. Nothing to look up, nothing to impersonate.
+  if (oauth.configured()) {
+    if (cfg.dryRun) return { dryRun: true, steps: plan(s, meeting, approver), url: s.jiraKey ? browse(s.jiraKey) : null,
+      note: 'JIRA_DRY_RUN=true: nothing was written to Jira' };
+    const as = await oauth.tokenFor(approver);                  // 428 when they have not connected
+    const steps = plan(s, meeting, approver);
+    const results = [];
+    for (const st of steps) results.push(await call(st.method, st.path, st.body, as));
+    const createdKey = s.kind === 'new_ticket' ? results[0].key : null;
+    return { dryRun: false, as: as.name, steps: steps.map(x => ({ method: x.method, path: x.path })), createdKey, url: browse(createdKey || s.jiraKey) };
+  }
   const reporterId = s.kind === 'new_ticket' ? await accountIdFor(approver) : null;
   const steps = plan(s, meeting, approver, reporterId);
   const live = !cfg.dryRun && hasCreds();
@@ -144,4 +164,6 @@ async function lastComment(key) {
   return { at: c.created, by: c.author ? c.author.displayName : null, text: text.slice(0, 600) };
 }
 
-module.exports = { searchAll, issue, lastComment, adfText, openTickets, apply, plan, accountIdFor, hasCreds, browse, dryRun: () => cfg.dryRun || !hasCreds() };
+const mode = () => oauth.configured() ? 'per-person' : (hasCreds() ? 'shared' : 'none');
+module.exports = { searchAll, issue, lastComment, adfText, openTickets, apply, plan, accountIdFor, hasCreds, canRead, browse, mode,
+  dryRun: () => cfg.dryRun || mode() === 'none' };

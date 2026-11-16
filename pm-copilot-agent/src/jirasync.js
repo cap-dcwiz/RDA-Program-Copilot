@@ -113,7 +113,7 @@ async function runAll(by) {
   running = (async () => {
     const db = store.load();
     const res = { at: new Date().toISOString(), by: by || 'scheduler' };
-    if (!jira.hasCreds()) { res.ok = false; res.error = 'JIRA_EMAIL / JIRA_API_TOKEN are not set'; }
+    if (!jira.canRead()) { res.ok = false; res.error = 'No Jira access: set JIRA_EMAIL / JIRA_API_TOKEN, or have someone connect their Jira account'; }
     else {
       try { res.dayone = await syncDayone(); res.portfolio = await syncPortfolio(); res.ok = true; }
       catch (e) { res.ok = false; res.error = e.message; }

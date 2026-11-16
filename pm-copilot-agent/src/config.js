@@ -31,6 +31,15 @@ module.exports = {
   ROOT,
   DATA_DIR: path.join(ROOT, 'data'),
   anthropic: { apiKey: env('ANTHROPIC_API_KEY'), model: env('ANTHROPIC_MODEL', 'claude-sonnet-5-5') },
+  // Per-person Jira sign-in (Atlassian OAuth 2.0, 3LO). An app registered at
+  // developer.atlassian.com, with callback <publicUrl>/api/jira/oauth/callback. When both id and
+  // secret are set, approvals are written as the approver and JIRA_EMAIL is only for background reads.
+  atlassian: {
+    clientId: env('ATLASSIAN_CLIENT_ID'),
+    clientSecret: env('ATLASSIAN_CLIENT_SECRET'),
+    publicUrl: env('PUBLIC_URL', 'https://ai-factory.demo.rda.ai/DeliveryCopilot'),
+    tokenKey: env('TOKEN_ENCRYPTION_KEY'),
+  },
   granola: {
     apiKey: env('GRANOLA_API_KEY'),
     baseUrl: env('GRANOLA_BASE_URL', 'https://public-api.granola.ai'),
@@ -56,6 +65,8 @@ module.exports = {
       .filter(([k, v]) => k && v).map(([k, v]) => [k.toLowerCase(), v])),
     clientField: env('JIRA_CLIENT_FIELD', 'customfield_10034'),
     dryRun: bool('JIRA_DRY_RUN', true),
+    // With per-person sign-in and no shared account, background reads use this person's access.
+    syncAs: env('JIRA_SYNC_AS'),
     // Nightly read sync. Default: the end of every working day, Mon–Fri 24:00 Singapore time
     // (= 00:00 Tue–Sat). JIRA_SYNC=off disables it; the "Sync now" button still works.
     sync: env('JIRA_SYNC', 'on') !== 'off',

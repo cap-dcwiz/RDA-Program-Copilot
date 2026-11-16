@@ -436,6 +436,7 @@ tr.grp td{background:var(--panel3);font-weight:700;color:var(--text-dim);padding
 .prop-reason{font-size:11.5px;color:var(--text-dimmer);margin-bottom:10px;}
 .prop-actions{display:flex;gap:8px;}
 .btn-approve{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.4);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-xs{padding:2px 8px !important;font-size:11px !important;margin-left:6px;vertical-align:middle;}
 .btn-reject{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
 /* Edge-of-page hint for scroll-to-next-view. Shown only while you are actually at an edge with
    somewhere to go, and it fills up as you keep scrolling, so the jump is something you can feel
@@ -4145,7 +4146,7 @@ async function pmcApi(method, path, body){
     headers: Object.assign({'Content-Type':'application/json'}, PMC.token ? {Authorization:`Bearer ${PMC.token}`} : {}),
     body: body ? JSON.stringify(body) : undefined });
   const data = await res.json().catch(()=>({}));
-  if(!res.ok) throw Object.assign(new Error(data.error || `HTTP ${res.status}`), {status:res.status});
+  if(!res.ok) throw Object.assign(new Error(data.error || `HTTP ${res.status}`), {status:res.status, code:data.code});
   return data;
 }
 const can = a => !!(PMC.me && PMC.me.perms && PMC.me.perms.actions.includes(a));
@@ -4169,6 +4170,7 @@ async function pmcRefresh(){
         me.perms.pages.includes('history') ? pmcApi('GET','/api/meetings') : {meetings:[]},
         me.perms.pages.includes('history') ? pmcApi('GET','/api/audit') : {audit:[]}]);
       PMC.me = me; PMC.suggestions = sg.suggestions; PMC.meetings = mt.meetings; PMC.audit = au.audit;
+      PMC.jira = PMC.health.jiraAuth === 'per-person' ? await pmcApi('GET','/api/jira/connection').catch(()=>null) : null;
     }catch(e){
       if(e.status===401) return authSignOut(true);
       PMC.error = e.message;
@@ -4183,12 +4185,41 @@ async function pmcSync(){
   PMC.busy = false; await pmcRefresh();
 }
 
+/* ---------- per-person Jira sign-in ----------
+   When the server has Atlassian sign-in set up, each approval is written to Jira as the person who
+   approved it. They connect once; Atlassian sends the browser back to the dashboard afterwards. */
+function pmcJiraWhoHTML(){
+  if(!PMC.health || PMC.health.jiraAuth!=='per-person' || !PMC.jira || !can('approve')) return '';
+  if(PMC.jira.connected) return ` · ${T('as','以')} <b>${esc(PMC.jira.account.name||PMC.jira.account.email||'')}</b>${T('',' 身份写入')}
+    <button class="btn-ghost btn-xs" onclick="pmcJiraDisconnect()" title="${T('Forget my Jira access on this server','在服务器上删除我的 Jira 授权')}">${T('Disconnect','断开')}</button>`;
+  return ` · <button class="btn-approve btn-xs" onclick="pmcJiraConnect()">${T('Connect my Jira','连接我的 Jira')}</button>`;
+}
+async function pmcJiraConnect(){
+  try{ const r = await pmcApi('POST','/api/jira/connect'); location.href = r.url; }
+  catch(e){ showToast(T('Could not start Jira sign-in','无法连接 Jira'), e.message); }
+}
+async function pmcJiraDisconnect(){
+  try{ PMC.jira = Object.assign(PMC.jira||{}, await pmcApi('POST','/api/jira/disconnect')); showToast(T('Jira disconnected','已断开 Jira'), ''); pmcRender(); }
+  catch(e){ showToast(T('Could not disconnect','断开失败'), e.message); }
+}
+/* Coming back from Atlassian: say how it went, then drop the marker from the address bar. */
+(function(){
+  try{
+    const q = new URLSearchParams(location.search);
+    if(!q.has('jira') && !q.has('jira_error')) return;
+    const ok = q.get('jira')==='connected', msg = q.get('jira_error');
+    history.replaceState(null, '', location.pathname + location.hash);
+    setTimeout(()=> ok ? showToast(T('Jira connected','Jira 已连接'), T('Approvals are now written to Jira as you','之后的批准会以你的身份写入 Jira'))
+                       : showToast(T('Jira not connected','Jira 未连接'), msg||''), 800);
+  }catch(e){}
+})();
+
 /* ---------- top bar (shared by both pages) ---------- */
 function pmcBarHTML(){
   if(PMC.me){
     const h = PMC.health || {};
     return `<span class="who"><span class="live-dot"></span>${esc(PMC.me.displayName)} · ${esc((PMC.me.perms.roles||[]).join(', ')||T('No role','无角色'))}</span>
-      <span>· Jira: <b style="color:${h.jiraDryRun?'var(--orange)':'var(--green)'}">${h.jiraDryRun?T('dry run, nothing is written','演练模式,不写入'):T('live','实时写入')}</b></span>
+      <span>· Jira: <b style="color:${h.jiraDryRun?'var(--orange)':'var(--green)'}">${h.jiraDryRun?T('dry run, nothing is written','演练模式,不写入'):T('live','实时写入')}</b>${pmcJiraWhoHTML()}</span>
       <span>· Granola: ${h.granola ? (h.lastGranolaSync ? T(`last sync ${fmtDT(h.lastGranolaSync)}`,`上次同步 ${fmtDT(h.lastGranolaSync)}`) : T('not synced yet','尚未同步')) : T('no API key','未配置 API key')}</span>
       <span class="sp"></span>
       ${can('ingest') && h.granola ? `<button class="btn-ghost" onclick="pmcSync()">${T('Sync Granola now','立即同步 Granola')}</button>` : ''}
@@ -4295,7 +4326,14 @@ async function pmcApprove(id){
     const s = await pmcApi('POST',`/api/suggestions/${id}/approve`);
     const i = PMC.suggestions.findIndex(x=>x.id===id); if(i>=0) PMC.suggestions[i] = Object.assign(PMC.suggestions[i], s);
     showToast(s.jira&&s.jira.dryRun ? T('Approved (dry run)','已批准(演练)') : T('Written to Jira','已写入 Jira'), s.title);
-  }catch(e){ showToast(T('Could not approve','审批失败'), e.message); }
+  }catch(e){
+    if(e.code==='jira_connect_required'){
+      PMC.busy = false;
+      showToast(T('Connect your Jira first','请先连接你的 Jira'), T('Taking you to Atlassian — approve again when you are back','正在跳转到 Atlassian 授权,回来后再点一次批准'));
+      return setTimeout(pmcJiraConnect, 1200);
+    }
+    showToast(T('Could not approve','审批失败'), e.message);
+  }
   PMC.busy = false; pmcRefresh();
 }
 /* Reject asks for its reason in a dialog. The old inline box looked finished after typing, but
