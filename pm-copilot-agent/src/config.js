@@ -29,7 +29,7 @@ const CLIENT_OPTIONS = {
 
 module.exports = {
   ROOT,
-  DATA_DIR: path.join(ROOT, 'data'),
+  DATA_DIR: process.env.DATA_DIR || path.join(ROOT, 'data'),   // tests point this at a temp copy
   anthropic: { apiKey: env('ANTHROPIC_API_KEY'), model: env('ANTHROPIC_MODEL', 'claude-sonnet-5-5') },
   granola: {
     apiKey: env('GRANOLA_API_KEY'),
