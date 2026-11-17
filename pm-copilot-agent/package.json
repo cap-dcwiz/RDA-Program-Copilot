@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "grant": "node scripts/grant-access.js",
     "sync": "node scripts/sync-once.js",
-    "test": "node test/smoke.js && node test/reporter.js && node test/filters.js && node test/feed.js && node test/health.js"
+    "test": "node test/smoke.js && node test/reporter.js && node test/filters.js && node test/feed.js && node test/health.js && node test/backfill.js"
   },
   "engines": {
     "node": ">=18"
