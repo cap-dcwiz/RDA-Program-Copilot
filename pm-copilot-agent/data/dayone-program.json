@@ -292,10 +292,10 @@
       "health": "risk",
       "progress": 70,
       "next": "Live BMS API for NTP-E targeted 20 Nov (Istofa with the BMS contractor and Kianonn Tan); Sherry to send the BMS point list; BMS is read-only for now",
-      "due": "08/21",
+      "due": "11/26",
       "ms": "MS2",
       "gs": "2026-08-12",
-      "ge": "2026-09-05"
+      "ge": "2026-11-26"
     },
     {
       "id": "03",
@@ -309,10 +309,10 @@
       "health": "risk",
       "progress": 75,
       "next": "Ground floor (all 6 halls) and chiller plants A/B received; Justin to extract Level 1 data by 20 Nov with the batch templates; upper floors about a month late",
-      "due": "11/20",
+      "due": "11/27",
       "ms": "MS2",
       "gs": "2026-07-31",
-      "ge": "2026-11-20",
+      "ge": "2026-11-27",
       "targetOriginal": "2026-08-14"
     },
     {
@@ -327,10 +327,10 @@
       "health": "fine",
       "progress": 85,
       "next": "Merge the three models into one holistic ground-floor model (6 halls + chiller plants A/B), validate the whole ground floor by 27 Nov, then Valdy review",
-      "due": "08/21",
+      "due": "11/27",
       "ms": "MS2",
       "gs": "2026-08-26",
-      "ge": "2026-09-15"
+      "ge": "2026-11-27"
     },
     {
       "id": "05",
@@ -342,12 +342,12 @@
       "owner": "Mingchen / Valdy",
       "status": "inprogress",
       "health": "good",
-      "progress": 90,
+      "progress": 100,
       "next": "All six ground-floor halls (E-GA to E-GF) validated; reuse as the template for upper floors once their data arrives",
-      "due": "08/20",
+      "due": "11/20",
       "ms": "MS2",
       "gs": "2026-08-17",
-      "ge": "2026-08-28",
+      "ge": "2026-11-20",
       "targetOriginal": "2026-08-17"
     },
     {
@@ -447,10 +447,10 @@
       "health": "risk",
       "progress": 30,
       "next": "Waits on the live BMS API (task 02) and on deploying edge services to the NTP-E VMs (VMs ready, services not yet deployed)",
-      "due": "09/05",
+      "due": "12/04",
       "ms": "—",
       "gs": "2026-08-20",
-      "ge": "2026-09-10"
+      "ge": "2026-12-04"
     },
     {
       "id": "10",
@@ -481,7 +481,7 @@
       "health": "fine",
       "progress": 25,
       "next": "Backtest on Apr–Jun data running; preliminary figures to DayOne next week, framed as not final",
-      "due": "09/15",
+      "due": "01/10",
       "ms": "—",
       "gs": "2026-12-10",
       "ge": "2027-01-10"
@@ -498,7 +498,7 @@
       "health": "fine",
       "progress": 45,
       "next": "Per-sensor buffers set from RMSE (23 °C ground floor, 24 °C upper floors); next: stress-test with bad inputs (drift, spikes, COV data) and add a data filter once the API is live",
-      "due": "09/20",
+      "due": "02/15",
       "ms": "—",
       "gs": "2027-01-10",
       "ge": "2027-02-15"
@@ -515,10 +515,10 @@
       "health": "risk",
       "progress": 0,
       "next": "Waits on the live BMS API (task 02); no new date agreed",
-      "due": "10/05",
+      "due": "12/18",
       "ms": "—",
-      "gs": "2026-10-05",
-      "ge": "2026-10-20"
+      "gs": "2026-12-01",
+      "ge": "2026-12-18"
     },
     {
       "id": "14",
@@ -528,14 +528,14 @@
       "month": 4,
       "monthLabel": "Month 4 · Oct 2026 · Optimization Deployment (Human-in-Loop)",
       "owner": "Valdy",
-      "status": "notstarted",
+      "status": "inprogress",
       "health": "none",
       "progress": 0,
       "next": "First step: on-site manual test plan (condenser-water setpoint step test, 2-chiller run, fan-speed low limit) to Justin and Jackie; BMS write access still unconfirmed",
-      "due": "10/15",
+      "due": "12/05",
       "ms": "—",
-      "gs": "2026-10-15",
-      "ge": "2026-11-01"
+      "gs": "2026-11-20",
+      "ge": "2026-12-05"
     },
     {
       "id": "15",
@@ -549,10 +549,10 @@
       "health": "none",
       "progress": 0,
       "next": "Dry-run simulation and what-if analysis once the holistic model is trained (RDA roadmap, 30 Oct)",
-      "due": "10/20",
+      "due": "12/18",
       "ms": "—",
-      "gs": "2026-10-20",
-      "ge": "2026-11-10"
+      "gs": "2026-11-27",
+      "ge": "2026-12-18"
     }
   ],
   "MILESTONE": {

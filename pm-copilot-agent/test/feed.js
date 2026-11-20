@@ -32,7 +32,7 @@ const jira = require('../src/jira');
         { taskId: '03', field: 'due', newValue: '2026-11-25', confidence: 'confirmed', evidence: 'by 25 Nov', reason: 'Date stated.' },
         { taskId: '04', field: 'status', newValue: 'done', confidence: 'confirmed', evidence: 'x', reason: 'Jira owns this' },
         { taskId: '04', field: 'health', newValue: 'good', confidence: 'confirmed', evidence: 'validated', reason: 'Validated.' },
-        { taskId: '05', field: 'progress', newValue: 90, confidence: 'confirmed', evidence: 'x', reason: 'Same as now' },
+        { taskId: '05', field: 'progress', newValue: 100, confidence: 'confirmed', evidence: 'x', reason: 'Same as now' },
         { taskId: '99', field: 'progress', newValue: 10, confidence: 'confirmed', evidence: 'x', reason: 'No such task' },
         { taskId: '12', field: 'progress', newValue: 140, confidence: 'confirmed', evidence: 'x', reason: 'Out of range' },
       ],
