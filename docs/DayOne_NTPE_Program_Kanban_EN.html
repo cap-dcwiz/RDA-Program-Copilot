@@ -3655,7 +3655,30 @@ function initProgram(data){
 
 /* Brief and recommendation are static spans with data-i18n-en/zh; swap in the data file's text so
    the language toggle keeps working. */
+/* Dates baked into the page chrome when it was built in August: the MS2 date (08/28) and which
+   month card is "current". Rewritten from the plan data so they follow MILESTONE and the phase. */
+function applyPlanDates(){
+  const ms = (typeof MILESTONE!=='undefined' && MILESTONE.due) || '08/28';
+  const msIso = (typeof MILESTONE!=='undefined' && MILESTONE.date) || '2026-08-28';
+  const fix = (v) => v.replace(/08\/28 MS2/g, `${ms} MS2`);
+  document.querySelectorAll('[data-i18n-en],[data-i18n-zh]').forEach(el => {
+    for (const a of ['data-i18n-en','data-i18n-zh']) { const v = el.getAttribute(a); if (v && v.includes('08/28 MS2')) el.setAttribute(a, fix(v)); }
+  });
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n;
+  while ((n = w.nextNode())) {
+    if (n.textContent.includes('08/28 MS2')) n.textContent = fix(n.textContent);
+    else if (n.textContent.includes('2026-08-28') && n.parentElement && n.parentElement.closest('[data-node="MS2"]')) n.textContent = n.textContent.replace('2026-08-28', msIso);
+  }
+  // The month list marks one card "current"; it was fixed at Month 2 (Aug).
+  const now = typeof phaseNow === 'function' ? phaseNow() : 2;
+  document.querySelectorAll('.month-card').forEach((c, i) => {
+    c.classList.toggle('current', i + 1 === now);
+    // The month under the title is the plan's calendar month; the project can be behind it, so say "phase".
+    const sub = c.querySelector('.mh-txt > span'); if (sub) sub.textContent = sub.textContent.replace(/\s*(\(current\)|· current phase|· 当前阶段)$/, '') + (i + 1 === now ? ` · ${T('current phase','当前阶段')}` : '');
+  });
+}
 function applyOverview(){
+  applyPlanDates();
   if(!OVERVIEW) return;
   const set = (el, v) => { if(!el || !v) return; el.setAttribute('data-i18n-en', v.en); el.setAttribute('data-i18n-zh', v.zh || v.en); el.textContent = T(v.en, v.zh || v.en); };
   set(document.querySelector('#page-overview .banner .banner-text span'), OVERVIEW.brief);
@@ -5200,7 +5223,7 @@ function applyDataSources(){
   document.querySelectorAll('.side-card').forEach(sc=>{
     const h = sc.querySelector('h3'); if(!h) return; const tx = h.textContent;
     if(/Current Phase Focus|当前阶段重点/.test(tx)) dsMark(sc, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), 'h3');
-    else if(/Upcoming Milestones|即将到来的里程碑/.test(tx)) dsMark(sc, 'plan', 'plan', T(`Original plan · 21 Aug · MS2 ${asOfShort()}`,`原始计划 · 8/21 · MS2 ${asOfZh()}`), 'h3');   // MS3–MS6 have not been re-planned
+    else if(/Upcoming Milestones|即将到来的里程碑/.test(tx)) dsMark(sc, 'plan', 'plan', T(`Original plan · 21 Aug · MS2 ${MILESTONE.due}`,`原始计划 · 8/21 · MS2 ${MILESTONE.due}`), 'h3');   // MS3–MS6 have not been re-planned
     else if(/Project Information|项目信息/.test(tx)) dsMark(sc, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), 'h3');
   });
   // Meetings page
