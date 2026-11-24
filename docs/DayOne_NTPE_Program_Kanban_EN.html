@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Delivery Copilot · Portfolio</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAEYUlEQVR42u3cz28UZRzH8e982dIfJiSakMChHmwilbLRw1TTE/8AGk4cIBz0UFswIfHAyUMTvMhBYyJQemgTSzXpiX+BAyGlc1CrsJjARRNCMGIIP4qX9bTJutDdnZlnZ+b7PO/XFbrZmc9nntmZ55kRAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVRc1m032ggde/LpVf/TDj7+IiDz76WcRERl7710ZrR86MVKvbw0fqm9RABHZTpK427+PxHFibXseXri4+fjaja7/b//ZM/NvzM0tBluAvxcX555u3LzUa0d121lV3Kb757+9lOZvOrctiAJk2VEiIhPrq9NVHRGyblPndnlfgDw7qqolyLtNIiJT925HIiJK+N3dPXZys9fvhqLl3abWvvG6AC7Cr2IJWsG5KpESvq0SPN246Wy7XtxpTCrh2ypBP1cx/fq38fsBJfz0JfBlfz1v3LqqhJ/eHx9/4s2lkxJ+tmHYhxKMTh48qoRvqwR7Ds8wApQdvi8jwe7Jt+8o4dsqwd7Tp6ZdfdbwgcmGEr6tEozEceLiNLD/7Jl5k6eAqoVfRgnyjgLtM4KmJoOqGn7nj7TxleVIClgHkOWeROf3U8K3ORKMxHEysb46nfbI7yynEv5gSuBq0qZXCabu3Y5a5/NuR/3E+uq0yRVB1sIvc2XRdpLEz9rmKsbiOOm1lqHSBbAcvpXlZUr4MvDFG0WcDrwqgC/hWyiBEn7YJVDCD7sESvhhl0AJP+wSKOGHXQIl/LBLoIQfdglKuROYdSZLXnGPe+/pUy89utXaoZYKVtYdw8IL4CL8nYLP+uh0yCUotAAuws+ykyydboouQWEFKCt8aVvLz0hQUgFcnfNbjzSX+R18K4FaCb/XogfpY/FE3s8o+uqgiOcQ1UL4IiIujoYxY+//KeJhVLUQvjhcQmXtPsGgS6AWwnf5OJTrR6usl0BDOPJ9MKgSKOGHXQJnl4GDDj/PJWC73956x/xj3S7fXKZWjnwXza/y4syyRgK1Muw/vHCRU8sASqBW3pnz+NqNXKOAj9PPLg4KtfSunKyt306S2Me1By6eQ9Q84ZcxuXL32MnNNOdy369M8pYg01VAFWbW+pkssTQDKCU9lp66AFXbqXsOz8hrH7w/3/k2zVCCz1uCVAUI6YgKpQRK+GH/JlDCD7sESvh+ziL2WwIl/P7frWNpRVG/r6rZtbCwQPg9jvx9X577UERkNI6T2nDtwZPrG0esfP8n1zeO1IZrD0Z3mDx6ZQEIf+df1L6V4KUCEH7vyymfSvC/+wCEn+5a2uL+6ryDqu2zZYSf7kbK+MpyZO3qoPNh1KjZbPKkruRbeWR5JIj+WVs7/ucX59aIPt9SK4slePObr47qX99fWWPYn8m9zs7i6eB549bVmgwNSbR7KNybPJ9/9unrs7NLLj5rfGU5erS0NHv/6+8uW9j2sYNTHzHuAwAAAAAAAAAAAAAAAAAAAAAAAAAAAABQff8BsVyVxnVCCOsAAAAASUVORK5CYII=">
 <style>
 :root{
   --bg:#080b16; --bg2:#0b0f1e;
@@ -866,13 +867,16 @@ body.gated{padding-left:0;}
   .dep-grid{grid-template-columns:1fr 1fr;}
   .rm-body{grid-template-columns:1fr;}
 }
+/* RDA logo in the brand tiles (header, icon rail, agent panel): red mark on a white tile. */
+.brand .logo,.icon-rail .rail-logo,.ag-brand .logo{background:#fff !important;}
+.rda-logo{width:78%;height:78%;object-fit:contain;display:block;}
 </style>
 </head>
 <body>
 <!-- ===== SIGN-IN GATE (PM Copilot agent) ===== -->
 <div class="auth-gate" id="authGate" hidden>
   <form class="ag-card" onsubmit="authLogin(event)" autocomplete="on">
-    <div class="ag-brand"><div class="logo">D</div><div><b>Delivery Copilot</b><span>RDA</span></div></div>
+    <div class="ag-brand"><div class="logo"><img class="rda-logo" src="" alt="RDA" data-rda-logo></div><div><b>Delivery Copilot</b><span>RDA</span></div></div>
     <h1><span data-i18n-en="Sign in" data-i18n-zh="登录">Sign in</span></h1>
     <p><span data-i18n-en="Sign in with your AI-factory Product Center account — the same one you use at ai-factory.demo.rda.ai. What you see here depends on your role." data-i18n-zh="使用你的 AI-factory Product Center 账号登录 — 与 ai-factory.demo.rda.ai 相同。此处可见内容取决于你的角色。">Sign in with your AI-factory Product Center account — the same one you use at ai-factory.demo.rda.ai. What you see here depends on your role.</span></p>
     <label><span data-i18n-en="Username" data-i18n-zh="用户名">Username</span><input id="agUser" name="username" autocomplete="username" required></label>
@@ -888,7 +892,7 @@ body.gated{padding-left:0;}
 </div>
 <!-- ===== LEFT ICON RAIL (global nav) ===== -->
 <div class="icon-rail">
-  <div class="rail-logo">D</div>
+  <div class="rail-logo"><img class="rda-logo" src="" alt="RDA" data-rda-logo></div>
   <div class="rail-icon active" data-page="portfolio" title="Portfolio" onclick="goPage('portfolio')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
   <div class="rail-icon" data-page="todo" title="Meeting To-dos" onclick="goPage('todo')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="rail-dot" id="railTodoDot" style="display:none"></span></div>
   <div class="rail-icon" data-page="history" title="Meeting History" onclick="goPage('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -922,7 +926,7 @@ body.gated{padding-left:0;}
     </svg>
     <div class="topbar-row">
       <div class="brand">
-        <div class="logo">D</div>
+        <div class="logo"><img class="rda-logo" src="" alt="RDA" data-rda-logo></div>
         <div class="brand-text">
           <div class="brand-title">Delivery Copilot</div>
           <div class="brand-sub"><span data-i18n-en="Make RDA delivery scalable." data-i18n-zh="让 RDA 交付更具可扩展性。">Make RDA delivery scalable.</span></div>
@@ -1841,6 +1845,7 @@ function miniBadge(b){ return `<span class="badge ${b.color}" style="padding:2px
 let TASKS = [];
 let MILESTONE = {};
 // Set from the plan data in initProgram(); declared here because the sidebars render before sign-in.
+document.addEventListener('DOMContentLoaded', () => { const src = (document.querySelector('link[rel="icon"]') || {}).href; if (src) document.querySelectorAll('img[data-rda-logo]').forEach(i => { i.src = src; }); });
 let PROGRAM_ASOF = '2026-08-21';
 let OVERVIEW = null;   // brief, recommendation, phase focus: PM text kept with the plan data so a refresh is a data edit
 const TODAY = new Date(new Date(Date.now()+8*3600e3).toISOString().slice(0,10));   // today, Singapore
@@ -3580,9 +3585,22 @@ function loadState(){
   let s;
   try{ s = JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); }catch(e){ return false; }
   if(!s || s.v !== 1) return false;
-  Object.entries(s.taskOverrides||{}).forEach(([id,fields])=>{ if(TASKS_BY_ID[id]) Object.assign(TASKS_BY_ID[id], fields); });
+  /* The server is the source of truth for the plan, its meetings, proposals and change log: plan
+     edits and review decisions are stored there and re-applied on load (pmcPlanLoad). This browser
+     copy used to replace all of it, so a browser that had opened the page in August kept showing
+     August — whatever the server had since. Now only what exists nowhere else comes back from it:
+     meetings imported by hand in this browser (they carry `raw`) with their proposals, and the
+     action list. Task overrides are no longer restored; the server's plan edits cover them. */
+  const known = new Set(MEETINGS.map(m => `${m.date}|${String(m.title).trim().toLowerCase()}`));
+  const ids = new Set(MEETINGS.map(m => m.id)), remap = {};
+  (s.meetings||[]).filter(m => m.raw !== undefined && !known.has(`${m.date}|${String(m.title).trim().toLowerCase()}`)).forEach(m => {
+    const id = ids.has(m.id) ? 'local-' + m.id : m.id; remap[m.id] = id; ids.add(id);
+    MEETINGS.push(Object.assign({}, m, { id }));
+  });
+  (s.proposals||[]).filter(p => remap[p.meetingId]).forEach(p => PROPOSALS.push(Object.assign({}, p, { meetingId: remap[p.meetingId], id: String(p.id).startsWith('local-') ? p.id : 'local-' + p.id })));
+  MEETINGS.sort((x, y) => String(y.date).localeCompare(String(x.date)));
   const swap = (arr, next) => { arr.length = 0; (next||[]).forEach(x=>arr.push(x)); };
-  swap(MEETINGS, s.meetings); swap(PROPOSALS, s.proposals); swap(CHANGELOG, s.changelog); swap(ACTIONS, s.actions);
+  swap(ACTIONS, s.actions);
   _actionSeq = s.actionSeq || 0; _logSeq = s.logSeq || 0;
   currentMeetingId = (MEETINGS.find(m=>m.id===s.currentMeetingId) ? s.currentMeetingId : (MEETINGS[0]||{}).id);
   return true;
