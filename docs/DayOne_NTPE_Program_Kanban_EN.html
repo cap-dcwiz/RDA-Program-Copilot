@@ -70,7 +70,6 @@ svg.i{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke
   background:var(--panel3);border:1px solid var(--border);color:var(--text);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
 .project-select span.lbl{color:var(--text-dim);font-weight:500;}
 .project-select svg.i{width:13px;height:13px;color:var(--text-dim);}
-.mascot{position:absolute;top:-26px;right:18px;width:64px;height:64px;pointer-events:none;user-select:none;}
 .tabs{display:flex;gap:4px;background:var(--panel3);padding:4px;border-radius:11px;border:1px solid var(--border);}
 .tab{padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--text-dim);cursor:pointer;
   border:none;background:transparent;white-space:nowrap;transition:.15s;}
@@ -910,20 +909,6 @@ body.gated{padding-left:0;}
 
   <!-- ===== HEADER ===== -->
   <div class="topbar">
-    <svg class="mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="mascotGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#6d5ef8"/>
-      </linearGradient></defs>
-      <circle cx="30" cy="24" r="9" fill="url(#mascotGrad)" opacity=".9"/>
-      <circle cx="70" cy="20" r="7" fill="url(#mascotGrad)" opacity=".9"/>
-      <rect x="24" y="30" width="52" height="44" rx="16" fill="url(#mascotGrad)"/>
-      <rect x="34" y="42" width="32" height="20" rx="6" fill="#0a0e1c"/>
-      <text x="50" y="57" font-size="12" font-weight="700" fill="#7dd3fc" text-anchor="middle" font-family="monospace">&gt;_</text>
-      <rect x="14" y="46" width="8" height="16" rx="4" fill="url(#mascotGrad)"/>
-      <rect x="78" y="46" width="8" height="16" rx="4" fill="url(#mascotGrad)"/>
-      <rect x="38" y="76" width="10" height="14" rx="4" fill="url(#mascotGrad)"/>
-      <rect x="52" y="76" width="10" height="14" rx="4" fill="url(#mascotGrad)"/>
-    </svg>
     <div class="topbar-row">
       <div class="brand">
         <div class="logo"><img class="rda-logo" src="" alt="RDA" data-rda-logo></div>
@@ -964,7 +949,7 @@ body.gated{padding-left:0;}
         <button class="tab" data-page="dependency" data-scope="project"><span data-i18n-en="Dependency View" data-i18n-zh="依赖关系图">Dependency View</span></button>
         <button class="tab" data-page="roadmap" data-scope="project"><span data-i18n-en="Roadmap View" data-i18n-zh="路线图">Roadmap View</span></button>
         <button class="tab" data-page="meetings" data-scope="project"><span data-i18n-en="Meetings" data-i18n-zh="会议">Meetings</span><span id="pendingBadge" style="display:none;margin-left:6px;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;"></span></button>
-        <button class="tab" data-page="luna" data-scope="project"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;">3</span></button>
+        <button class="tab" data-page="luna" data-scope="project"><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span style="margin-left:6px;background:var(--purple2);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:800;" id="lunaTabCount">0</span></button>
       </div>
     </div>
   </div>
@@ -1221,18 +1206,18 @@ body.gated{padding-left:0;}
         <div class="panel-title"><div class="icon-box" style="background:var(--violet-bg);color:var(--violet)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span data-i18n-en="Luna Queue" data-i18n-zh="Luna 队列">Luna Queue</span><span class="ai-tag"><span data-i18n-en="Preview" data-i18n-zh="预览">Preview</span></span></div>
         <div class="mini-queue-row">
           <span class="mq-icon" style="background:var(--blue-bg);color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-          <span class="mq-count">3</span><span class="mq-label"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></span>
+          <span class="mq-count" id="lunaMqReview">0</span><span class="mq-label"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></span>
         </div>
         <div class="mini-queue-row">
           <span class="mq-icon" style="background:var(--orange-bg);color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-          <span class="mq-count">2</span><span class="mq-label"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span>
+          <span class="mq-count" id="lunaMqWaiting">0</span><span class="mq-label"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span>
         </div>
         <div class="mini-queue-row">
           <span class="mq-icon" style="background:var(--red-bg);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-          <span class="mq-count">1</span><span class="mq-label"><span data-i18n-en="Escalation Suggested" data-i18n-zh="建议升级">Escalation Suggested</span></span>
+          <span class="mq-count" id="lunaMqEscalate">0</span><span class="mq-label"><span data-i18n-en="Escalation Suggested" data-i18n-zh="建议升级">Escalation Suggested</span></span>
         </div>
         <div class="mq-recent-label"><span data-i18n-en="Recent" data-i18n-zh="最近">Recent</span></div>
-        <div class="mq-recent-row"><span><b>DT-024</b> · Historical BMS Data</span><span class="badge red"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span></div>
+        <div id="lunaMqRecent"></div>
         <a class="panel-link" onclick="goPage('luna')"><span data-i18n-en="Open Luna Queue" data-i18n-zh="打开 Luna 队列">Open Luna Queue</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
 
@@ -1760,42 +1745,12 @@ body.gated{padding-left:0;}
       <p><span data-i18n-en="A queue of items Luna (the AI assistant) has flagged for human review, response, or escalation" data-i18n-zh="Luna(AI 助手)标记为需要人工审核、回复或升级处理的事项队列">A queue of items Luna (the AI assistant) has flagged for human review, response, or escalation</span></p>
     </div>
 
-    <div class="banner" style="margin-bottom:18px;">
-      <div class="icon-box"><svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-      <div>
-        <div class="banner-title"><span data-i18n-en="Preview" data-i18n-zh="预览">Preview</span></div>
-        <div class="banner-text"><span data-i18n-en="This page is a preview of an upcoming feature — the counts and rows below are placeholder content, not live data. Once wired up, Luna Queue will surface anything the AI assistant thinks needs a human decision: ambiguous Change Proposals, stalled owners, and items worth escalating." data-i18n-zh="此页面是即将推出功能的预览 — 下方的数量与行均为占位内容,并非实时数据。接入真实数据后,Luna 队列将展示 AI 助手认为需要人工决策的事项:含糊的变更提案、停滞的负责人,以及值得升级的事项。">This page is a preview of an upcoming feature — the counts and rows below are placeholder content, not live data. Once wired up, Luna Queue will surface anything the AI assistant thinks needs a human decision: ambiguous Change Proposals, stalled owners, and items worth escalating.</span></div>
-      </div>
-    </div>
-
-    <div class="stats" style="grid-template-columns:repeat(3,1fr);">
-      <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--blue-bg);color:var(--blue)"><svg class="i" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-label"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></div></div>
-        <div class="stat-value">3</div>
-        <div class="stat-sub"><span data-i18n-en="Change Proposals awaiting your Approve / Reject" data-i18n-zh="等待你批准／拒绝的变更提案">Change Proposals awaiting your Approve / Reject</span></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--orange-bg);color:var(--orange)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></div></div>
-        <div class="stat-value">2</div>
-        <div class="stat-sub"><span data-i18n-en="Owners pinged, no reply yet" data-i18n-zh="已提醒负责人,尚无回复">Owners pinged, no reply yet</span></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top"><div class="icon-box" style="background:var(--red-bg);color:var(--red)"><svg class="i" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label"><span data-i18n-en="Escalation Suggested" data-i18n-zh="建议升级">Escalation Suggested</span></div></div>
-        <div class="stat-value">1</div>
-        <div class="stat-sub"><span data-i18n-en="Luna thinks this needs a manager's attention" data-i18n-zh="Luna 认为这需要管理者关注">Luna thinks this needs a manager's attention</span></div>
-      </div>
-    </div>
-
+    <div class="stats" style="grid-template-columns:repeat(3,1fr);" id="lunaStats"></div>
     <div class="panel">
-      <div class="panel-title"><div class="icon-box" style="background:var(--purple-bg);color:var(--purple)"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span data-i18n-en="Queue" data-i18n-zh="队列">Queue</span></div>
+      <div class="panel-title"><span data-i18n-en="Queue" data-i18n-zh="队列">Queue</span><span class="ds-tag" style="margin-left:8px"><span data-i18n-en="Live · approvals, Jira and the plan" data-i18n-zh="实时 · 审批、Jira 与计划">Live · approvals, Jira and the plan</span></span></div>
       <table>
         <thead><tr><th><span data-i18n-en="ID" data-i18n-zh="编号">ID</span></th><th><span data-i18n-en="Item" data-i18n-zh="事项">Item</span></th><th><span data-i18n-en="Reason" data-i18n-zh="原因">Reason</span></th><th><span data-i18n-en="Status" data-i18n-zh="状态">Status</span></th></tr></thead>
-        <tbody>
-          <tr><td>DT-024</td><td><span data-i18n-en="03 Historical BMS Data" data-i18n-zh="03 历史 BMS 数据">03 Historical BMS Data</span></td><td><span data-i18n-en="Root blocker, overdue against original target" data-i18n-zh="根本阻塞项,相对原始目标已逾期">Root blocker, overdue against original target</span></td><td><span class="badge red"><span data-i18n-en="Overdue" data-i18n-zh="已逾期">Overdue</span></span></td></tr>
-          <tr><td>DT-025</td><td><span data-i18n-en="02 Data Point / API Integration" data-i18n-zh="02 数据点／API 集成">02 Data Point / API Integration</span></td><td><span data-i18n-en="Completion date was TBC for 2 weeks" data-i18n-zh="完成日期悬而未定已2周">Completion date was TBC for 2 weeks</span></td><td><span class="badge orange"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span></td></tr>
-          <tr><td>DT-026</td><td><span data-i18n-en="08 Chiller Plant Modelling (E+)" data-i18n-zh="08 冷机房建模(E+)">08 Chiller Plant Modelling (E+)</span></td><td><span data-i18n-en="Geometry flagged as incorrect, no update since 08/19" data-i18n-zh="几何模型被标记为不正确,自08/19起无更新">Geometry flagged as incorrect, no update since 08/19</span></td><td><span class="badge orange"><span data-i18n-en="Waiting for Response" data-i18n-zh="等待回复">Waiting for Response</span></span></td></tr>
-          <tr><td>DT-027</td><td><span data-i18n-en="p14 · 03 Original Target Date change" data-i18n-zh="p14 · 03 原始目标日期变更">p14 · 03 Original Target Date change</span></td><td><span data-i18n-en="Confidence: confirmed, still pending review" data-i18n-zh="置信度:已确认,仍待审核">Confidence: confirmed, still pending review</span></td><td><span class="badge violet"><span data-i18n-en="Pending Review" data-i18n-zh="待审核">Pending Review</span></span></td></tr>
-        </tbody>
+        <tbody id="lunaRows"></tbody>
       </table>
     </div>
   </div>
@@ -3377,6 +3332,56 @@ function renderMeetingsPage(){
   if(document.getElementById('mt-history').classList.contains('active')) renderHistory();
   if(typeof applyDataSources==='function') applyDataSources();
 }
+/* Luna Queue, from live data: what needs a person on this project right now.
+     review   — Jira updates drafted from meetings (Meeting To-dos) and plan changes (Meetings)
+                that nobody has approved or rejected yet
+     waiting  — open tasks whose Jira ticket has had no update for over 14 days
+     escalate — open tasks past their date, or blocked */
+function lunaItems(){
+  const out = [], J = (typeof PLAN!=='undefined' && PLAN.jira && PLAN.jira.tasks) || {};
+  const days = (a, b) => Math.round((a - b) / 864e5);
+  const sug = ((typeof PMC!=='undefined' && PMC.suggestions) || []).filter(x => x.status==='pending' && (x.project==='dayone' || (x.projects||[]).includes('dayone')));
+  sug.forEach(x => { const mt = ((PMC.meetings || []).find(m => m.id === x.meetingId) || {}).title;
+    out.push({ kind:'review', id: x.jiraKey || T('New','新建'), item: x.title,
+      reason: mt ? T(`Jira update drafted from “${mt}”`, `根据「${mt}」起草的 Jira 更新`) : T('Jira update drafted from a meeting', '根据会议起草的 Jira 更新'), go:'todo' }); });
+  PROPOSALS.filter(p => p.status==='pending').forEach(p => {
+    const t = TASKS_BY_ID[p.entityId], m = MEETINGS.find(x => x.id===p.meetingId);
+    out.push({ kind:'review', id: p.entityId, item: `${t ? taskName(t) : p.entityId} · ${tr(fieldLabel(p.field))}`,
+      reason: T(`Plan change from “${m ? m.title : 'a meeting'}” (${m ? m.date : ''})`, `来自「${m ? m.title : '会议'}」(${m ? m.date : ''})的计划变更`), go:'meetings' });
+  });
+  TASKS.forEach(t => {
+    if (t.status==='done') return;
+    const j = J[t.id], due = t.ge ? new Date(t.ge) : parseDue(t.due), name = `${t.id} ${taskName(t)}`;
+    if (t.status==='blocked') out.push({ kind:'escalate', id: j ? j.key : t.id, item: name, reason: T('Blocked','阻塞'), go:'blocker' });
+    else if (due && due < TODAY) out.push({ kind:'escalate', id: j ? j.key : t.id, item: name,
+      reason: T(`${days(TODAY, due)} days past its date (${t.due})`, `已超过截止日期(${t.due})${days(TODAY, due)} 天`), go:'roadmap' });
+    else if (j && j.updated && days(TODAY, new Date(j.updated)) > 14) out.push({ kind:'waiting', id: j.key, item: name,
+      reason: T(`No update on the Jira ticket for ${days(TODAY, new Date(j.updated))} days`, `Jira 工单 ${days(TODAY, new Date(j.updated))} 天没有更新`), url: j.url });
+  });
+  return out;
+}
+function renderLunaQueue(){
+  const items = lunaItems(), n = (k) => items.filter(x => x.kind===k).length;
+  const K = { review:{ c:'violet', en:'Pending review', zh:'待审核' }, waiting:{ c:'orange', en:'Waiting for response', zh:'等待回复' }, escalate:{ c:'red', en:'Escalate', zh:'建议升级' } };
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('lunaTabCount', items.length); set('lunaMqReview', n('review')); set('lunaMqWaiting', n('waiting')); set('lunaMqEscalate', n('escalate'));
+  const stats = document.getElementById('lunaStats');
+  if (stats) stats.innerHTML = [
+    ['review', T('Approvals and plan changes nobody has decided yet','尚未批准或拒绝的 Jira 更新与计划变更'), 'blue'],
+    ['waiting', T('Open tasks with no Jira update for over 14 days','超过 14 天没有 Jira 更新的进行中任务'), 'orange'],
+    ['escalate', T('Open tasks past their date, or blocked','已过截止日期或被阻塞的任务'), 'red'],
+  ].map(([k, sub, c]) => `<div class="stat-card"><div class="stat-top"><div class="stat-label">${T(K[k].en, K[k].zh)}</div></div>
+      <div class="stat-value" style="color:var(--${c})">${n(k)}</div><div class="stat-sub">${sub}</div></div>`).join('');
+  const order = { escalate:0, waiting:1, review:2 };
+  const rows = items.slice().sort((a, b) => order[a.kind] - order[b.kind]);
+  const link = (x) => x.go ? `onclick="goPage('${x.go}')" style="cursor:pointer"` : (x.url ? `onclick="window.open('${esc(x.url)}','_blank')" style="cursor:pointer"` : '');
+  const tb = document.getElementById('lunaRows');
+  if (tb) tb.innerHTML = rows.length ? rows.map(x => `<tr ${link(x)}><td>${esc(x.id)}</td><td>${esc(x.item)}</td><td>${esc(x.reason)}</td>
+      <td><span class="badge ${K[x.kind].c}">${T(K[x.kind].en, K[x.kind].zh)}</span></td></tr>`).join('')
+    : `<tr><td colspan="4" style="color:var(--muted)">${T('Nothing needs a person right now.','目前没有需要处理的事项。')}</td></tr>`;
+  const rec = document.getElementById('lunaMqRecent');
+  if (rec) rec.innerHTML = rows.slice(0, 2).map(x => `<div class="mq-recent-row"><span><b>${esc(x.id)}</b> · ${esc(x.item)}</span><span class="badge ${K[x.kind].c}">${T(K[x.kind].en, K[x.kind].zh)}</span></div>`).join('');
+}
 function updatePendingBadge(){
   const pendingCount = PROPOSALS.filter(p=>p.status==='pending').length;
   const pb = document.getElementById('pendingBadge');
@@ -3629,6 +3634,7 @@ function render(){
   if(document.getElementById('page-blocker').classList.contains('active')) drawBimConnectors();
   if(document.getElementById('page-dependency').classList.contains('active')) drawDepConnectors();
   updatePendingBadge();
+  renderLunaQueue();
   if(document.getElementById('page-meetings').classList.contains('active')) renderMeetingsPage();
   if(typeof applyDataSources==='function') applyDataSources();
   saveState();
@@ -4234,6 +4240,7 @@ async function pmcRefresh(){
         me.perms.pages.includes('history') ? pmcApi('GET','/api/meetings') : {meetings:[]},
         me.perms.pages.includes('history') ? pmcApi('GET','/api/audit') : {audit:[]}]);
       PMC.me = me; PMC.suggestions = sg.suggestions; PMC.meetings = mt.meetings; PMC.audit = au.audit;
+      if (typeof TASKS!=='undefined' && TASKS.length) renderLunaQueue();
     }catch(e){
       if(e.status===401) return authSignOut(true);
       PMC.error = e.message;
@@ -5122,7 +5129,7 @@ function dsStripHTML(pid){
   const mtFields = TASKS.reduce((n,t)=>n + DS_FIELDS.filter(([f])=>dsField(t,f).k==='meeting').length, 0);
   const J = PLAN.jira;
   const parts = [];
-  if(pid==='luna'){ parts.push(dsKindTag('sample', T('Sample · whole page is a preview','示例 · 整页为预览'))); }
+  if(pid==='luna'){ parts.push(dsKindTag('calc', T('Calculated · approvals waiting, Jira activity, dates and blockers','系统计算 · 待审批、Jira 动态、日期与阻塞'))); }
   else if(pid==='meetings'){
     parts.push(dsKindTag('meeting', T(`Meeting minutes · ${MEETINGS.length} meetings · ${appr} changes approved, ${pend} waiting`,`会议纪要 · ${MEETINGS.length} 场会议 · 已批准 ${appr} 条,待审 ${pend} 条`)));
     parts.push(dsKindTag('plan', T('Current values: original plan / Jira','当前值:原始计划 / Jira')));
@@ -5162,7 +5169,7 @@ function applyDataSources(){
     document.querySelectorAll(`#page-${pid} .stat-card`).forEach(card=>{
       const kpi = card.querySelector('[data-kpi]:not([data-kpi$="-sub"])');
       let spec, k, label;
-      if(pid==='luna'){ spec = 'sample'; k = 'sample'; }
+      if(pid==='luna'){ spec = 'calc'; k = 'calc'; }
       else if(/Current Phase|当前阶段/.test(card.querySelector('.stat-label')?.textContent||'')){
         const ph = dsPhase(); spec = 'phase'; k = ph.k; label = ph.k==='jira' ? `Jira ${ph.key}` : T(`Plan · ${asOfShort()}`,`计划 · ${asOfZh()}`);
         const v = card.querySelector('.stat-value'), sb = card.querySelector('.stat-sub');
@@ -5230,13 +5237,12 @@ function applyDataSources(){
     ov.querySelectorAll('.panel').forEach(p=>{
       const title = p.querySelector('.panel-title'); if(!title) return;
       const tx = title.textContent;
-      if(/Luna|Internal Delivery|内部交付/.test(tx)) dsMark(p, 'sample', 'sample', null, '.panel-title');
+      if(/Internal Delivery|内部交付/.test(tx)) dsMark(p, 'sample', 'sample', null, '.panel-title');
       else if(/Actions to Follow|待跟进/.test(tx)) title.setAttribute('data-ds-skip','1');
     });
   }
   const reco = document.querySelector('#page-blocker .reco-card'); if(reco) dsMark(reco, 'static', 'static', T(`Fixed text · ${asOfShort()}`,`固定文字 · ${asOfZh()}`), 'h4');
   const luna = document.getElementById('page-luna');
-  if(luna) luna.querySelectorAll('.panel-title').forEach(pt=>dsMark(pt, 'sample', 'sample'));
   // Roadmap side cards
   document.querySelectorAll('.side-card').forEach(sc=>{
     const h = sc.querySelector('h3'); if(!h) return; const tx = h.textContent;
