@@ -4,6 +4,7 @@ const granola = require('./granola');
 const jira = require('./jira');
 const { analyseMeeting } = require('./claude');
 const cfg = require('./config');
+const teams = require('./teams');
 const feed = require('./programfeed');
 
 let syncing = null;
@@ -26,6 +27,9 @@ async function ingest(meeting, by) {
     for (const s of a.suggestions) db.suggestions.push({ id: store.id('sug'), meetingId: m.id, status: 'pending', createdAt: now, ...s });
     m.status = 'analysed'; m.suggestionCount = a.suggestions.length;
     store.audit(by, 'analyse', m.id, `${a.suggestions.length} suggestions from "${m.title}"`);
+    // Post the new to-dos to the Teams approval chat, if one is registered. Never fails the sync.
+    teams.postSuggestions(db.suggestions.filter(s => s.meetingId === m.id && s.status === 'pending'), m)
+      .then(r => r.posted && store.audit('luna', 'teams-post', m.id, `${r.posted} to-dos posted to Teams`)).catch(e => console.warn('[teams]', e.message));
     // A meeting about a project with a plan view also updates that view (meetings, change proposals,
     // change log, brief). A failure here leaves the Jira suggestions in place.
     const planProjects = (m.projects || []).includes('dayone') || /day\s*one/i.test(m.title || '') ? ['dayone'] : [];
@@ -82,8 +86,9 @@ async function decide(id, decision, user, extra = {}) {
     s.status = 'rejected'; s.rejectReason = extra.reason || null;
   }
   s.decidedBy = user.name; s.decidedAt = new Date().toISOString();
-  store.audit(user.name, decision, s.id, `${s.kind} ${s.jiraKey || ''} ${s.title}${s.jira && s.jira.dryRun ? ' (dry run)' : ''}`.trim());
+  store.audit(user.name, decision, s.id, `${s.kind} ${s.jiraKey || ''} ${s.title}${s.jira && s.jira.dryRun ? ' (dry run)' : ''}${user.via === 'teams' ? ' (from Teams)' : ''}`.trim());
   store.save();
+  if (user.via !== 'teams') teams.cardDecided(s).catch(() => {});   // decided on the web: retire its Teams card
   return s;
 }
 
