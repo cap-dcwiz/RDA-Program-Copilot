@@ -52,9 +52,10 @@ After deploying, compare the neighbouring paths against a baseline taken beforeh
 (`edgectl check --all`, plus a `curl` of each public path) — `deploy-vm.sh` spot-checks
 `/DCBI/`, `/PM/` and `/ROI` on its way out.
 
-## Daily auto-deploy
+## Auto-deploy
 
-A systemd timer on the VM checks GitHub once a day and redeploys only if `main` has moved.
+A systemd timer on the VM checks GitHub **every ten minutes** and redeploys only if `main` has
+moved, so a merge reaches the site within ten minutes.
 
 ```bash
 systemctl list-timers delivery-copilot-update      # when it next runs
@@ -63,13 +64,25 @@ sudo systemctl start delivery-copilot-update       # run the check right now
 sudo systemctl disable --now delivery-copilot-update.timer   # stop auto-deploying
 ```
 
-It runs at **19:30 UTC (03:30 Singapore)**, which is clear of the agent's own nightly Jira sync at
-00:00 SGT, so a restart never lands mid-sync. `Persistent=true` means a run missed because the VM
-was off happens on the next boot instead of being skipped.
+A run that finds nothing is a `git fetch` and a sha compare — 0.55s measured on this VM — and
+`flock -n` means a tick that arrives during a slow deploy is skipped rather than overlapped.
+`Persistent=true` means a tick missed because the VM was off happens once it is back.
+
+This used to run once a day at 19:30 UTC, a time chosen to sit hours clear of the agent's own
+nightly Jira sync at 16:00 UTC (00:00 SGT, Tue–Sat). Ten-minute checks give that distance up, so
+`auto-update.sh` honours the window itself: between 15:58 and 16:10 UTC it logs the update it found
+and defers to the next tick. Restarting mid-sync would abandon a sync whose next attempt is 24h
+away, and waiting ten minutes costs nothing.
+
+The three systemd units — the service, the updater's service and its timer — are all installed
+from the checkout on every deploy. Installing only the service let the timer file in the repo and
+the schedule actually running drift apart silently, and left a rollback unable to take the old
+schedule back with it. The updater never restarts its own service unit: it *is* that service, so a
+`daemon-reload` is what makes its next run use the new unit.
 
 The timer lives on the VM rather than in a laptop crontab or a cloud runner because the VM is the
-only place that already has the checkout, `sudo` and `~/edge/edgectl` — and because it is awake at
-03:30. `deploy/auto-update.sh` is what it runs, and it differs from a hand-run `deploy-vm.sh` in
+only place that already has the checkout, `sudo` and `~/edge/edgectl` — and because it is always
+awake. `deploy/auto-update.sh` is what it runs, and it differs from a hand-run `deploy-vm.sh` in
 three ways that matter when nobody is watching:
 
 - **It rolls back.** If the new commit will not answer `/api/health` within 30s, the previous
@@ -98,8 +111,8 @@ reset, no restart, no route move, and the service stays exactly where it is.
 | cryptography | new `createCipheriv`, `createHmac`, `randomBytes`, `timingSafeEqual`, `scrypt`, … |
 | new secret-shaped config | a new `*_SECRET`, `*_TOKEN`, `*_API_KEY`, `*_CLIENT_ID`, `*_ENCRYPTION_KEY` |
 | new outbound host | a URL host that appears nowhere in the current tree |
-| request authorisation | lines in `server.js` touching `signedIn`, `whoIs`, `Authorization`, `Bearer`, `/api/login` |
-| deploy mechanism | anything under `deploy/` |
+| request authorisation | code lines in `server.js` touching `signedIn`, `whoIs`, `Authorization`, `Bearer`, `/api/login` |
+| deploy mechanism | any real change under `deploy/`, documentation and comment-only churn aside |
 | new dependency | a first third-party package in a service that has none |
 
 Two of those deserve their reasons stated. **`deploy/` holds** because without that rule a commit
@@ -107,11 +120,27 @@ could delete the gate and everything after it would flow through unread. And the
 always the one in the **current** checkout, never the incoming commit's copy — a commit does not
 get to supply the rules it is judged by.
 
-Line-level rules read code, not prose: scanning `.md` made the gate quote a markdown table in a
-README as evidence of an authorisation change, which is how a log teaches people to stop reading it.
+Line-level rules read code, not prose, and that has been narrowed twice by things this gate
+actually did:
+
+- Scanning `.md` made it quote a markdown table in a README as evidence of an authorisation change.
+- Scanning comments made it hold the 16 Nov range for "request authorisation" and offer, as its
+  evidence, a line of comment this repo had just added to explain the very fix being deployed. The
+  test is line-prefix based on purpose: a trailing comment on a real code line still counts,
+  because the code line is real.
+- `review-gate.js` is excluded from the line rules entirely. Its source necessarily contains the
+  tokens the rules search for — rule 2 lists the crypto primitives by name — so touching those
+  lines made the gate report its own rule definitions as a cryptography change. Nothing is lost:
+  rule 6 holds for any real change here by path, a stronger test than a line match.
+
+For the same reason, `deploy/*.md` and comment-only changes under `deploy/` no longer hold.
+Approving a deploy because a README paragraph moved is the same training to approve without
+looking. Deleting code still shows up as removed non-comment lines, so the delete-the-gate case
+rule 6 exists for is unaffected — verified, along with the four cases above, against this repo's
+own history and against synthetic commits.
 
 A hold exits **75**, so `systemctl status delivery-copilot-update` shows it and the log carries the
-full report with the matching lines quoted. Later nights print one line instead of repeating it.
+full report with the matching lines quoted. Later ticks print one line instead of repeating it.
 
 Being held is **not** a verdict on the code. Several of these rules fire on changes that are
 perfectly good — it means only that a person should read this one before it serves the public.

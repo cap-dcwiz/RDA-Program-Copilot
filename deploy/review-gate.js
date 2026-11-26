@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Decides whether a commit range may deploy unattended.
  *
- * The daily timer deploys whatever is on main. That is fine for ordinary changes and wrong for
+ * The timer deploys whatever is on main. That is fine for ordinary changes and wrong for
  * changes that move credentials, identity or access around: those want a person to have read them
  * first. This script is the difference between the two. It never deploys and never blocks a human
  * — it only answers "may the timer do this on its own tonight".
@@ -40,8 +40,22 @@ const linesOf = (paths, keep) => {
   const d = git('diff', '-U0', base, next, '--', ...paths);
   return d.split('\n').filter(l => keep.test(l) && !/^(\+\+\+|---)/.test(l)).map(l => l.slice(1));
 };
-const codeFiles = files.filter(f => CODE.test(f));
-const addedLines = linesOf(codeFiles, /^\+/);
+
+/* A comment is not code. The first version of this gate scanned raw diff text, so it quoted a
+   line of its own explanatory comment — "...whoIs() gives null without a token." — as evidence
+   that a commit had changed how requests are authorised. Evidence that is prose teaches people to
+   stop reading the log, which costs more than the rule is worth. The test is line-prefix based on
+   purpose: a trailing comment on a real code line still counts, because the code line is real. */
+const COMMENT = /^\s*(\/\/|\/\*|\*\/|\*|#)/;
+const code = (lines) => lines.filter(l => l.trim() && !COMMENT.test(l));
+
+/* This file is excluded from the line rules. Its source necessarily contains the very tokens the
+   rules search for — the crypto primitives are listed in rule 2 — so any diff that touches those
+   lines made the gate report its own rule definitions as a cryptography change. Nothing is lost:
+   rule 6 holds for any real change here by path, which is a stronger test than a line match. */
+const SELF = 'deploy/review-gate.js';
+const codeFiles = files.filter(f => CODE.test(f) && f !== SELF);
+const addedLines = code(linesOf(codeFiles, /^\+/));
 const added = addedLines.join('\n');
 const SERVER = 'pm-copilot-agent/src/server.js';
 
@@ -65,7 +79,7 @@ hit('cryptography', 'new cryptographic code — key handling and modes need read
 //    fake JIRA_API_TOKEN, and a rule that cries wolf over test scaffolding gets ignored.
 const CONFIG_FILES = /(^|\/)\.env(\.example)?$|(^|\/)config\.js$|\.(service|timer|caddy)$/;
 hit('new secret-shaped config', 'introduces configuration that holds a credential',
-  linesOf(files.filter(f => CONFIG_FILES.test(f)), /^\+/)
+  code(linesOf(files.filter(f => CONFIG_FILES.test(f)), /^\+/))
     .filter(l => /\b[A-Z][A-Z0-9_]*(SECRET|_TOKEN|API_KEY|CLIENT_ID|PASSWORD|ENCRYPTION_KEY|PRIVATE_KEY)\b/.test(l))
     .map(l => (l.trim().split('=')[0] || l.trim()).slice(0, 80)));
 
@@ -78,14 +92,19 @@ hit('new outbound host', 'the server would start talking to somewhere it has not
 
 // 5. The sign-in gate and the route table in server.js — where "who may call this" is enforced.
 hit('request authorisation', 'changes how requests are authorised or which routes skip the sign-in gate',
-  linesOf(files.filter(f => f === SERVER), /^[+-]/)
+  code(linesOf(files.filter(f => f === SERVER), /^[+-]/))
     .filter(l => /\b(signedIn|whoIs|Authorization|Bearer|action\(|\/api\/login)\b/.test(l))
     .map(l => l.trim().slice(0, 100)));
 
 // 6. The deploy mechanism itself. Without this rule a commit could simply delete this gate and
-//    everything after it would flow through unread.
+//    everything after it would flow through unread, so the test stays crude: touch the privileged
+//    files at all and it holds. Two things cannot change what a deploy does, and holding for them
+//    only trains people to approve without looking — documentation (deploy/*.md), and a change
+//    that moves nothing but comments. Deleting code still shows up as removed non-comment lines,
+//    so the delete-the-gate case this rule exists for is unaffected.
 hit('deploy mechanism', 'changes the privileged code that performs the deploy, this gate included',
-  files.filter(f => f.startsWith('deploy/')));
+  files.filter(f => f.startsWith('deploy/'))
+       .filter(f => !/\.md$/.test(f) && code(linesOf([f], /^[+-]/)).length));
 
 // 7. A first third-party dependency. The agent has none today, which is why it has no supply chain.
 const depsAdded = addedLines.some(l => /"dependencies"\s*:/.test(l)) || files.some(f => /package-lock\.json$/.test(f));
