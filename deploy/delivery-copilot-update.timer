@@ -1,16 +1,21 @@
-# Daily auto-deploy check. 19:30 UTC = 03:30 Singapore — clear of the agent's own nightly Jira
-# sync, which runs at 00:00 SGT (16:00 UTC) Tue–Sat, so a restart never lands mid-sync.
+# Auto-deploy check, every ten minutes: a merge to main reaches the site within ten minutes
+# instead of waiting for the small hours. A run that finds nothing is a fetch and a sha compare —
+# 0.55s measured on this VM — and flock in the script means a slow deploy is never overlapped.
+#
+# This used to run once a day at 19:30 UTC, chosen to sit clear of the agent's own nightly Jira
+# sync at 16:00 UTC. Ten-minute checks give that up, so the script honours the sync window itself
+# and defers to the next tick.
 #
 # Install: systemctl enable --now delivery-copilot-update.timer
 # Inspect: systemctl list-timers delivery-copilot-update
 [Unit]
-Description=Daily check for new Delivery Copilot commits on main
+Description=Check for new Delivery Copilot commits on main (every 10 minutes)
 
 [Timer]
-OnCalendar=*-*-* 19:30:00 UTC
-# A few minutes of jitter so this does not collide with anything else on the box at 19:30 sharp.
-RandomizedDelaySec=5min
-# If the VM was off at 19:30, run once it is back rather than waiting a whole day.
+OnCalendar=*:0/10
+# Jitter, so this never lands on the exact minute every other cron-shaped thing on the box uses.
+RandomizedDelaySec=2min
+# If the VM was off over a tick, run once it is back rather than waiting for the next one.
 Persistent=true
 Unit=delivery-copilot-update.service
 

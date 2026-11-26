@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Runs ON the VM, once a day, started by delivery-copilot-update.timer.
+# Runs ON the VM every ten minutes, started by delivery-copilot-update.timer.
 #
 # What it does: fetch origin/main; if the commit has not moved, do nothing and say so. If it has,
 # redeploy — and if the new commit will not come up healthy, put the previous commit back.
 #
-# Why it lives on the VM rather than on someone's laptop: the laptop is asleep at 03:30, and the
+# Why it lives on the VM rather than on someone's laptop: the laptop is not always awake, and the
 # VM is the only place that already has the checkout, sudo, and ~/edge/edgectl.
 #
 # Isolation, same rule as deploy/remote-install.sh: this touches only this project's checkout, its
@@ -69,9 +69,24 @@ healthy() {  # the agent answers on its port within 30s
   return 1
 }
 
-install_from_checkout() {  # unit + route as they are at the currently checked-out commit
-  sudo cp "$APP_DIR/deploy/$SERVICE.service" "/etc/systemd/system/$SERVICE.service" || return 1
+install_from_checkout() {  # units + route as they are at the currently checked-out commit
+  # All three units come from the checkout, not just the service: the timer's schedule is in the
+  # repo too, and installing only the service let the file and the schedule actually running drift
+  # apart silently — and left a rollback unable to take the old schedule back with it.
+  local changed=""
+  local u
+  for u in "$SERVICE.service" "$SERVICE-update.service" "$SERVICE-update.timer"; do
+    [ -f "$APP_DIR/deploy/$u" ] || continue
+    cmp -s "$APP_DIR/deploy/$u" "/etc/systemd/system/$u" && continue
+    sudo cp "$APP_DIR/deploy/$u" "/etc/systemd/system/$u" || return 1
+    changed="$changed $u"
+  done
   sudo systemctl daemon-reload || return 1
+  [ -n "$changed" ] && say "systemd units updated:$changed"
+  # A timer re-reads OnCalendar only when its unit is restarted; that does not disturb the service.
+  # Never restart $SERVICE-update.service — this script IS that service. daemon-reload is enough
+  # for its next run to use the new unit.
+  case "$changed" in *"$SERVICE-update.timer"*) sudo systemctl restart "$SERVICE-update.timer" || return 1 ;; esac
   sudo systemctl restart "$SERVICE" || return 1
 }
 
@@ -81,6 +96,15 @@ PREV=$(git -C "$APP_DIR" rev-parse HEAD)
 NEXT=$(git -C "$APP_DIR" rev-parse "origin/$BRANCH")
 if [ "$PREV" = "$NEXT" ]; then
   say "no change (${PREV:0:7}) — nothing to deploy"
+  exit 0
+fi
+
+# Not while the nightly Jira sync is running. The old once-a-day schedule sat clear of it by
+# being hours away; a ten-minute check can land on top of it, and a restart mid-sync abandons a
+# sync whose next attempt is 24h later. Deferring costs one tick, so this is not a failure.
+nowhm=$(( 10#$(date -u '+%H%M') ))
+if [ "$nowhm" -ge 1558 ] && [ "$nowhm" -le 1610 ]; then
+  say "update ${PREV:0:7} -> ${NEXT:0:7} deferred: the nightly Jira sync runs at 16:00 UTC. Next tick."
   exit 0
 fi
 
