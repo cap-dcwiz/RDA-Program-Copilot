@@ -207,7 +207,8 @@ async function handle(a, deps) {
     return;
   }
 
-  const text = lower(String(a.text || '').replace(/<at>[^<]*<\/at>/gi, ''));
+  // Accepts "@Luna register" and the commands the existing Luna app lists ("/luna register control-room").
+  const text = lower(String(a.text || '').replace(/<at>[^<]*<\/at>/gi, '').replace(/^\s*\/?luna\b/i, '')).trim();
   if (/^register\b/.test(text)) {
     if (!isApprover) return reply(conv, a, `${name}：只有审批人可以登记审批群。`);
     load().conversation = { ...conv, registeredBy: name, registeredAt: new Date().toISOString() }; save();

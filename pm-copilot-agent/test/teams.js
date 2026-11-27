@@ -69,7 +69,7 @@ const deps = { decide, store };
     // 2. Only an approver can register the chat; then "pending" posts this project's to-dos only.
     await teams.handle(act('u-bob', { text: '<at>Luna</at> register' }), deps);
     assert.equal(teams.registered(), false); assert.match(replies.pop(), /只有审批人/);
-    await teams.handle(act('u-selena', { text: '<at>Luna</at> register' }), deps);
+    await teams.handle(act('u-selena', { text: '<at>Luna</at> /luna register control-room' }), deps);
     assert.equal(teams.registered(), true);
     await teams.handle(act('u-selena', { text: '<at>Luna</at> pending' }), deps);
     assert.equal(posted.length, 2);                                   // s3 is another project

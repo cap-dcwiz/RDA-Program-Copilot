@@ -6,9 +6,12 @@ Deciding on the web page updates the card too. Code: `src/teams.js`.
 
 ## One-time setup
 
-1. **Azure Bot** (the existing Luna registration). Under *Configuration*, set the messaging endpoint to
-   `https://ai-factory.demo.rda.ai/DeliveryCopilot/api/teams/messages`, and make sure the
-   *Microsoft Teams* channel is enabled under *Channels*.
+1. **The bot** is the existing "Luna Delivery Copilot", registered in the Teams Developer Portal
+   (not an Azure resource): App ID / bot ID `b31f5c90-8240-41d9-a1fd-bb9de28d5517`, tenant rda.ai
+   (`2cb084b9-f1b5-4878-b639-adf3a4f719c0`). In dev.teams.microsoft.com → Tools → Bots → Luna:
+   *Configure* → HTTPS endpoint `https://ai-factory.demo.rda.ai/DeliveryCopilot/api/teams/messages`;
+   *Client secrets* → add one for the server. In Apps → Luna → App features → Bot, tick the
+   *Group chat* scope if the approval chat is a group chat.
 2. **Server `.env`** (then restart `delivery-copilot`):
    ```
    TEAMS_APP_ID=<Microsoft App ID>
