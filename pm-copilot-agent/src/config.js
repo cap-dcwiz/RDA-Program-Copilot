@@ -31,6 +31,17 @@ module.exports = {
   ROOT,
   DATA_DIR: path.join(ROOT, 'data'),
   anthropic: { apiKey: env('ANTHROPIC_API_KEY'), model: env('ANTHROPIC_MODEL', 'claude-sonnet-5-5') },
+  // Approving meeting to-dos from a Teams chat (teams.js). Off until TEAMS_APP_ID/PASSWORD are set.
+  teams: {
+    appId: env('TEAMS_APP_ID'), password: env('TEAMS_APP_PASSWORD'), tenantId: env('TEAMS_TENANT_ID'),
+    appType: env('TEAMS_APP_TYPE', 'SingleTenant'),
+    // Who may approve or reject from Teams: their Teams sign-in email / UPN, comma-separated.
+    approvers: env('TEAMS_APPROVERS').split(',').map(x => x.trim().toLowerCase()).filter(Boolean),
+    // Only these projects' to-dos are posted to the chat; empty = all.
+    projects: env('TEAMS_PROJECTS').split(',').map(x => x.trim()).filter(Boolean),
+    backlogLimit: Number(env('TEAMS_BACKLOG_LIMIT', '10')),
+    dashboardUrl: env('DASHBOARD_URL', 'https://ai-factory.demo.rda.ai/DeliveryCopilot/'),
+  },
   granola: {
     apiKey: env('GRANOLA_API_KEY'),
     baseUrl: env('GRANOLA_BASE_URL', 'https://public-api.granola.ai'),

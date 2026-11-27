@@ -44,6 +44,7 @@ const plan = require('./plan');
 const jirasync = require('./jirasync');
 const projects = require('./projects');
 const feed = require('./programfeed');
+const teams = require('./teams');
 
 const DASHBOARD = path.join(cfg.ROOT, '..', 'docs', 'DayOne_NTPE_Program_Kanban_EN.html');
 const err = (status, message) => Object.assign(new Error(message), { status });
@@ -95,7 +96,7 @@ async function route(req, res, user) {
     const db = store.load();
     return send(res, 200, { ok: true, model: cfg.anthropic.model, claude: !!cfg.anthropic.apiKey, granola: granola.configured(),
       signIn: { provider: cfg.productCenter.label, url: cfg.productCenter.url },
-      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(),
+      jiraCredentials: jira.hasCreds(), jiraDryRun: jira.dryRun(), teams: { configured: teams.configured(), registered: teams.registered() },
       // The sign-in screen reads this before anyone has signed in, so it stays public — but only
       // for operational status. The client roster is not status: on a public URL it is a list of
       // who we work for, readable by anyone who knows the path. whoIs() gives null without a token.
@@ -268,6 +269,16 @@ async function route(req, res, user) {
 const server = http.createServer(async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+  // Teams (Bot Framework) calls in with its own signed token, not a dashboard session: handled
+  // before whoIs() so that token is never sent to Product Center. Unknown or unverified → 401.
+  if (req.method === 'POST' && /\/api\/teams\/messages\/?$/.test(new URL(req.url, 'http://x').pathname)) {
+    try {
+      const activity = await readBody(req);
+      await teams.verify(req.headers.authorization, activity);
+      await teams.handle(activity, { decide: agent.decide, store });
+      res.writeHead(200); return res.end();
+    } catch (e) { if (e.status !== 401) console.error('[teams]', e); return send(res, e.status === 401 ? 401 : 500, { error: e.status === 401 ? 'Unauthorized' : 'Teams handler failed' }); }
+  }
   try { await route(req, res, await auth.whoIs(req)); }
   catch (e) { if (!e.status) console.error(e); if (!res.headersSent) send(res, e.status || 500, { error: e.message }); }
 });

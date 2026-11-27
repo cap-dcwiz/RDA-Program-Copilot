@@ -1,0 +1,35 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "${TEAMS_APP_ID}",
+  "developer": {
+    "name": "RDA",
+    "websiteUrl": "https://ai-factory.demo.rda.ai/DeliveryCopilot/",
+    "privacyUrl": "https://ai-factory.demo.rda.ai/DeliveryCopilot/",
+    "termsOfUseUrl": "https://ai-factory.demo.rda.ai/DeliveryCopilot/"
+  },
+  "name": { "short": "Luna", "full": "Luna · Delivery Copilot" },
+  "description": {
+    "short": "Approve meeting to-dos from Delivery Copilot in Teams.",
+    "full": "Luna posts the Jira updates Delivery Copilot drafts from meeting notes into this chat. Approvers can approve or reject each one here; approved updates are written to Jira."
+  },
+  "icons": { "color": "color.png", "outline": "outline.png" },
+  "accentColor": "#E32028",
+  "bots": [
+    {
+      "botId": "${TEAMS_APP_ID}",
+      "scopes": ["groupChat", "team", "personal"],
+      "supportsFiles": false,
+      "isNotificationOnly": false,
+      "commandLists": [
+        { "scopes": ["groupChat", "team"], "commands": [
+          { "title": "register", "description": "Make this chat the approval chat (approvers only)" },
+          { "title": "pending", "description": "Post the to-dos still waiting for approval" }
+        ] }
+      ]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["ai-factory.demo.rda.ai"]
+}
