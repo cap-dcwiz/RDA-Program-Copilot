@@ -102,16 +102,20 @@ function edit(id, patch, user) {
 }
 
 /* Meetings analysed before the plan feed existed (or while it failed): give them the plan pass
-   once, newest last so the latest brief wins. Only meetings after the shipped plan's asOf. */
+   once, newest last so the latest brief wins. Only meetings after the shipped plan's asOf.
+   A meeting that already has a result is skipped, so a normal restart costs nothing; one whose
+   analysis keeps failing is retried at most BACKFILL_TRIES times, so a restart loop can't run up
+   a Claude bill. "Re-analyse" on the meeting still works after that. */
+const BACKFILL_TRIES = 3;
 async function backfillPlanFeed(by = 'backfill') {
   const db = store.load();
   const asOf = (feed.baselineAsOf && feed.baselineAsOf('dayone')) || '';
   const todo = db.meetings.filter(m => m.status === 'analysed' && m.notesText && String(m.date || '').slice(0, 10) > asOf
-    && ((m.projects || []).includes('dayone') || /day\s*one/i.test(m.title || '')) && !(m.planFeed && m.planFeed.dayone && !m.planFeed.dayone.error))
+    && ((m.projects || []).includes('dayone') || /day\s*one/i.test(m.title || '')) && !(m.planFeed && m.planFeed.dayone && !m.planFeed.dayone.error) && ((m.planFeed && m.planFeed.dayone && m.planFeed.dayone.tries) || 0) < BACKFILL_TRIES)
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
   for (const m of todo) {
     try { m.planFeed = { dayone: await feed.analyse('dayone', m) }; store.audit(by, 'plan-feed', m.id, `dayone: ${m.planFeed.dayone.proposals || 0} plan proposals`); }
-    catch (e) { m.planFeed = { dayone: { error: e.message } }; }
+    catch (e) { const tries = ((m.planFeed && m.planFeed.dayone && m.planFeed.dayone.tries) || 0) + 1; m.planFeed = { dayone: { error: e.message, tries } }; }
     store.save();
   }
   return { meetings: todo.length };
